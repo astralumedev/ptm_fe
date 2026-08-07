@@ -1,0 +1,90 @@
+/* globals.css */
+
+@import "tailwindcss";
+@theme {
+  --font-display: "Poppins", "sans-serif";
+  --breakpoint-3xl: 1920px;
+  --color-avocado-100: oklch(0.99 0 0);
+  --color-avocado-200: oklch(0.98 0.04 113.22);
+  --color-avocado-300: oklch(0.94 0.11 115.03);
+  --color-avocado-400: oklch(0.92 0.19 114.08);
+  --color-avocado-500: oklch(0.84 0.18 117.33);
+  --color-avocado-600: oklch(0.53 0.12 118.34);
+  --ease-fluid: cubic-bezier(0.3, 0, 0, 1);
+  --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
+  --color-mall-primary: #2e3094;
+  --color-mall-secondary: #c22328;
+  --color-mall-blue: #2e3094;
+  --color-mall-red: #c22328;
+  --color-mall-background: #F8FAFC;
+  --color-mall-accent: #F1F4F9;
+  --color-mall-accent-dark: #16194A;
+  --color-mall-cream: #FAFAFD;
+  --color-mall-brown: #181A40;
+  --color-mall-reseda-green: #2e3094;
+  --color-mall-sage: #64748B;
+  --color-mall-dark-sage: #334155;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 12s infinite;
+}
+
+/* Font family classes */
+.font-arizona-flare {
+  font-family: 'Arizona Flare', 'Times New Roman', serif;
+}
+
+.font-poppins {
+  font-family: 'Poppins', sans-serif;
+}
+
+.font-montserrat {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.font-playfair {
+  font-family: 'Playfair Display', serif;
+}
+
+.font-audiowide {
+  font-family: 'Audiowide', cursive;
+}
+
+.font-lora {
+  font-family: 'Lora', serif;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover{
+  text-decoration-line: underline !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+

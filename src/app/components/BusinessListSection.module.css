@@ -1,0 +1,13 @@
+.discoverLink{
+font-weight: 500;
+transition: color 0.3s ease;
+display: flex; /* To align icon and text */
+text-decoration-line: underline !important;
+text-underline-offset: 8px !important;
+text-decoration-thickness: 2px !important;
+}
+
+.discoverLink:hover {
+ color: #e96d26;
+ font-weight: 500;
+}

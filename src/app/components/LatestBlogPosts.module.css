@@ -1,0 +1,65 @@
+.latestBlog {
+    padding: 2rem;
+    background-color: #fff;
+    text-align: left;
+  }
+  
+  .sectionTitle {
+    font-size: 2.3rem;
+    font-weight: bold;
+    color: #b71c1c; /* Dark red */
+    margin-bottom: 1.5rem;
+  }
+  
+  .blogGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .blogCard {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    text-align: left;
+  }
+  
+  .cardTitle {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #b71c1c; /* Dark red */
+    margin-bottom: 0.5rem;
+  }
+  
+  .cardExcerpt {
+    color: #555;
+    margin-bottom: 1rem;
+  }
+  
+  .readMoreLink {
+    color: #d4af37; /* Gold */
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  
+  .readMoreLink:hover {
+    color: #daa520; /* Darker gold */
+  }
+  
+  .viewAll {
+    margin-top: 1rem;
+  }
+  
+  .viewAllLink {
+    color: #b71c1c; /* Dark red */
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+  }
+  
+  .viewAllLink:hover {
+    color: #d4af37; /* Gold */
+  }

@@ -1,0 +1,9 @@
+.navLink {
+  transition: color 0.3s ease;
+  color: #000000;
+}
+
+.navLink:hover {
+  color: #3d3b3b;
+  text-decoration-line: none !important;
+}

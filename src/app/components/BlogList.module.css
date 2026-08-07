@@ -1,0 +1,15 @@
+.blogItem {
+  text-decoration: none !important;
+}
+
+.blogItem:hover {
+  text-decoration: none !important;
+}
+
+.readMore {
+  text-decoration: underline;
+}
+
+.readMore:hover {
+  text-decoration: underline;
+} 
