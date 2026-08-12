@@ -5,8 +5,7 @@ import {
   FloorData,
   WayfindingStore,
   WayfindingLocation,
-  PathResult,
-  GraphNode
+  PathResult
 } from '../types/wayfinding';
 import wayfindingService from '../services/wayfindingService';
 import { buildGlobalPathGraph, findRoute, BuiltGraphData } from '../lib/wayfindingGraph';

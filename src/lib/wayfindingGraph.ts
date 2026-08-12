@@ -159,9 +159,9 @@ export function buildGlobalPathGraph(
       const node = nodeInfo[nodeId];
       if (!node) return;
 
-      let closestSeg = null;
+      let closestSeg: { id: string; a: { x: number; y: number }; b: { x: number; y: number } } | null = null;
       let minDistance = Infinity;
-      let projection = null;
+      let projection: { x: number; y: number } | null = null;
 
       CORRIDOR_SEGMENTS.forEach(seg => {
         const proj = projectPointToSegment(node, seg.a, seg.b);
@@ -175,11 +175,13 @@ export function buildGlobalPathGraph(
 
       if (closestSeg && projection) {
         const wpNodeId = `${floorId}:wp_${node.id}`;
+        const projObj = projection as { x: number; y: number };
+        const segObj = closestSeg as { id: string; a: { x: number; y: number }; b: { x: number; y: number } };
 
         nodeInfo[wpNodeId] = {
           floorId: floorId as FloorId,
-          x: Math.round(projection.x),
-          y: Math.round(projection.y),
+          x: Math.round(projObj.x),
+          y: Math.round(projObj.y),
           id: `wp_${node.id}`,
           label: `Hallway near ${node.label}`,
           isWaypoint: true
@@ -188,11 +190,11 @@ export function buildGlobalPathGraph(
         graph[wpNodeId] = [];
         addEdge(nodeId, wpNodeId, minDistance);
 
-        const tVal = getSegmentT(projection, closestSeg.a, closestSeg.b);
-        corridorWaypoints[closestSeg.id].push({
+        const tVal = getSegmentT(projObj, segObj.a, segObj.b);
+        corridorWaypoints[segObj.id].push({
           nodeId: wpNodeId,
-          x: projection.x,
-          y: projection.y,
+          x: projObj.x,
+          y: projObj.y,
           t: tVal
         });
       }
@@ -352,8 +354,6 @@ export function findRoute(
     });
   }
 
-  let currentFloor = startNode?.floorId;
-
   for (let i = 0; i < nodePath.length - 1; i++) {
     const currId = nodePath[i];
     const nextId = nodePath[i + 1];
@@ -368,7 +368,6 @@ export function findRoute(
         type: 'floor_change',
         icon: transitType === 'Elevator' ? 'elevator' : 'stairs'
       });
-      currentFloor = next.floorId;
     }
   }
 

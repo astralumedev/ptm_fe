@@ -32,7 +32,7 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
   stores,
   activeCategory,
   selectedLocation,
-  selectedStore,
+  selectedStore: _selectedStore,
   startLocation,
   routeNodePath,
   graphNodeInfo,

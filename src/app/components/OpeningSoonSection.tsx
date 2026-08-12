@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaClock, FaMapMarkerAlt, FaBell, FaCheckCircle, FaArrowRight } from 'react-icons/fa';
+import { FaClock, FaMapMarkerAlt, FaBell, FaCheckCircle } from 'react-icons/fa';
 
 interface UpcomingStore {
   id: string;
