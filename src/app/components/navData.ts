@@ -79,6 +79,7 @@ export const menuItems: MenuItem[] = [
       {
         title: "Mall Services",
         items: [
+          { label: "Mall Map", href: "/mall-map" },
           { label: "Mall Information", href: "/page/info" },
           { label: "Parking", href: "/page/parking" },
           { label: "Contact Us", href: "/contact" },

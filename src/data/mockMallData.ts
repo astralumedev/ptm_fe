@@ -256,8 +256,8 @@ export const mockPages: PageData[] = [
     title: 'Pokhara Trade Mall',
     slug: 'homepage_intro',
     content: `
-      <p>A premier destination for shopping, entertainment, and leisure in the heart of Pokhara. As one of the city's first modern malls, we blend the vibrant local culture with a contemporary retail experience, offering everything from fashion boutiques and electronics to unique local handicrafts.</p>
-      <p>Whether you are looking to catch the latest blockbuster at our state-of-the-art QFX Cineplex, enjoy a delicious meal at our diverse food court, or explore a wide array of shops, Pokhara Trade Mall serves as the perfect social hub for families, tourists, and locals alike. Visit us today at Chiple Dhunga to experience the best of convenience, comfort, and community spirit in the beautiful lakeside city of Pokhara.</p>
+      <p>Pokhara Trade Mall is the premier destination for shopping, dining, and leisure in the heart of Chiple Dhunga. We blend vibrant local culture with contemporary retail, featuring top fashion boutiques, electronics, and local artisan crafts.</p>
+      <p>Whether catching blockbusters at QFX Cineplex or enjoying gourmet meals at our food court, experience Pokhara's favorite social hub.</p>
     `,
     cover_image: createHelperImage('/mall_images/IMG_1364.webp'),
     gallery: [],

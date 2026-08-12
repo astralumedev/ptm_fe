@@ -9,6 +9,7 @@ import BlogListPage from '../pages/BlogListPage';
 import BlogDetailPage from '../pages/BlogDetailPage';
 import ContactPage from '../pages/ContactPage';
 import ContentPage from '../pages/ContentPage';
+import MallMapPage from '../pages/MallMapPage';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/blogs/:slug" element={<BlogDetailPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/page/:slug" element={<ContentPage />} />
+          <Route path="/mall-map" element={<MallMapPage />} />
         </Routes>
       </div>
     </Router>

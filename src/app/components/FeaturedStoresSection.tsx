@@ -1,238 +1,193 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaStore, FaClock, FaMapMarkerAlt, FaChevronRight } from 'react-icons/fa';
+import { FaArrowRight, FaMapMarkerAlt } from 'react-icons/fa';
 
 interface FeaturedStore {
   id: string;
   name: string;
-  subtitle: string;
   category: string;
-  categoryType: 'fashion' | 'tech' | 'beauty' | 'crafts' | 'kids';
   floor: string;
   coverUrl: string;
-  logoUrl: string;
-  hours: string;
   slug: string;
+  colSpanClass: string;
+  heightClass: string;
 }
 
 const featuredStoresData: FeaturedStore[] = [
+  // Row 1: 1-span + 2-span (Mirrored layout for subtle distinction from Dine)
   {
     id: 'levis',
-    name: "Levi's Store",
-    subtitle: 'Official Levi Strauss & Co. Denim & Apparel',
+    name: "LEVI'S STORE",
     category: 'Fashion & Apparel',
-    categoryType: 'fashion',
     floor: '1st Floor - Wing A',
     coverUrl: '/stores/levis_cover.webp',
-    logoUrl: '/stores/levis_logo.avif',
-    hours: '10:00 AM - 8:00 PM',
     slug: 'himalayan-outfitters',
+    colSpanClass: 'md:col-span-1',
+    heightClass: 'h-64 sm:h-72 lg:h-80',
   },
   {
     id: 'fone-decor',
-    name: 'Fone Decor & Tech',
-    subtitle: 'Smartphone Accessories, Gadgets & Repairs',
+    name: 'FONE DECOR & TECH',
     category: 'Tech & Mobiles',
-    categoryType: 'tech',
     floor: 'Ground Floor - Tech Alley',
     coverUrl: '/stores/fone_decor_cover.jpeg',
-    logoUrl: '/stores/fone_decor_logo.jpeg',
-    hours: '10:00 AM - 8:00 PM',
     slug: 'tech-gadgets-arcade',
+    colSpanClass: 'md:col-span-2',
+    heightClass: 'h-64 sm:h-72 lg:h-80',
   },
+  // Row 2: 1-span + 1-span + 1-span
   {
     id: 'obsession',
-    name: 'Obsession Cosmetics',
-    subtitle: 'International Makeup, Skincare & Fragrances',
+    name: 'OBSESSION COSMETICS',
     category: 'Beauty & Skincare',
-    categoryType: 'beauty',
     floor: '1st Floor - Beauty Hub',
     coverUrl: '/stores/obsession_cosmetics_cover.jpeg',
-    logoUrl: '/stores/obsession_logo.png',
-    hours: '10:00 AM - 8:00 PM',
     slug: 'aura-luxury-spa',
+    colSpanClass: 'md:col-span-1',
+    heightClass: 'h-56 sm:h-64 lg:h-72',
   },
   {
     id: 'woven',
-    name: 'Woven Nepali Handicrafts',
-    subtitle: 'Authentic Handwoven Textiles & Himalayan Souvenirs',
+    name: 'WOVEN NEPALI HANDICRAFTS',
     category: 'Local Crafts & Gifts',
-    categoryType: 'crafts',
-    floor: 'Ground Floor',
+    floor: 'Ground Floor Main Atrium',
     coverUrl: '/stores/woven_cover.jpg',
-    logoUrl: '/stores/woven_logo.avif',
-    hours: '10:00 AM - 8:00 PM',
     slug: 'machhapuchhre-fashion',
+    colSpanClass: 'md:col-span-1',
+    heightClass: 'h-56 sm:h-64 lg:h-72',
   },
   {
     id: 'dadybird',
-    name: 'Dadybird Fashion',
-    subtitle: 'Trendy Casual Wear & Family Apparel',
+    name: 'DADYBIRD FASHION',
     category: 'Fashion & Kids',
-    categoryType: 'fashion',
     floor: '2nd Floor - Wing B',
     coverUrl: '/stores/dadybird_cover.webp',
-    logoUrl: '/stores/dadybird_logo.webp',
-    hours: '10:00 AM - 8:00 PM',
     slug: 'machhapuchhre-fashion',
+    colSpanClass: 'md:col-span-1',
+    heightClass: 'h-56 sm:h-64 lg:h-72',
   },
+  // Row 3: 2-span + 1-span
   {
     id: 'cube',
-    name: 'Cube Gaming & Tech',
-    subtitle: 'High-Performance Laptops & Gaming Accessories',
+    name: 'CUBE GAMING & TECH',
     category: 'Tech & Gaming',
-    categoryType: 'tech',
-    floor: 'Ground Floor - Tech Hub',
+    floor: 'Ground Floor - Tech Alley',
     coverUrl: '/stores/cube_cover.jpg',
-    logoUrl: '/stores/cube_logo.png',
-    hours: '10:00 AM - 8:00 PM',
     slug: 'tech-gadgets-arcade',
+    colSpanClass: 'md:col-span-2',
+    heightClass: 'h-64 sm:h-72 lg:h-80',
   },
-];
-
-const categories = [
-  { label: 'All Outlets', value: 'all' },
-  { label: 'Fashion & Apparel', value: 'fashion' },
-  { label: 'Tech & Mobiles', value: 'tech' },
-  { label: 'Beauty & Skincare', value: 'beauty' },
-  { label: 'Crafts & Gifts', value: 'crafts' },
+  {
+    id: 'malabar',
+    name: 'MALABAR GOLD & DIAMONDS',
+    category: 'Jewelry & Watches',
+    floor: 'Ground Floor Plaza',
+    coverUrl: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&q=80',
+    slug: 'himalayan-outfitters',
+    colSpanClass: 'md:col-span-1',
+    heightClass: 'h-64 sm:h-72 lg:h-80',
+  },
 ];
 
 export default function FeaturedStoresSection() {
-  const [activeCategory, setActiveCategory] = useState('all');
-
-  const filteredStores = activeCategory === 'all'
-    ? featuredStoresData
-    : featuredStoresData.filter((s) => s.categoryType === activeCategory);
-
   return (
-    <section className="w-full py-16 md:py-24 bg-gray-50 border-t border-gray-200">
-      <div className="container mx-auto px-4 md:px-8">
+    <section className="w-full py-12 md:py-20 bg-white">
+      <div className="container mx-auto px-3 sm:px-6">
         
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <span className="text-xs uppercase tracking-widest text-[#c22328] font-bold block mb-2" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-            RETAIL DIRECTORY
-          </span>
-          <h2
-            className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-wider mb-4"
-            style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
-          >
-            FEATURED STORES
-          </h2>
-          <div className="w-24 h-1 bg-[#c22328] mx-auto rounded-full mb-4" />
-          <p className="text-gray-600 text-sm md:text-base leading-relaxed" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-            Explore top international brands, local artisan boutiques, tech shops, and lifestyle outlets all under one roof at Pokhara Trade Mall.
-          </p>
-        </div>
-
-        {/* Category Filters */}
-        <div className="flex flex-wrap justify-center items-center gap-2 md:gap-3 mb-12">
-          {categories.map((cat) => (
-            <button
-              key={cat.value}
-              onClick={() => setActiveCategory(cat.value)}
-              className={`px-5 py-2.5 rounded-full text-xs md:text-sm font-medium transition-all duration-300 cursor-pointer ${
-                activeCategory === cat.value
-                  ? 'bg-[#760316] text-white shadow-md scale-105'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-              }`}
+        {/* Heading Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 gap-6">
+          {/* Left Aligned Title & Description */}
+          <div className="max-w-3xl text-left">
+            <h2
+              className="text-3xl md:text-4xl lg:text-5xl font-medium text-gray-900 tracking-wider mb-2 uppercase"
+              style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
+            >
+              SHOP
+            </h2>
+            <div className="w-12 md:w-16 h-0.5 bg-[#801424]/60 rounded-full mb-3" />
+            <p
+              className="text-gray-600 text-sm md:text-base leading-relaxed mt-2"
               style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
-              {cat.label}
-            </button>
-          ))}
+              Pokhara Trade Mall is your one-stop destination for an expansive selection of the best brands in clothing, fashion accessories, beauty, home collections, interiors and more. With its fashion-forward collection and eclectic pop-up shops, Pokhara Trade Mall delivers a dynamic shopping experience that will make you come back for more.
+            </p>
+          </div>
+
+          {/* Right Aligned Controls: See All Link */}
+          <div className="flex-shrink-0 self-start md:self-end pb-1">
+            <Link
+              to="/shops/retail"
+              className="inline-flex items-center gap-2 text-base md:text-lg font-medium text-gray-900 hover:text-[#801424] transition-colors group whitespace-nowrap !no-underline hover:!no-underline focus:!no-underline"
+              style={{ fontFamily: "'Montserrat', sans-serif", textDecoration: 'none' }}
+            >
+              <span>See All</span>
+              <FaArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1.5 duration-300" />
+            </Link>
+          </div>
         </div>
 
-        {/* Stores Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredStores.map((store, index) => (
+        {/* 3-Row Grid Layout for SHOP: [1-span][2-span] / [1-span][1-span][1-span] / [2-span][1-span] */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          {featuredStoresData.map((store, index) => (
             <motion.div
               key={store.id}
-              initial={{ opacity: 0, y: 25 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.4, delay: index * 0.08 }}
               viewport={{ once: true }}
-              className="group bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col"
+              className={`w-full ${store.colSpanClass}`}
             >
-              {/* Cover Image Container */}
-              <div className="relative h-56 w-full overflow-hidden bg-gray-100">
-                <img
-                  src={store.coverUrl}
-                  alt={store.name}
-                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-                
-                {/* Category Badge */}
-                <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-[#760316] text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-xs">
-                  {store.category}
-                </span>
-
-                {/* Floor Badge */}
-                <span className="absolute bottom-4 left-4 text-white text-xs font-medium flex items-center bg-black/50 backdrop-blur-md px-3 py-1 rounded-md">
-                  <FaMapMarkerAlt className="w-3 h-3 mr-1.5 text-red-400" />
-                  {store.floor}
-                </span>
-
-                {/* Store Logo Circle */}
-                <div className="absolute bottom-4 right-4 w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-md bg-white p-0.5 flex items-center justify-center">
+              <Link
+                to={`/shops/details/${store.slug}`}
+                className="group relative block w-full overflow-hidden rounded-2xl bg-white border border-gray-200/80 shadow-xs hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between !no-underline"
+                style={{ textDecoration: 'none' }}
+              >
+                {/* Cover Image Container */}
+                <div className={`relative w-full ${store.heightClass} overflow-hidden bg-gray-100`}>
                   <img
-                    src={store.logoUrl}
-                    alt={`${store.name} logo`}
-                    className="object-contain w-full h-full rounded-full"
+                    src={store.coverUrl}
+                    alt={store.name}
+                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ease-out"
                   />
-                </div>
-              </div>
 
-              {/* Card Body */}
-              <div className="p-6 flex-1 flex flex-col justify-between" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                <div>
-                  <h3
-                    className="text-xl font-bold text-gray-900 group-hover:text-[#760316] transition-colors mb-1 tracking-wide"
-                    style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
-                  >
-                    {store.name}
-                  </h3>
-                  <p className="text-xs text-gray-500 font-medium mb-3 leading-relaxed">
-                    {store.subtitle}
-                  </p>
-                </div>
-
-                <div className="pt-4 border-t border-gray-100 mt-4 flex items-center justify-between">
-                  <span className="text-xs text-gray-500 flex items-center">
-                    <FaClock className="w-3 h-3 mr-1.5 text-gray-400" />
-                    {store.hours}
+                  {/* Top-Right Location Badge */}
+                  <span className="absolute top-3 right-3 text-[10px] font-semibold text-gray-800 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/60 flex items-center">
+                    <FaMapMarkerAlt className="w-2.5 h-2.5 mr-1 text-[#801424]" />
+                    {store.floor}
                   </span>
-                  
-                  <Link
-                    to={`/shops/details/${store.slug}`}
-                    className="inline-flex items-center text-xs font-semibold text-[#760316] hover:text-[#c22328] group/btn transition-colors"
-                  >
-                    Explore
-                    <FaChevronRight className="w-2.5 h-2.5 ml-1 transition-transform group-hover/btn:translate-x-1" />
-                  </Link>
                 </div>
-              </div>
+
+                {/* Light-Mode Store Card Details Footer */}
+                <div className="p-5 md:p-6 bg-white flex flex-col justify-between text-left" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                  <div>
+                    <span className="text-[11px] uppercase tracking-widest text-[#801424] font-bold block mb-1">
+                      {store.category}
+                    </span>
+                    <h3
+                      className="text-lg md:text-xl font-semibold text-gray-900 group-hover:text-[#801424] transition-colors uppercase tracking-wider leading-snug !no-underline hover:!no-underline"
+                      style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif", textDecoration: 'none' }}
+                    >
+                      {store.name}
+                    </h3>
+                  </div>
+
+                  <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-[#801424] font-semibold">
+                    <span>Explore Outlet</span>
+                    <FaArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </Link>
             </motion.div>
           ))}
-        </div>
-
-        {/* View All Stores CTA */}
-        <div className="mt-14 text-center">
-          <Link
-            to="/page/business"
-            className="inline-flex items-center justify-center px-8 py-3.5 bg-[#760316] hover:bg-[#5a0211] text-white text-sm font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-300 group"
-            style={{ fontFamily: "'Montserrat', sans-serif" }}
-          >
-            <FaStore className="w-4 h-4 mr-2" />
-            View Complete Mall Directory
-            <FaChevronRight className="w-3 h-3 ml-2 transition-transform group-hover:translate-x-1" />
-          </Link>
         </div>
 
       </div>
     </section>
   );
 }
+
+
+
+
+
+

@@ -16,9 +16,9 @@ export default {
       },
       colors: {
         'mall-primary': '#2e3094',
-        'mall-secondary': '#c22328',
+        'mall-secondary': '#801424',
         'mall-blue': '#2e3094',
-        'mall-red': '#c22328',
+        'mall-red': '#801424',
         'mall-background': '#F8FAFC',
         'mall-accent': '#F1F4F9',
         'mall-accent-dark': '#16194A',

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaClock, FaMapMarkerAlt, FaBell, FaCheckCircle } from 'react-icons/fa';
+import { FaClock, FaMapMarkerAlt, FaBell, FaCheckCircle, FaArrowRight } from 'react-icons/fa';
 
 interface UpcomingStore {
   id: string;
@@ -67,48 +67,46 @@ export default function OpeningSoonSection() {
   };
 
   return (
-    <section className="w-full py-16 md:py-24 bg-gray-900 text-white relative overflow-hidden">
+    <section className="w-full py-12 md:py-20 bg-gray-900 text-white relative overflow-hidden border-t border-gray-800">
       {/* Background Subtle Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-[#4a020d]/40 pointer-events-none" />
       
-      <div className="container mx-auto px-4 md:px-8 relative z-10">
+      <div className="container mx-auto px-3 sm:px-6 relative z-10">
         
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center space-x-2 bg-[#c22328]/20 border border-[#c22328]/40 px-4 py-1.5 rounded-full mb-3">
-            <span className="w-2 h-2 rounded-full bg-[#c22328] animate-ping" />
-            <span className="text-xs uppercase tracking-widest text-[#e43f44] font-bold" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-              UPCOMING BRANDS
-            </span>
-          </div>
+        {/* Heading Section */}
+        <div className="mb-8 md:mb-12 text-left max-w-3xl">
           <h2
-            className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-wider mb-4"
+            className="text-3xl md:text-4xl lg:text-5xl font-medium text-white tracking-wider mb-2 uppercase"
             style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
           >
             OPENING SOON
           </h2>
-          <div className="w-24 h-1 bg-[#c22328] mx-auto rounded-full mb-4" />
-          <p className="text-gray-300 text-sm md:text-base leading-relaxed" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-            Get ready for excited new arrivals! Iconic global brands and flagship outlets are bringing their signature experiences to Pokhara Trade Mall.
+          <div className="w-12 md:w-16 h-0.5 bg-[#801424]/60 rounded-full mb-3" />
+
+          <p
+            className="text-gray-300 text-sm md:text-base leading-relaxed"
+            style={{ fontFamily: "'Montserrat', sans-serif" }}
+          >
+            Get ready for exciting new arrivals! Iconic global brands, luxury lifestyle lounges, and flagship outlets are bringing their signature experiences to Pokhara Trade Mall.
           </p>
         </div>
 
         {/* Upcoming Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {upcomingStoresData.map((store, index) => {
             const isNotified = notifiedStores[store.id];
 
             return (
               <motion.div
                 key={store.id}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 25 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.15 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-gray-800/80 backdrop-blur-md rounded-2xl overflow-hidden border border-gray-700/60 hover:border-[#c22328]/50 shadow-xl transition-all duration-300 flex flex-col sm:flex-row"
+                className="bg-gray-800/80 backdrop-blur-md rounded-2xl overflow-hidden border border-gray-700/60 hover:border-[#801424]/60 shadow-xl transition-all duration-300 flex flex-col sm:flex-row"
               >
                 {/* Image Side */}
-                <div className="relative w-full sm:w-2/5 h-52 sm:h-auto overflow-hidden bg-gray-950">
+                <div className="relative w-full sm:w-2/5 h-48 sm:h-auto overflow-hidden bg-gray-950">
                   <img
                     src={store.imageUrl}
                     alt={store.name}
@@ -117,27 +115,27 @@ export default function OpeningSoonSection() {
                   <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent sm:hidden" />
                   
                   {/* Badge Ribbon */}
-                  <span className="absolute top-3 left-3 bg-[#c22328] text-white text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-md shadow-md">
+                  <span className="absolute top-3 left-3 bg-[#801424] text-white text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full shadow-md">
                     COMING SOON
                   </span>
                 </div>
 
                 {/* Content Side */}
-                <div className="p-6 sm:w-3/5 flex flex-col justify-between" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                <div className="p-5 md:p-6 sm:w-3/5 flex flex-col justify-between" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-red-400 font-semibold tracking-wider uppercase">
+                      <span className="text-[11px] text-rose-300 font-bold tracking-wider uppercase">
                         {store.category}
                       </span>
-                      <span className="text-xs text-gray-400 font-medium flex items-center bg-gray-900/60 px-2.5 py-1 rounded-full border border-gray-700">
-                        <FaClock className="w-2.5 h-2.5 mr-1.5 text-red-400" />
+                      <span className="text-[11px] text-gray-300 font-medium flex items-center bg-gray-900/60 px-2.5 py-1 rounded-full border border-gray-700">
+                        <FaClock className="w-2.5 h-2.5 mr-1.5 text-rose-300" />
                         {store.expectedDate}
                       </span>
                     </div>
 
                     <h3
-                      className="text-xl md:text-2xl font-bold text-white mb-2 tracking-wide"
-                      style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
+                      className="text-lg md:text-xl font-semibold text-white mb-2 tracking-wide uppercase !no-underline"
+                      style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif", textDecoration: 'none' }}
                     >
                       {store.name}
                     </h3>
@@ -148,8 +146,8 @@ export default function OpeningSoonSection() {
                   </div>
 
                   <div className="pt-3 border-t border-gray-700/60 flex items-center justify-between">
-                    <span className="text-xs text-gray-400 flex items-center">
-                      <FaMapMarkerAlt className="w-3 h-3 mr-1 text-red-400" />
+                    <span className="text-xs text-gray-300 flex items-center">
+                      <FaMapMarkerAlt className="w-3 h-3 mr-1.5 text-rose-400" />
                       {store.floor}
                     </span>
 
@@ -158,7 +156,7 @@ export default function OpeningSoonSection() {
                       className={`inline-flex items-center text-xs font-semibold px-3.5 py-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                         isNotified
                           ? 'bg-emerald-600 text-white shadow-md'
-                          : 'bg-gray-700 hover:bg-[#c22328] text-white'
+                          : 'bg-gray-700 hover:bg-[#801424] text-white'
                       }`}
                     >
                       {isNotified ? (
@@ -185,3 +183,4 @@ export default function OpeningSoonSection() {
     </section>
   );
 }
+

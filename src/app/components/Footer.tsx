@@ -71,27 +71,27 @@ const Footer: React.FC = () => {
           </h4>
           <ul className="space-y-3 text-sm">
             <li>
-              <Link to="/page/about_us" className="text-gray-700 hover:text-[#c22328] transition-colors">
+              <Link to="/page/about_us" className="text-gray-700 hover:text-[#801424] transition-colors">
                 Our Story
               </Link>
             </li>
             <li>
-              <Link to="/page/business" className="text-gray-700 hover:text-[#c22328] transition-colors">
+              <Link to="/page/business" className="text-gray-700 hover:text-[#801424] transition-colors">
                 Businesses
               </Link>
             </li>
             <li>
-              <Link to="/blogs" className="text-gray-700 hover:text-[#c22328] transition-colors">
+              <Link to="/blogs" className="text-gray-700 hover:text-[#801424] transition-colors">
                 Events
               </Link>
             </li>
             <li>
-              <Link to="/page/privacy_policy" className="text-gray-700 hover:text-[#c22328] transition-colors">
+              <Link to="/page/privacy_policy" className="text-gray-700 hover:text-[#801424] transition-colors">
                 Privacy Policy
               </Link>
             </li>
             <li>
-              <Link to="/contact" className="text-gray-700 hover:text-[#c22328] transition-colors">
+              <Link to="/contact" className="text-gray-700 hover:text-[#801424] transition-colors">
                 Contact Us
               </Link>
             </li>
@@ -108,9 +108,9 @@ const Footer: React.FC = () => {
               <li key={idx}>
                 <a
                   href={`tel:${phone.replace(/\s+/g, '')}`}
-                  className="group flex items-center text-gray-700 hover:text-[#c22328] transition-colors"
+                  className="group flex items-center text-gray-700 hover:text-[#801424] transition-colors"
                 >
-                  <FaPhoneAlt className="w-4 h-4 mr-3 text-gray-800 group-hover:text-[#c22328] transition-colors flex-shrink-0" />
+                  <FaPhoneAlt className="w-4 h-4 mr-3 text-gray-800 group-hover:text-[#801424] transition-colors flex-shrink-0" />
                   <span className="leading-tight">{phone}</span>
                 </a>
               </li>
@@ -118,9 +118,9 @@ const Footer: React.FC = () => {
             <li>
               <a
                 href={`mailto:${siteSettings?.email || 'info@pokharatrademall.com'}`}
-                className="group flex items-center text-gray-700 hover:text-[#c22328] transition-colors"
+                className="group flex items-center text-gray-700 hover:text-[#801424] transition-colors"
               >
-                <FaEnvelope className="w-4 h-4 mr-3 text-gray-800 group-hover:text-[#c22328] transition-colors flex-shrink-0" />
+                <FaEnvelope className="w-4 h-4 mr-3 text-gray-800 group-hover:text-[#801424] transition-colors flex-shrink-0" />
                 <span className="leading-tight">{siteSettings?.email || 'info@pokharatrademall.com'}</span>
               </a>
             </li>
@@ -133,7 +133,7 @@ const Footer: React.FC = () => {
               </a>
             )}
             {siteSettings?.instagram && (
-              <a href={siteSettings.instagram} className="text-gray-800 hover:text-[#c22328] transition-colors p-2 bg-white rounded-full border border-gray-300 shadow-xs" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <a href={siteSettings.instagram} className="text-gray-800 hover:text-[#801424] transition-colors p-2 bg-white rounded-full border border-gray-300 shadow-xs" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                 <FaInstagram className="w-4 h-4" />
               </a>
             )}
@@ -180,9 +180,9 @@ const Footer: React.FC = () => {
             href={googleMapsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center text-xs font-medium text-gray-800 hover:text-[#c22328] transition-colors bg-white px-3.5 py-2.5 rounded-md border border-gray-300 shadow-xs"
+            className="group inline-flex items-center text-xs font-medium text-gray-800 hover:text-[#801424] transition-colors bg-white px-3.5 py-2.5 rounded-md border border-gray-300 shadow-xs"
           >
-            <FaMapMarkerAlt className="w-3.5 h-3.5 mr-2 text-gray-800 group-hover:text-[#c22328] transition-colors" />
+            <FaMapMarkerAlt className="w-3.5 h-3.5 mr-2 text-gray-800 group-hover:text-[#801424] transition-colors" />
             View on Google Maps
           </a>
         </div>
@@ -192,9 +192,9 @@ const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto border-t border-gray-300 mt-12 pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-gray-600">
         <p>© {new Date().getFullYear()} Pokhara Trade Mall. All rights reserved.</p>
         <div className="flex space-x-6 mt-3 md:mt-0">
-          <Link to="/page/privacy_policy" className="hover:text-[#c22328] transition-colors">Privacy Policy</Link>
-          <Link to="/page/about_us" className="hover:text-[#c22328] transition-colors">About Us</Link>
-          <Link to="/contact" className="hover:text-[#c22328] transition-colors">Contact</Link>
+          <Link to="/page/privacy_policy" className="hover:text-[#801424] transition-colors">Privacy Policy</Link>
+          <Link to="/page/about_us" className="hover:text-[#801424] transition-colors">About Us</Link>
+          <Link to="/contact" className="hover:text-[#801424] transition-colors">Contact</Link>
         </div>
       </div>
     </footer>

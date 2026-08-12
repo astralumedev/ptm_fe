@@ -1,0 +1,2862 @@
+{
+  "stores": [
+    {
+      "id": "zara-x1",
+      "name": "Zara",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 3 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:X1"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 296-3626"
+    },
+    {
+      "id": "levi-s-c1",
+      "name": "Levi's",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:C1"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 690-6108"
+    },
+    {
+      "id": "victoria-s-secret-c2",
+      "name": "Victoria's Secret",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:C2"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 870-3142"
+    },
+    {
+      "id": "pandora-jewelry-y1",
+      "name": "Pandora Jewelry",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 4 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:Y1"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 868-5683"
+    },
+    {
+      "id": "sephora-y2",
+      "name": "Sephora",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 4 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:Y2"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 373-5252"
+    },
+    {
+      "id": "toni-guy-saloon-y3",
+      "name": "Toni & Guy Saloon",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 4 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:Y3"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 348-6138"
+    },
+    {
+      "id": "heavenly-spa-a21",
+      "name": "Heavenly Spa",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Parking on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A21"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 347-5287"
+    },
+    {
+      "id": "l-oreal-paris-a22",
+      "name": "L'Oreal Paris",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Parking on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A22"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 697-9496"
+    },
+    {
+      "id": "chanel-perfumes-a19",
+      "name": "Chanel Perfumes",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 4 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A19"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 611-6804"
+    },
+    {
+      "id": "rolex-boutique-a23",
+      "name": "Rolex Boutique",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 4 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A23"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 815-3930"
+    },
+    {
+      "id": "apple-store-a24",
+      "name": "Apple Store",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 4 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A24"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 486-9051"
+    },
+    {
+      "id": "starbucks-coffee-c3",
+      "name": "Starbucks Coffee",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 4 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:C3"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 810-6793"
+    },
+    {
+      "id": "mcdonald-s-c4",
+      "name": "McDonald's",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 4 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:C4"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 570-5085"
+    },
+    {
+      "id": "h-m-c5",
+      "name": "H&M",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 4 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:C5"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 440-7066"
+    },
+    {
+      "id": "nike-store-a25",
+      "name": "Nike Store",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 4 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A25"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 654-6573"
+    },
+    {
+      "id": "la-senza-c108",
+      "name": "La Senza",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 4 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:C108"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 153-1260"
+    },
+    {
+      "id": "swarovski-c107",
+      "name": "Swarovski",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 4 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:C107"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 966-5691"
+    },
+    {
+      "id": "mac-cosmetics-c106",
+      "name": "MAC Cosmetics",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 4 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:C106"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 738-1682"
+    },
+    {
+      "id": "supercuts-a126 & a127",
+      "name": "Supercuts",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 4 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A126 & A127"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 572-3685"
+    },
+    {
+      "id": "therapeutic-touch-a128",
+      "name": "Therapeutic Touch",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 4 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A128"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 612-8233"
+    },
+    {
+      "id": "maybelline-studio-b15",
+      "name": "Maybelline Studio",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 5 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B15"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 289-3550"
+    },
+    {
+      "id": "dior-fragrance-b16",
+      "name": "Dior Fragrance",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 5 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B16"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 572-4872"
+    },
+    {
+      "id": "omega-watches-b17",
+      "name": "Omega watches",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 5 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B17"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 721-2193"
+    },
+    {
+      "id": "samsung-experience-b18 & b19",
+      "name": "Samsung Experience",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 5 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B18 & B19"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 860-1898"
+    },
+    {
+      "id": "costa-coffee-b20",
+      "name": "Costa Coffee",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 5 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B20"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 528-9716"
+    },
+    {
+      "id": "pizza-hut-b21",
+      "name": "Pizza Hut",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 5 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B21"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 122-1849"
+    },
+    {
+      "id": "mango-c14",
+      "name": "Mango",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:C14",
+        "lower_ground_floor:C13"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 576-2680"
+    },
+    {
+      "id": "adidas-c12",
+      "name": "Adidas",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:C12"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 668-6424"
+    },
+    {
+      "id": "intimissimi-c111",
+      "name": "Intimissimi",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:C111"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 179-4558"
+    },
+    {
+      "id": "michael-kors-c10",
+      "name": "Michael Kors",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:C10"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 724-3226"
+    },
+    {
+      "id": "clinique-c9",
+      "name": "Clinique",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:C9"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 562-1469"
+    },
+    {
+      "id": "regis-salon-d6",
+      "name": "Regis Salon",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:D6"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 621-6459"
+    },
+    {
+      "id": "lotus-wellness-d105",
+      "name": "Lotus Wellness",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:D105"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 488-8102"
+    },
+    {
+      "id": "fenty-beauty-d3 & d4",
+      "name": "Fenty Beauty",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:D3 & D4"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 794-6193"
+    },
+    {
+      "id": "versace-scent-d2",
+      "name": "Versace Scent",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:D2"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 777-4673"
+    },
+    {
+      "id": "tag-heuer-d1",
+      "name": "Tag Heuer",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:D1"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 926-1310"
+    },
+    {
+      "id": "sony-center-d117",
+      "name": "Sony Center",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:D117"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 541-8875"
+    },
+    {
+      "id": "dunkin-donuts-d115 & d116",
+      "name": "Dunkin Donuts",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:D115 & D116"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 320-9079"
+    },
+    {
+      "id": "kfc-d7 & d8",
+      "name": "KFC",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:D7 & D8",
+        "lower_ground_floor:D9 & D10"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 775-6687"
+    },
+    {
+      "id": "forever-21-d11",
+      "name": "Forever 21",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:D11",
+        "lower_ground_floor:D12 & D13"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 783-7126"
+    },
+    {
+      "id": "puma-d14",
+      "name": "Puma",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:D14"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 687-2922"
+    },
+    {
+      "id": "agent-provocateur-a29",
+      "name": "Agent Provocateur",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A29"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 479-6613"
+    },
+    {
+      "id": "coach-a30",
+      "name": "Coach",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A30"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 984-1926"
+    },
+    {
+      "id": "estee-lauder-a31",
+      "name": "Estee Lauder",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A31"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 430-5632"
+    },
+    {
+      "id": "elite-cuts-a33",
+      "name": "Elite Cuts",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A33"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 364-2156"
+    },
+    {
+      "id": "zen-escape-a34",
+      "name": "Zen Escape",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A34"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 155-8636"
+    },
+    {
+      "id": "cosmic-shine-a35",
+      "name": "Cosmic Shine",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A35"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 772-9892"
+    },
+    {
+      "id": "aroma-mist-a36",
+      "name": "Aroma Mist",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A36"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 103-8171"
+    },
+    {
+      "id": "seiko-studio-a37",
+      "name": "Seiko Studio",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A37"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 977-6431"
+    },
+    {
+      "id": "huawei-studio-a38",
+      "name": "Huawei Studio",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A38"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 763-5055"
+    },
+    {
+      "id": "aroma-cafe-a39",
+      "name": "Aroma Cafe",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A39",
+        "lower_ground_floor:A40"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 573-2622"
+    },
+    {
+      "id": "burger-king-a41",
+      "name": "Burger King",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A41"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 631-7819"
+    },
+    {
+      "id": "gucci-a42",
+      "name": "Gucci",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 8 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A42"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 296-8374"
+    },
+    {
+      "id": "tommy-hilfiger-b22",
+      "name": "Tommy Hilfiger",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 7 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B22"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 413-4491"
+    },
+    {
+      "id": "silk-secrets-b23",
+      "name": "Silk Secrets",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 7 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B23"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 263-1481"
+    },
+    {
+      "id": "kate-spade-b24",
+      "name": "Kate Spade",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 7 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B24"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 700-6922"
+    },
+    {
+      "id": "glow-cosmetics-b25",
+      "name": "Glow Cosmetics",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 7 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B25"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 189-3199"
+    },
+    {
+      "id": "scissors-palace-b26",
+      "name": "Scissors Palace",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 7 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B26"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 723-7579"
+    },
+    {
+      "id": "oasis-retreat-b27",
+      "name": "Oasis Retreat",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 7 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B27"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 251-7966"
+    },
+    {
+      "id": "pure-glow-b28",
+      "name": "Pure Glow",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 7 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B28"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 445-5953"
+    },
+    {
+      "id": "essence-luxe-b29",
+      "name": "Essence Luxe",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 7 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B29",
+        "lower_ground_floor:B30"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 737-4021"
+    },
+    {
+      "id": "timekeeper-b31",
+      "name": "Timekeeper",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 7 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B31"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 140-2306"
+    },
+    {
+      "id": "mobile-zone-b32",
+      "name": "Mobile Zone",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 7 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B32"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 396-7998"
+    },
+    {
+      "id": "bean-brew-b33",
+      "name": "Bean & Brew",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 7 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B33"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 681-1800"
+    },
+    {
+      "id": "subway-b34",
+      "name": "Subway",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 7 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B34"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 312-3489"
+    },
+    {
+      "id": "prada-b35",
+      "name": "Prada",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 7 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:B35"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 266-3490"
+    },
+    {
+      "id": "calvin-klein-a18",
+      "name": "Calvin Klein",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 5 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A18"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 747-4139"
+    },
+    {
+      "id": "satin-touch-a32",
+      "name": "Satin Touch",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 6 on the lower ground floor.",
+      "shutters": [
+        "lower_ground_floor:A32"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 361-2540"
+    },
+    {
+      "id": "silver-lining-a101",
+      "name": "Silver Lining",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 1 on the ground floor.",
+      "shutters": [
+        "ground_floor:A101"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 613-8964"
+    },
+    {
+      "id": "skin-tonic-a102",
+      "name": "Skin & Tonic",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 1 on the ground floor.",
+      "shutters": [
+        "ground_floor:A102"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 916-8858"
+    },
+    {
+      "id": "stylers-co-a103",
+      "name": "Stylers & Co",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 1 on the ground floor.",
+      "shutters": [
+        "ground_floor:A103"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 704-9245"
+    },
+    {
+      "id": "rejuvenate-lounge-a104",
+      "name": "Rejuvenate Lounge",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 1 on the ground floor.",
+      "shutters": [
+        "ground_floor:A104",
+        "ground_floor:A105"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 402-9085"
+    },
+    {
+      "id": "nail-bar-a106",
+      "name": "Nail Bar",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 1 on the ground floor.",
+      "shutters": [
+        "ground_floor:A106"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 894-1715"
+    },
+    {
+      "id": "oud-amber-b101",
+      "name": "Oud & Amber",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 1 on the ground floor.",
+      "shutters": [
+        "ground_floor:B101"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 897-7782"
+    },
+    {
+      "id": "chrono-hub-b102",
+      "name": "Chrono Hub",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 1 on the ground floor.",
+      "shutters": [
+        "ground_floor:B102"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 369-8761"
+    },
+    {
+      "id": "tech-talk-b103",
+      "name": "Tech & Talk",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 1 on the ground floor.",
+      "shutters": [
+        "ground_floor:B103"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 223-9028"
+    },
+    {
+      "id": "daily-grind-b104",
+      "name": "Daily Grind",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 1 on the ground floor.",
+      "shutters": [
+        "ground_floor:B104"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 658-3049"
+    },
+    {
+      "id": "taco-bell-b105",
+      "name": "Taco Bell",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 1 on the ground floor.",
+      "shutters": [
+        "ground_floor:B105",
+        "ground_floor:B106"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 825-2858"
+    },
+    {
+      "id": "chanel-a107",
+      "name": "Chanel",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 2 on the ground floor.",
+      "shutters": [
+        "ground_floor:A107"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 177-4198"
+    },
+    {
+      "id": "hugo-boss-a108",
+      "name": "Hugo Boss",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 2 on the ground floor.",
+      "shutters": [
+        "ground_floor:A108"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 289-2180"
+    },
+    {
+      "id": "lace-lilies-a109",
+      "name": "Lace & Lilies",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 2 on the ground floor.",
+      "shutters": [
+        "ground_floor:A109"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 700-8300"
+    },
+    {
+      "id": "gold-co-a110",
+      "name": "Gold & Co",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 2 on the ground floor.",
+      "shutters": [
+        "ground_floor:A110"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 207-3843"
+    },
+    {
+      "id": "glamour-hub-a111",
+      "name": "Glamour Hub",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 2 on the ground floor.",
+      "shutters": [
+        "ground_floor:A111"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 340-4203"
+    },
+    {
+      "id": "wave-hair-studio-a112",
+      "name": "Wave Hair Studio",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 2 on the ground floor.",
+      "shutters": [
+        "ground_floor:A112"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 667-7824"
+    },
+    {
+      "id": "serenity-lounge-a113",
+      "name": "Serenity Lounge",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 2 on the ground floor.",
+      "shutters": [
+        "ground_floor:A113"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 304-9684"
+    },
+    {
+      "id": "blush-brush-a114",
+      "name": "Blush & Brush",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 2 on the ground floor.",
+      "shutters": [
+        "ground_floor:A114"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 295-3285"
+    },
+    {
+      "id": "sweet-blossom-a115",
+      "name": "Sweet Blossom",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 2 on the ground floor.",
+      "shutters": [
+        "ground_floor:A115"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 552-9046"
+    },
+    {
+      "id": "tick-tock-a116",
+      "name": "Tick Tock",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 2 on the ground floor.",
+      "shutters": [
+        "ground_floor:A116"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 360-2578"
+    },
+    {
+      "id": "gadget-world-a117",
+      "name": "Gadget World",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 2 on the ground floor.",
+      "shutters": [
+        "ground_floor:A117"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 213-5587"
+    },
+    {
+      "id": "espresso-lounge-b107",
+      "name": "Espresso Lounge",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 3 on the ground floor.",
+      "shutters": [
+        "ground_floor:B107"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 347-1411"
+    },
+    {
+      "id": "the-grill-house-b108",
+      "name": "The Grill House",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 3 on the ground floor.",
+      "shutters": [
+        "ground_floor:B108"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 194-9953"
+    },
+    {
+      "id": "vogue-wear-b109",
+      "name": "Vogue Wear",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 3 on the ground floor.",
+      "shutters": [
+        "ground_floor:B109"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 133-1742"
+    },
+    {
+      "id": "armani-b110",
+      "name": "Armani",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 3 on the ground floor.",
+      "shutters": [
+        "ground_floor:B110"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 249-3532"
+    },
+    {
+      "id": "cozy-intimates-b111",
+      "name": "Cozy Intimates",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 3 on the ground floor.",
+      "shutters": [
+        "ground_floor:B111"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 840-6785"
+    },
+    {
+      "id": "gemstone-gallery-b112",
+      "name": "Gemstone Gallery",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 3 on the ground floor.",
+      "shutters": [
+        "ground_floor:B112"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 371-1116"
+    },
+    {
+      "id": "radiant-you-b113",
+      "name": "Radiant You",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 3 on the ground floor.",
+      "shutters": [
+        "ground_floor:B113"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 555-7182"
+    },
+    {
+      "id": "the-grooming-room-b114",
+      "name": "The Grooming Room",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 3 on the ground floor.",
+      "shutters": [
+        "ground_floor:B114"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 273-2241"
+    },
+    {
+      "id": "sauna-world-c101",
+      "name": "Sauna World",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:C101"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 818-2885"
+    },
+    {
+      "id": "powder-room-c102",
+      "name": "Powder Room",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:C102"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 247-5165"
+    },
+    {
+      "id": "royal-scents-y7",
+      "name": "Royal Scents",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Core on the ground floor.",
+      "shutters": [
+        "ground_floor:Y7"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 205-7215"
+    },
+    {
+      "id": "quartz-gallery-y6",
+      "name": "Quartz Gallery",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Core on the ground floor.",
+      "shutters": [
+        "ground_floor:Y6"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 170-7578"
+    },
+    {
+      "id": "wired-up-y5",
+      "name": "Wired Up",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Core on the ground floor.",
+      "shutters": [
+        "ground_floor:Y5"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 222-7086"
+    },
+    {
+      "id": "mug-shots-y4",
+      "name": "Mug Shots",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Core on the ground floor.",
+      "shutters": [
+        "ground_floor:Y4"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 616-1690"
+    },
+    {
+      "id": "pasta-paradise-a120",
+      "name": "Pasta Paradise",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 4 on the ground floor.",
+      "shutters": [
+        "ground_floor:A120"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 457-2869"
+    },
+    {
+      "id": "luxe-style-a121",
+      "name": "Luxe Style",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 4 on the ground floor.",
+      "shutters": [
+        "ground_floor:A121"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 270-2224"
+    },
+    {
+      "id": "gentleman-club-a122",
+      "name": "Gentleman Club",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 4 on the ground floor.",
+      "shutters": [
+        "ground_floor:A122"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 980-8954"
+    },
+    {
+      "id": "lingerie-spot-1-a119-a119",
+      "name": "Lingerie Spot 1 (A119)",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 4 on the ground floor.",
+      "shutters": [
+        "ground_floor:A119"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 555-1865"
+    },
+    {
+      "id": "bling-palace-a123",
+      "name": "Bling Palace",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 4 on the ground floor.",
+      "shutters": [
+        "ground_floor:A123"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 398-6362"
+    },
+    {
+      "id": "organics-studio-a124",
+      "name": "Organics Studio",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 4 on the ground floor.",
+      "shutters": [
+        "ground_floor:A124"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 616-5198"
+    },
+    {
+      "id": "saloon-spot-1-c103-c103",
+      "name": "Saloon Spot 1 (C103)",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 4 on the ground floor.",
+      "shutters": [
+        "ground_floor:C103"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 898-9770"
+    },
+    {
+      "id": "spa-spot-1-c104-c104",
+      "name": "Spa Spot 1 (C104)",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 4 on the ground floor.",
+      "shutters": [
+        "ground_floor:C104"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 255-4208"
+    },
+    {
+      "id": "cosmetic-shops-spot-1-c105-c105",
+      "name": "Cosmetic Shops Spot 1 (C105)",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 4 on the ground floor.",
+      "shutters": [
+        "ground_floor:C105"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 791-9796"
+    },
+    {
+      "id": "perfumes-spot-1-a125-a125",
+      "name": "Perfumes Spot 1 (A125)",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 4 on the ground floor.",
+      "shutters": [
+        "ground_floor:A125"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 339-9076"
+    },
+    {
+      "id": "watches-spot-1-c108-c108",
+      "name": "Watches Spot 1 (C108)",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 4 on the ground floor.",
+      "shutters": [
+        "ground_floor:C108"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 984-9697"
+    },
+    {
+      "id": "robo-shop-c107",
+      "name": "Robo Shop",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 4 on the ground floor.",
+      "shutters": [
+        "ground_floor:C107"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 167-7030"
+    },
+    {
+      "id": "the-roasted-bean-c106",
+      "name": "The Roasted Bean",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 4 on the ground floor.",
+      "shutters": [
+        "ground_floor:C106"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 259-7570"
+    },
+    {
+      "id": "sushi-club-a126 & a127",
+      "name": "Sushi Club",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 4 on the ground floor.",
+      "shutters": [
+        "ground_floor:A126 & A127"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 932-3370"
+    },
+    {
+      "id": "urban-chic-a128",
+      "name": "Urban Chic",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 4 on the ground floor.",
+      "shutters": [
+        "ground_floor:A128"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 458-7105"
+    },
+    {
+      "id": "urban-fit-b115",
+      "name": "Urban Fit",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 5 on the ground floor.",
+      "shutters": [
+        "ground_floor:B115"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 808-6027"
+    },
+    {
+      "id": "lingerie-spot-2-b116-b116",
+      "name": "Lingerie Spot 2 (B116)",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 5 on the ground floor.",
+      "shutters": [
+        "ground_floor:B116"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 210-9315"
+    },
+    {
+      "id": "charming-trinkets-b117",
+      "name": "Charming Trinkets",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 5 on the ground floor.",
+      "shutters": [
+        "ground_floor:B117"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 275-6776"
+    },
+    {
+      "id": "velvet-skin-b118 & b119",
+      "name": "Velvet Skin",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 5 on the ground floor.",
+      "shutters": [
+        "ground_floor:B118 & B119"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 412-1619"
+    },
+    {
+      "id": "saloon-spot-2-b120-b120",
+      "name": "Saloon Spot 2 (B120)",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 5 on the ground floor.",
+      "shutters": [
+        "ground_floor:B120"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 738-3235"
+    },
+    {
+      "id": "spa-spot-2-b121-b121",
+      "name": "Spa Spot 2 (B121)",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 5 on the ground floor.",
+      "shutters": [
+        "ground_floor:B121"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 967-8083"
+    },
+    {
+      "id": "cosmetic-shops-spot-2-c114-c114",
+      "name": "Cosmetic Shops Spot 2 (C114)",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:C114"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 385-6297"
+    },
+    {
+      "id": "perfumes-spot-2-c113-c113",
+      "name": "Perfumes Spot 2 (C113)",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:C113"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 883-5569"
+    },
+    {
+      "id": "watches-spot-2-c112-c112",
+      "name": "Watches Spot 2 (C112)",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:C112"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 726-5882"
+    },
+    {
+      "id": "future-tech-c111",
+      "name": "Future Tech",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:C111"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 766-4489"
+    },
+    {
+      "id": "sweet-cravings-c110",
+      "name": "Sweet Cravings",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:C110"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 246-6755"
+    },
+    {
+      "id": "tandoori-flames-c109",
+      "name": "Tandoori Flames",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:C109"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 294-6698"
+    },
+    {
+      "id": "glow-boutique-d106",
+      "name": "Glow Boutique",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:D106"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 276-9062"
+    },
+    {
+      "id": "rugged-den-d105",
+      "name": "Rugged Den",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:D105"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 245-8213"
+    },
+    {
+      "id": "lingerie-spot-3-d103-d104-d103 & d104",
+      "name": "Lingerie Spot 3 (D103 & D104)",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:D103 & D104"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 697-9857"
+    },
+    {
+      "id": "accessories-spot-1-d102-d102",
+      "name": "Accessories Spot 1 (D102)",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:D102"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 893-9095"
+    },
+    {
+      "id": "beauty-spot-1-d101-d101",
+      "name": "Beauty Spot 1 (D101)",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:D101"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 969-3822"
+    },
+    {
+      "id": "saloon-spot-3-d117-d117",
+      "name": "Saloon Spot 3 (D117)",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:D117"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 640-2672"
+    },
+    {
+      "id": "spa-spot-3-d115-d116-d115 & d116",
+      "name": "Spa Spot 3 (D115 & D116)",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:D115 & D116"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 665-2725"
+    },
+    {
+      "id": "cosmetic-shops-spot-3-d107-d108-d107 & d108",
+      "name": "Cosmetic Shops Spot 3 (D107 & D108)",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:D107 & D108"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 498-3339"
+    },
+    {
+      "id": "perfumes-spot-3-d109-d110-d109 & d110",
+      "name": "Perfumes Spot 3 (D109 & D110)",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:D109 & D110"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 368-5465"
+    },
+    {
+      "id": "watches-spot-3-d111-d111",
+      "name": "Watches Spot 3 (D111)",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:D111"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 210-7523"
+    },
+    {
+      "id": "mobile-phones-gadgets-spot-1-d112-d113-d112 & d113",
+      "name": "Mobile Phones & Gadgets Spot 1 (D112 & D113)",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:D112 & D113"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 379-1071"
+    },
+    {
+      "id": "cafes-spot-1-d114-d114",
+      "name": "Cafes Spot 1 (D114)",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:D114"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 719-9108"
+    },
+    {
+      "id": "noodle-box-a129",
+      "name": "Noodle Box",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:A129"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 610-9308"
+    },
+    {
+      "id": "trendy-thread-a130",
+      "name": "Trendy Thread",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:A130"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 527-8949"
+    },
+    {
+      "id": "apex-apparel-a131",
+      "name": "Apex Apparel",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:A131"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 660-8470"
+    },
+    {
+      "id": "lingerie-spot-4-a133-a133",
+      "name": "Lingerie Spot 4 (A133)",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:A133"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 251-2909"
+    },
+    {
+      "id": "accessories-spot-2-a134-a134",
+      "name": "Accessories Spot 2 (A134)",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:A134",
+        "ground_floor:A235"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 954-1379"
+    },
+    {
+      "id": "beauty-spot-2-a236-a236",
+      "name": "Beauty Spot 2 (A236)",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:A236"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 876-6737"
+    },
+    {
+      "id": "saloon-spot-4-a137-a137",
+      "name": "Saloon Spot 4 (A137)",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:A137"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 696-9681"
+    },
+    {
+      "id": "spa-spot-4-a138-a138",
+      "name": "Spa Spot 4 (A138)",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:A138"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 817-9969"
+    },
+    {
+      "id": "cosmetic-shops-spot-4-a139-a139",
+      "name": "Cosmetic Shops Spot 4 (A139)",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:A139"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 493-5508"
+    },
+    {
+      "id": "perfumes-spot-4-a140-a140",
+      "name": "Perfumes Spot 4 (A140)",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:A140"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 241-4058"
+    },
+    {
+      "id": "watches-spot-4-a141-a141",
+      "name": "Watches Spot 4 (A141)",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:A141"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 165-9180"
+    },
+    {
+      "id": "mobile-phones-gadgets-spot-2-a142-a142",
+      "name": "Mobile Phones & Gadgets Spot 2 (A142)",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 8 on the ground floor.",
+      "shutters": [
+        "ground_floor:A142"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 483-4111"
+    },
+    {
+      "id": "cafes-spot-2-b122-b122",
+      "name": "Cafes Spot 2 (B122)",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 7 on the ground floor.",
+      "shutters": [
+        "ground_floor:B122"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 952-7847"
+    },
+    {
+      "id": "spice-route-b123",
+      "name": "Spice Route",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 7 on the ground floor.",
+      "shutters": [
+        "ground_floor:B123"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 130-4969"
+    },
+    {
+      "id": "bella-moda-b124",
+      "name": "Bella Moda",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 7 on the ground floor.",
+      "shutters": [
+        "ground_floor:B124"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 582-8928"
+    },
+    {
+      "id": "classic-suit-b125",
+      "name": "Classic Suit",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 7 on the ground floor.",
+      "shutters": [
+        "ground_floor:B125"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 134-1733"
+    },
+    {
+      "id": "lingerie-spot-5-b126-b126",
+      "name": "Lingerie Spot 5 (B126)",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 7 on the ground floor.",
+      "shutters": [
+        "ground_floor:B126"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 856-1962"
+    },
+    {
+      "id": "accessories-spot-3-b127-b127",
+      "name": "Accessories Spot 3 (B127)",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 7 on the ground floor.",
+      "shutters": [
+        "ground_floor:B127",
+        "ground_floor:B128"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 639-9070"
+    },
+    {
+      "id": "beauty-spot-3-b129-b129",
+      "name": "Beauty Spot 3 (B129)",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 7 on the ground floor.",
+      "shutters": [
+        "ground_floor:B129"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 464-6048"
+    },
+    {
+      "id": "saloon-spot-5-b130-b130",
+      "name": "Saloon Spot 5 (B130)",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 7 on the ground floor.",
+      "shutters": [
+        "ground_floor:B130"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 106-2835"
+    },
+    {
+      "id": "spa-spot-5-b131-b131",
+      "name": "Spa Spot 5 (B131)",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 7 on the ground floor.",
+      "shutters": [
+        "ground_floor:B131"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 431-9071"
+    },
+    {
+      "id": "cosmetic-shops-spot-5-b132-b132",
+      "name": "Cosmetic Shops Spot 5 (B132)",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 7 on the ground floor.",
+      "shutters": [
+        "ground_floor:B132"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 413-7939"
+    },
+    {
+      "id": "perfumes-spot-5-b133-b133",
+      "name": "Perfumes Spot 5 (B133)",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 7 on the ground floor.",
+      "shutters": [
+        "ground_floor:B133"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 179-4544"
+    },
+    {
+      "id": "watches-spot-5-b134-b134",
+      "name": "Watches Spot 5 (B134)",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 7 on the ground floor.",
+      "shutters": [
+        "ground_floor:B134"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 666-3283"
+    },
+    {
+      "id": "mobile-phones-gadgets-spot-3-b135-b135",
+      "name": "Mobile Phones & Gadgets Spot 3 (B135)",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 7 on the ground floor.",
+      "shutters": [
+        "ground_floor:B135"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 748-1173"
+    },
+    {
+      "id": "cafes-spot-3-a201-a201",
+      "name": "Cafes Spot 3 (A201)",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 1 on the first floor.",
+      "shutters": [
+        "first_floor:A201"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 509-1952"
+    },
+    {
+      "id": "restaurants-spot-1-a202-a202",
+      "name": "Restaurants Spot 1 (A202)",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 1 on the first floor.",
+      "shutters": [
+        "first_floor:A202"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 746-8062"
+    },
+    {
+      "id": "cotton-club-a203",
+      "name": "Cotton Club",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 1 on the first floor.",
+      "shutters": [
+        "first_floor:A203",
+        "first_floor:A204"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 349-9299"
+    },
+    {
+      "id": "dapper-style-a205",
+      "name": "Dapper Style",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 1 on the first floor.",
+      "shutters": [
+        "first_floor:A205",
+        "first_floor:A206"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 731-4821"
+    },
+    {
+      "id": "lingerie-spot-6-b201-b201",
+      "name": "Lingerie Spot 6 (B201)",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 1 on the first floor.",
+      "shutters": [
+        "first_floor:B201"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 981-6102"
+    },
+    {
+      "id": "accessories-spot-4-b202-b202",
+      "name": "Accessories Spot 4 (B202)",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 1 on the first floor.",
+      "shutters": [
+        "first_floor:B202"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 958-7912"
+    },
+    {
+      "id": "beauty-spot-4-b203-b203",
+      "name": "Beauty Spot 4 (B203)",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 1 on the first floor.",
+      "shutters": [
+        "first_floor:B203"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 954-4932"
+    },
+    {
+      "id": "saloon-spot-6-b204-b204",
+      "name": "Saloon Spot 6 (B204)",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 1 on the first floor.",
+      "shutters": [
+        "first_floor:B204"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 193-5683"
+    },
+    {
+      "id": "spa-spot-6-b205-b205",
+      "name": "Spa Spot 6 (B205)",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 1 on the first floor.",
+      "shutters": [
+        "first_floor:B205"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 633-5142"
+    },
+    {
+      "id": "cosmetic-shops-spot-6-b206-b206",
+      "name": "Cosmetic Shops Spot 6 (B206)",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 1 on the first floor.",
+      "shutters": [
+        "first_floor:B206"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 230-9544"
+    },
+    {
+      "id": "perfumes-spot-6-a207-a207",
+      "name": "Perfumes Spot 6 (A207)",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 2 on the first floor.",
+      "shutters": [
+        "first_floor:A207"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 650-6919"
+    },
+    {
+      "id": "watches-spot-6-a208-a208",
+      "name": "Watches Spot 6 (A208)",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 2 on the first floor.",
+      "shutters": [
+        "first_floor:A208"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 394-2568"
+    },
+    {
+      "id": "mobile-phones-gadgets-spot-4-a209-a209",
+      "name": "Mobile Phones & Gadgets Spot 4 (A209)",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 2 on the first floor.",
+      "shutters": [
+        "first_floor:A209"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 309-9634"
+    },
+    {
+      "id": "cafes-spot-4-a210-a210",
+      "name": "Cafes Spot 4 (A210)",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 2 on the first floor.",
+      "shutters": [
+        "first_floor:A210"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 996-1832"
+    },
+    {
+      "id": "restaurants-spot-2-a211-a211",
+      "name": "Restaurants Spot 2 (A211)",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 2 on the first floor.",
+      "shutters": [
+        "first_floor:A211"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 860-3167"
+    },
+    {
+      "id": "women-s-fashion-spot-1-a212-a212",
+      "name": "Women's Fashion Spot 1 (A212)",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 2 on the first floor.",
+      "shutters": [
+        "first_floor:A212"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 350-7675"
+    },
+    {
+      "id": "men-s-fashion-spot-1-a213-a213",
+      "name": "Men's Fashion Spot 1 (A213)",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 2 on the first floor.",
+      "shutters": [
+        "first_floor:A213"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 103-1734"
+    },
+    {
+      "id": "lingerie-spot-7-a214-a214",
+      "name": "Lingerie Spot 7 (A214)",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 2 on the first floor.",
+      "shutters": [
+        "first_floor:A214"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 895-1083"
+    },
+    {
+      "id": "accessories-spot-5-a215-a215",
+      "name": "Accessories Spot 5 (A215)",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 2 on the first floor.",
+      "shutters": [
+        "first_floor:A215"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 591-8402"
+    },
+    {
+      "id": "beauty-spot-5-a216-a216",
+      "name": "Beauty Spot 5 (A216)",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 2 on the first floor.",
+      "shutters": [
+        "first_floor:A216"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 820-1516"
+    },
+    {
+      "id": "saloon-spot-7-a217-a217",
+      "name": "Saloon Spot 7 (A217)",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 2 on the first floor.",
+      "shutters": [
+        "first_floor:A217"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 492-6295"
+    },
+    {
+      "id": "spa-spot-7-b207-b207",
+      "name": "Spa Spot 7 (B207)",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 3 on the first floor.",
+      "shutters": [
+        "first_floor:B207",
+        "first_floor:B208"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 947-4857"
+    },
+    {
+      "id": "cosmetic-shops-spot-7-b209-b209",
+      "name": "Cosmetic Shops Spot 7 (B209)",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 3 on the first floor.",
+      "shutters": [
+        "first_floor:B209"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 593-1393"
+    },
+    {
+      "id": "perfumes-spot-7-b210-b210",
+      "name": "Perfumes Spot 7 (B210)",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 3 on the first floor.",
+      "shutters": [
+        "first_floor:B210"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 327-2123"
+    },
+    {
+      "id": "watches-spot-7-b211-b211",
+      "name": "Watches Spot 7 (B211)",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 3 on the first floor.",
+      "shutters": [
+        "first_floor:B211"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 211-8874"
+    },
+    {
+      "id": "mobile-phones-gadgets-spot-5-b212-b212",
+      "name": "Mobile Phones & Gadgets Spot 5 (B212)",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 3 on the first floor.",
+      "shutters": [
+        "first_floor:B212"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 142-6600"
+    },
+    {
+      "id": "cafes-spot-5-b213-b213",
+      "name": "Cafes Spot 5 (B213)",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 3 on the first floor.",
+      "shutters": [
+        "first_floor:B213"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 462-5406"
+    },
+    {
+      "id": "restaurants-spot-3-b214-b214",
+      "name": "Restaurants Spot 3 (B214)",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 3 on the first floor.",
+      "shutters": [
+        "first_floor:B214"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 832-9299"
+    },
+    {
+      "id": "women-s-fashion-spot-2-c201-c201",
+      "name": "Women's Fashion Spot 2 (C201)",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:C201"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 315-3587"
+    },
+    {
+      "id": "men-s-fashion-spot-2-c202-c202",
+      "name": "Men's Fashion Spot 2 (C202)",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:C202"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 114-4026"
+    },
+    {
+      "id": "lingerie-spot-8-y9-y9",
+      "name": "Lingerie Spot 8 (Y9)",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Core on the first floor.",
+      "shutters": [
+        "first_floor:Y9"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 748-8029"
+    },
+    {
+      "id": "accessories-spot-6-a220-a220",
+      "name": "Accessories Spot 6 (A220)",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 4 on the first floor.",
+      "shutters": [
+        "first_floor:A220"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 717-6475"
+    },
+    {
+      "id": "beauty-spot-6-a221-a221",
+      "name": "Beauty Spot 6 (A221)",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 4 on the first floor.",
+      "shutters": [
+        "first_floor:A221"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 943-5585"
+    },
+    {
+      "id": "saloon-spot-8-a222-a222",
+      "name": "Saloon Spot 8 (A222)",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 4 on the first floor.",
+      "shutters": [
+        "first_floor:A222"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 499-3824"
+    },
+    {
+      "id": "spa-spot-8-a219-a219",
+      "name": "Spa Spot 8 (A219)",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 4 on the first floor.",
+      "shutters": [
+        "first_floor:A219"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 891-6617"
+    },
+    {
+      "id": "cosmetic-shops-spot-8-a223-a223",
+      "name": "Cosmetic Shops Spot 8 (A223)",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 4 on the first floor.",
+      "shutters": [
+        "first_floor:A223"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 967-4978"
+    },
+    {
+      "id": "perfumes-spot-8-a224-a224",
+      "name": "Perfumes Spot 8 (A224)",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 4 on the first floor.",
+      "shutters": [
+        "first_floor:A224"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 723-8387"
+    },
+    {
+      "id": "watches-spot-8-c203-c203",
+      "name": "Watches Spot 8 (C203)",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 4 on the first floor.",
+      "shutters": [
+        "first_floor:C203"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 730-7141"
+    },
+    {
+      "id": "mobile-phones-gadgets-spot-6-c204-c204",
+      "name": "Mobile Phones & Gadgets Spot 6 (C204)",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 4 on the first floor.",
+      "shutters": [
+        "first_floor:C204"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 879-1228"
+    },
+    {
+      "id": "cafes-spot-6-c205-c205",
+      "name": "Cafes Spot 6 (C205)",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 4 on the first floor.",
+      "shutters": [
+        "first_floor:C205"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 722-3095"
+    },
+    {
+      "id": "restaurants-spot-4-a225-a225",
+      "name": "Restaurants Spot 4 (A225)",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 4 on the first floor.",
+      "shutters": [
+        "first_floor:A225",
+        "first_floor:C208"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 699-2700"
+    },
+    {
+      "id": "women-s-fashion-spot-3-c207-c207",
+      "name": "Women's Fashion Spot 3 (C207)",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 4 on the first floor.",
+      "shutters": [
+        "first_floor:C207"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 590-9288"
+    },
+    {
+      "id": "men-s-fashion-spot-3-c206-c206",
+      "name": "Men's Fashion Spot 3 (C206)",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 4 on the first floor.",
+      "shutters": [
+        "first_floor:C206"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 439-8734"
+    },
+    {
+      "id": "lingerie-spot-9-a226-a227-a226 & a227",
+      "name": "Lingerie Spot 9 (A226 & A227)",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 4 on the first floor.",
+      "shutters": [
+        "first_floor:A226 & A227"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 671-9115"
+    },
+    {
+      "id": "accessories-spot-7-a228-a228",
+      "name": "Accessories Spot 7 (A228)",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 4 on the first floor.",
+      "shutters": [
+        "first_floor:A228"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 855-1121"
+    },
+    {
+      "id": "beauty-spot-7-b215-b215",
+      "name": "Beauty Spot 7 (B215)",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 5 on the first floor.",
+      "shutters": [
+        "first_floor:B215"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 805-9824"
+    },
+    {
+      "id": "saloon-spot-9-b216-b216",
+      "name": "Saloon Spot 9 (B216)",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 5 on the first floor.",
+      "shutters": [
+        "first_floor:B216",
+        "first_floor:B217"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 522-9757"
+    },
+    {
+      "id": "spa-spot-9-b218-b219-b218 & b219",
+      "name": "Spa Spot 9 (B218 & B219)",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 5 on the first floor.",
+      "shutters": [
+        "first_floor:B218 & B219"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 288-9823"
+    },
+    {
+      "id": "cosmetic-shops-spot-9-b220-b220",
+      "name": "Cosmetic Shops Spot 9 (B220)",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 5 on the first floor.",
+      "shutters": [
+        "first_floor:B220",
+        "first_floor:B221"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 723-7651"
+    },
+    {
+      "id": "perfumes-spot-9-c214-c214",
+      "name": "Perfumes Spot 9 (C214)",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:C214",
+        "first_floor:C213"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 624-9365"
+    },
+    {
+      "id": "watches-spot-9-c212-c212",
+      "name": "Watches Spot 9 (C212)",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:C212"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 842-2719"
+    },
+    {
+      "id": "mobile-phones-gadgets-spot-7-c211-c211",
+      "name": "Mobile Phones & Gadgets Spot 7 (C211)",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:C211"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 330-6805"
+    },
+    {
+      "id": "cafes-spot-7-c210-c210",
+      "name": "Cafes Spot 7 (C210)",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:C210"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 362-2300"
+    },
+    {
+      "id": "restaurants-spot-5-c209-c209",
+      "name": "Restaurants Spot 5 (C209)",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:C209"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 693-3099"
+    },
+    {
+      "id": "women-s-fashion-spot-4-d206-d206",
+      "name": "Women's Fashion Spot 4 (D206)",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:D206"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 130-6941"
+    },
+    {
+      "id": "men-s-fashion-spot-4-d205-d205",
+      "name": "Men's Fashion Spot 4 (D205)",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:D205"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 330-9918"
+    },
+    {
+      "id": "lingerie-spot-10-d203-d204-d203 & d204",
+      "name": "Lingerie Spot 10 (D203 & D204)",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:D203 & D204"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 489-9119"
+    },
+    {
+      "id": "accessories-spot-8-d202-d202",
+      "name": "Accessories Spot 8 (D202)",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:D202"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 523-5169"
+    },
+    {
+      "id": "beauty-spot-8-d201-d201",
+      "name": "Beauty Spot 8 (D201)",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:D201"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 797-4201"
+    },
+    {
+      "id": "saloon-spot-10-d217-d217",
+      "name": "Saloon Spot 10 (D217)",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:D217"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 437-5472"
+    },
+    {
+      "id": "spa-spot-10-d215-d216-d215 & d216",
+      "name": "Spa Spot 10 (D215 & D216)",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:D215 & D216"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 828-5276"
+    },
+    {
+      "id": "cosmetic-shops-spot-10-d207-d208-d207 & d208",
+      "name": "Cosmetic Shops Spot 10 (D207 & D208)",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:D207 & D208"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 966-4151"
+    },
+    {
+      "id": "perfumes-spot-10-d209-d210-d209 & d210",
+      "name": "Perfumes Spot 10 (D209 & D210)",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:D209 & D210"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 278-8322"
+    },
+    {
+      "id": "watches-spot-10-d211-d211",
+      "name": "Watches Spot 10 (D211)",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:D211"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 926-6732"
+    },
+    {
+      "id": "mobile-phones-gadgets-spot-8-d212-d213-d212 & d213",
+      "name": "Mobile Phones & Gadgets Spot 8 (D212 & D213)",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:D212 & D213"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 408-1508"
+    },
+    {
+      "id": "cafes-spot-8-d214-d214",
+      "name": "Cafes Spot 8 (D214)",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:D214"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 328-3473"
+    },
+    {
+      "id": "restaurants-spot-6-a229-a229",
+      "name": "Restaurants Spot 6 (A229)",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 8 on the first floor.",
+      "shutters": [
+        "first_floor:A229"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 397-2384"
+    },
+    {
+      "id": "women-s-fashion-spot-5-a230-a230",
+      "name": "Women's Fashion Spot 5 (A230)",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 6 on the first floor.",
+      "shutters": [
+        "first_floor:A230"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 689-8895"
+    },
+    {
+      "id": "men-s-fashion-spot-5-a231-a231",
+      "name": "Men's Fashion Spot 5 (A231)",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 6 on the first floor.",
+      "shutters": [
+        "first_floor:A231"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 881-1636"
+    },
+    {
+      "id": "lingerie-spot-11-a233-a233",
+      "name": "Lingerie Spot 11 (A233)",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:A233"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 411-5804"
+    },
+    {
+      "id": "accessories-spot-9-a234-a234",
+      "name": "Accessories Spot 9 (A234)",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:A234",
+        "first_floor:A235"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 771-1550"
+    },
+    {
+      "id": "beauty-spot-9-a236-a236",
+      "name": "Beauty Spot 9 (A236)",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:A236"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 437-5219"
+    },
+    {
+      "id": "saloon-spot-11-a237-a237",
+      "name": "Saloon Spot 11 (A237)",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:A237"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 418-9450"
+    },
+    {
+      "id": "spa-spot-11-a238-a238",
+      "name": "Spa Spot 11 (A238)",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:A238",
+        "first_floor:A239"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 669-3854"
+    },
+    {
+      "id": "cosmetic-shops-spot-11-a240-a240",
+      "name": "Cosmetic Shops Spot 11 (A240)",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:A240"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 327-1251"
+    },
+    {
+      "id": "perfumes-spot-11-a241-a241",
+      "name": "Perfumes Spot 11 (A241)",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:A241"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 433-3835"
+    },
+    {
+      "id": "watches-spot-11-a242-a242",
+      "name": "Watches Spot 11 (A242)",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:A242"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 283-7771"
+    },
+    {
+      "id": "mobile-phones-gadgets-spot-9-b222-b222",
+      "name": "Mobile Phones & Gadgets Spot 9 (B222)",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:B222"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 762-7821"
+    },
+    {
+      "id": "cafes-spot-9-b223-b223",
+      "name": "Cafes Spot 9 (B223)",
+      "cat": "cafes",
+      "desc": "Premier outlet for cafes located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:B223"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 665-7473"
+    },
+    {
+      "id": "restaurants-spot-7-b224-b224",
+      "name": "Restaurants Spot 7 (B224)",
+      "cat": "restaurants",
+      "desc": "Premier outlet for restaurants located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:B224"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 807-3930"
+    },
+    {
+      "id": "women-s-fashion-spot-6-b225-b225",
+      "name": "Women's Fashion Spot 6 (B225)",
+      "cat": "womens_fashion",
+      "desc": "Premier outlet for women's fashion located in Block 6 on the first floor.",
+      "shutters": [
+        "first_floor:B225"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 687-6530"
+    },
+    {
+      "id": "men-s-fashion-spot-6-b226-b226",
+      "name": "Men's Fashion Spot 6 (B226)",
+      "cat": "mens_fashion",
+      "desc": "Premier outlet for men's fashion located in Block 6 on the first floor.",
+      "shutters": [
+        "first_floor:B226"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 977-2949"
+    },
+    {
+      "id": "lingerie-spot-12-b227-b227",
+      "name": "Lingerie Spot 12 (B227)",
+      "cat": "lingerie",
+      "desc": "Premier outlet for lingerie located in Block 6 on the first floor.",
+      "shutters": [
+        "first_floor:B227"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 989-5329"
+    },
+    {
+      "id": "accessories-spot-10-b228-b228",
+      "name": "Accessories Spot 10 (B228)",
+      "cat": "accessories",
+      "desc": "Premier outlet for accessories located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:B228"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 667-4721"
+    },
+    {
+      "id": "beauty-spot-10-b229-b229",
+      "name": "Beauty Spot 10 (B229)",
+      "cat": "beauty",
+      "desc": "Premier outlet for beauty located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:B229",
+        "first_floor:B230"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 626-6863"
+    },
+    {
+      "id": "saloon-spot-12-b231-b231",
+      "name": "Saloon Spot 12 (B231)",
+      "cat": "saloon",
+      "desc": "Premier outlet for saloon located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:B231"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 349-8997"
+    },
+    {
+      "id": "spa-spot-12-b232-b232",
+      "name": "Spa Spot 12 (B232)",
+      "cat": "spa",
+      "desc": "Premier outlet for spa located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:B232",
+        "first_floor:B233"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 688-1435"
+    },
+    {
+      "id": "cosmetic-shops-spot-12-b234-b234",
+      "name": "Cosmetic Shops Spot 12 (B234)",
+      "cat": "cosmetic_shops",
+      "desc": "Premier outlet for cosmetic shops located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:B234"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 391-3612"
+    },
+    {
+      "id": "perfumes-spot-12-b235-b235",
+      "name": "Perfumes Spot 12 (B235)",
+      "cat": "perfumes",
+      "desc": "Premier outlet for perfumes located in Block 7 on the first floor.",
+      "shutters": [
+        "first_floor:B235"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 755-4879"
+    },
+    {
+      "id": "watches-spot-12-x2-x2",
+      "name": "Watches Spot 12 (X2)",
+      "cat": "watches",
+      "desc": "Premier outlet for watches located in Block 3 on the first floor.",
+      "shutters": [
+        "first_floor:X2"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 361-6354"
+    },
+    {
+      "id": "mobile-phones-gadgets-spot-10-a232-a232",
+      "name": "Mobile Phones & Gadgets Spot 10 (A232)",
+      "cat": "mobile_phones_gadgets",
+      "desc": "Premier outlet for mobile phones & gadgets located in BLock 6 on the first floor.",
+      "shutters": [
+        "first_floor:A232"
+      ],
+      "hours": "10:00 AM - 10:00 PM",
+      "phone": "+1 (555) 329-2738"
+    }
+  ]
+}
