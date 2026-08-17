@@ -13,7 +13,7 @@ const NavigationBar: React.FC = () => {
   return (
     <header className="relative w-full" style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}>
       {/* Hero Section */}
-      <div className="relative h-[140px] w-full overflow-hidden">
+      <div className="relative h-[120px] sm:h-[160px] md:h-[180px] w-full overflow-hidden">
         <img
           src="/mall_images/ptm_hero.webp"
           alt="Hero Background"
@@ -27,22 +27,21 @@ const NavigationBar: React.FC = () => {
       </div>
 
       {/* Navigation Menu */}
-      <nav className="absolute top-2 left-0 right-0 z-50">
-        <div className="w-full px-4 md:px-8 lg:px-12">
-          <div className="relative flex h-24 items-center justify-between">
-            {/* Logo on Left */}
+      <nav className="absolute top-0 left-0 right-0 z-50 bg-gray-100/95 backdrop-blur-md border-b border-gray-200/90 shadow-md">
+        <div className="w-full px-3 sm:px-6 md:px-8 lg:px-12">
+          <div className="relative flex h-18 sm:h-22 md:h-26 py-2 sm:py-3 items-center justify-between">
             <div className="relative z-20 flex items-center flex-shrink-0">
               <Link to="/" className="flex items-center no-underline hover:no-underline">
                 <img
-                  src="/tm_logo_tp.png"
+                  src="/tm_logo_nobg.png"
                   alt="Pokhara Trade Mall Logo"
-                  className="w-36 md:w-44 lg:w-48 h-auto object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)] transition-all"
+                  className="w-36 sm:w-40 md:w-44 lg:w-48 h-auto max-h-14 sm:max-h-16 md:max-h-20 object-contain transition-transform hover:scale-105"
                 />
               </Link>
             </div>
 
             {/* Navigation Items Centered (Exact Horizontal Center) */}
-            <div className="hidden md:flex items-center space-x-5 lg:space-x-8 text-white absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-20">
+            <div className="hidden md:flex items-center space-x-5 lg:space-x-8 text-gray-800 absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-20">
               {menuItems.map((item, index) => {
                 const hasSub = !!item.subGroups;
                 const isDropdownOpen = activeDropdown === item.label;
@@ -53,7 +52,7 @@ const NavigationBar: React.FC = () => {
                     <Link
                       key={item.label}
                       to={item.href || '#'}
-                      className={`text-white text-sm tracking-widest no-underline hover:no-underline hover:text-red-300 ${styles.navLink} transition-colors whitespace-nowrap`}
+                      className={`text-gray-800 font-semibold text-sm tracking-widest no-underline hover:no-underline hover:text-red-700 ${styles.navLink} transition-colors whitespace-nowrap`}
                       style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                     >
                       {item.label.toUpperCase()}
@@ -69,14 +68,13 @@ const NavigationBar: React.FC = () => {
                     onMouseLeave={() => setActiveDropdown(null)}
                   >
                     <button
-                      className={`flex items-center space-x-1.5 text-sm tracking-widest whitespace-nowrap text-shadow cursor-pointer transition-colors ${
-                        isDropdownOpen ? 'text-red-400' : 'text-white hover:text-red-300'
-                      }`}
+                      className={`flex items-center space-x-1.5 text-sm font-semibold tracking-widest whitespace-nowrap cursor-pointer transition-colors ${isDropdownOpen ? 'text-red-700' : 'text-gray-800 hover:text-red-700'
+                        }`}
                       style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                     >
                       <span>{item.label.toUpperCase()}</span>
                       <svg
-                        className={`w-3.5 h-3.5 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180 text-red-400' : 'text-white/70'}`}
+                        className={`w-3.5 h-3.5 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180 text-red-700' : 'text-gray-500'}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -93,16 +91,14 @@ const NavigationBar: React.FC = () => {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 8, scale: 0.98 }}
                           transition={{ duration: 0.2, ease: "easeOut" }}
-                          className={`absolute top-full mt-1 bg-black/90 backdrop-blur-xl border border-white/15 rounded-xl shadow-2xl p-4 z-50 text-white ${
-                            isRightAligned ? 'right-0 left-auto' : 'left-0 right-auto'
-                          } ${
-                            item.subGroups && item.subGroups.length > 1 ? 'w-[440px] max-w-[90vw] grid grid-cols-2 gap-6' : 'min-w-[220px] whitespace-nowrap'
-                          }`}
+                          className={`absolute top-full mt-2 bg-white/98 backdrop-blur-xl border border-gray-200/90 rounded-xl shadow-2xl p-4 z-50 text-gray-800 ${isRightAligned ? 'right-0 left-auto' : 'left-0 right-auto'
+                            } ${item.subGroups && item.subGroups.length > 1 ? 'w-[440px] max-w-[90vw] grid grid-cols-2 gap-6' : 'min-w-[220px] whitespace-nowrap'
+                            }`}
                         >
                           {item.subGroups?.map((group, gIdx) => (
                             <div key={gIdx} className="space-y-2">
                               {group.title && (
-                                <div className="text-xs font-bold tracking-widest text-red-400 uppercase pb-1.5 border-b border-white/15">
+                                <div className="text-xs font-bold tracking-widest text-red-700 uppercase pb-1.5 border-b border-gray-200">
                                   {group.title}
                                 </div>
                               )}
@@ -112,7 +108,7 @@ const NavigationBar: React.FC = () => {
                                     key={subItem.label}
                                     to={subItem.href}
                                     onClick={() => setActiveDropdown(null)}
-                                    className="block px-3 py-2 text-sm tracking-wider text-gray-200 hover:text-red-300 hover:bg-white/10 no-underline hover:no-underline rounded-lg transition-all"
+                                    className="block px-3 py-2 text-sm tracking-wider text-gray-700 hover:text-red-700 hover:bg-red-50/80 no-underline hover:no-underline rounded-lg font-medium transition-all"
                                     style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                                   >
                                     {subItem.label}
@@ -130,38 +126,38 @@ const NavigationBar: React.FC = () => {
             </div>
 
             {/* Persistent Right Section: Mall Timings & Mall Map */}
-            <div className="hidden xl:flex items-center space-x-3.5 bg-black/55 backdrop-blur-xl border border-white/20 px-4 py-2 rounded-full text-white shadow-xl flex-shrink-0">
+            <div className="hidden xl:flex items-center space-x-3.5 bg-gray-100/90 border border-gray-200/90 px-4 py-2 rounded-full text-gray-800 shadow-sm flex-shrink-0">
               {/* Mall Timings */}
               <div className="relative group cursor-pointer flex items-center space-x-1.5 text-xs font-semibold tracking-wide">
-                <svg className="w-3.5 h-3.5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-gray-300 uppercase tracking-widest text-[10px]">TIMINGS:</span>
-                <span className="text-white font-bold text-xs whitespace-nowrap">10 AM - 8 PM</span>
+                <span className="text-gray-500 uppercase tracking-widest text-[10px]">TIMINGS:</span>
+                <span className="text-gray-900 font-bold text-xs whitespace-nowrap">10 AM - 8 PM</span>
 
                 {/* Hover Schedule Popup */}
-                <div className="absolute top-full right-0 mt-2.5 hidden group-hover:block bg-black/95 backdrop-blur-2xl border border-white/20 rounded-xl p-3 shadow-2xl text-xs text-white min-w-[210px] z-50">
-                  <div className="text-[10px] font-bold text-red-400 uppercase tracking-widest pb-1 border-b border-white/15 mb-2">Mall Operating Hours</div>
-                  <div className="space-y-1 text-gray-200">
-                    <div className="flex justify-between"><span>Weekdays:</span> <span className="font-semibold text-white">10:00 AM - 8:00 PM</span></div>
-                    <div className="flex justify-between"><span>Weekends:</span> <span className="font-semibold text-white">10:00 AM - 10:00 PM</span></div>
+                <div className="absolute top-full right-0 mt-2.5 hidden group-hover:block bg-white border border-gray-200 rounded-xl p-3 shadow-2xl text-xs text-gray-800 min-w-[210px] z-50">
+                  <div className="text-[10px] font-bold text-red-700 uppercase tracking-widest pb-1 border-b border-gray-200 mb-2">Mall Operating Hours</div>
+                  <div className="space-y-1 text-gray-600">
+                    <div className="flex justify-between"><span>Weekdays:</span> <span className="font-semibold text-gray-900">10:00 AM - 8:00 PM</span></div>
+                    <div className="flex justify-between"><span>Weekends:</span> <span className="font-semibold text-gray-900">10:00 AM - 10:00 PM</span></div>
                   </div>
                 </div>
               </div>
 
-              <span className="text-white/25">|</span>
+              <span className="text-gray-300">|</span>
 
               {/* Mall Map Link */}
               <Link
                 to="/page/wayfinding"
-                className="flex items-center space-x-1 text-xs font-bold text-white hover:text-red-300 no-underline hover:no-underline transition-colors whitespace-nowrap group"
+                className="flex items-center space-x-1 text-xs font-bold text-gray-900 hover:text-red-700 no-underline hover:no-underline transition-colors whitespace-nowrap group"
               >
-                <svg className="w-3.5 h-3.5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 <span>MALL MAP</span>
-                <svg className="w-3 h-3 text-red-400 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 text-red-600 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>

@@ -28,15 +28,15 @@
 }
 
 .navLink {
-  font-weight: 400;
+  font-weight: 600;
   transition: color 0.3s ease;
-  color: #ffffff;
+  color: #1e293b;
   display: flex; /* To align icon and text */
 }
 
 .navLink:hover {
-  color: #fca5a5;
-  font-weight: 400;
+  color: #b91c1c;
+  font-weight: 600;
   text-decoration-line: none !important;
 }
 

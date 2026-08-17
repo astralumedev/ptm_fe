@@ -95,16 +95,16 @@ export default function FeaturedStoresSection() {
       <div className="container mx-auto px-3 sm:px-6">
         
         {/* Heading Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 gap-6">
-          {/* Left Aligned Title & Description */}
-          <div className="max-w-3xl text-left">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 gap-6 text-center md:text-left">
+          {/* Title & Description */}
+          <div className="max-w-3xl text-center md:text-left mx-auto md:mx-0">
             <h2
               className="text-3xl md:text-4xl lg:text-5xl font-medium text-gray-900 tracking-wider mb-2 uppercase"
               style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
             >
               SHOP
             </h2>
-            <div className="w-12 md:w-16 h-0.5 bg-[#801424]/60 rounded-full mb-3" />
+            <div className="w-12 md:w-16 h-0.5 bg-[#801424]/60 rounded-full mb-3 mx-auto md:mx-0" />
             <p
               className="text-gray-600 text-sm md:text-base leading-relaxed mt-2"
               style={{ fontFamily: "'Montserrat', sans-serif" }}
@@ -114,7 +114,7 @@ export default function FeaturedStoresSection() {
           </div>
 
           {/* Right Aligned Controls: See All Link */}
-          <div className="flex-shrink-0 self-start md:self-end pb-1">
+          <div className="flex-shrink-0 self-center md:self-end pb-1">
             <Link
               to="/shops/retail"
               className="inline-flex items-center gap-2 text-base md:text-lg font-medium text-gray-900 hover:text-[#801424] transition-colors group whitespace-nowrap !no-underline hover:!no-underline focus:!no-underline"

@@ -55,7 +55,7 @@ export const WayfindingHeader: React.FC<WayfindingHeaderProps> = ({
       <div className={styles.headerMain}>
         <Link to="/" className={styles.logo} title="Return to Pokhara Trade Mall Home">
           <img
-            src="/tm_logo_tp.png"
+            src="/tm_logo_nobg.png"
             alt="Pokhara Trade Mall Logo"
             className={styles.logoImg}
           />

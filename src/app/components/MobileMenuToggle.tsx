@@ -10,10 +10,10 @@ function MobileMenuToggle({ onClick }: MobileMenuToggleProps) {
   return (
     <button 
       onClick={onClick} 
-      className="text-white p-2 hover:bg-white/10 rounded-full transition-colors flex items-center gap-2"
+      className="text-gray-900 hover:bg-gray-200/80 p-2 rounded-full transition-colors flex items-center justify-center cursor-pointer"
+      aria-label="Open Navigation Menu"
     >
-      <RiMenuFill size={28} className="text-white transform rotate-90" />
-      <span className="text-white text-sm tracking-wider font-medium">MENU</span>
+      <RiMenuFill size={26} className="text-gray-900" />
     </button>
   );
 }

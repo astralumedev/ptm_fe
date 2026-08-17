@@ -98,10 +98,10 @@ export default function QFXSection() {
       <div className="container mx-auto px-3 sm:px-6">
         
         {/* Heading Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 gap-6">
-          {/* Left Aligned Title & Description */}
-          <div className="max-w-3xl text-left">
-            <div className="flex items-center gap-3 mb-3">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 gap-6 text-center md:text-left">
+          {/* Title & Description */}
+          <div className="max-w-3xl text-center md:text-left mx-auto md:mx-0">
+            <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
               <span className="text-xs uppercase tracking-widest text-[#801424] font-bold bg-[#801424]/10 px-3 py-1 rounded-full">
                 Multiplex Cineplex
               </span>
@@ -118,7 +118,7 @@ export default function QFXSection() {
             >
               QFX CINEMAS
             </h2>
-            <div className="w-12 md:w-16 h-0.5 bg-[#801424]/60 rounded-full mb-3" />
+            <div className="w-12 md:w-16 h-0.5 bg-[#801424]/60 rounded-full mb-3 mx-auto md:mx-0" />
 
             <p
               className="text-gray-600 text-sm md:text-base leading-relaxed"
@@ -129,7 +129,7 @@ export default function QFXSection() {
           </div>
 
           {/* Right Aligned Controls: Book Tickets Link & Scroll Buttons */}
-          <div className="flex items-center gap-4 flex-shrink-0 self-start md:self-end pb-1">
+          <div className="flex items-center justify-center md:justify-end gap-4 flex-shrink-0 self-center md:self-end pb-1">
             <a
               href="https://www.qfxcinemas.com/"
               target="_blank"
