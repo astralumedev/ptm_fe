@@ -23,7 +23,7 @@ const latestNewsAndEvents: NewsItem[] = [
     date: 'Aug 15 - Aug 25',
     summary: 'Up to 50% OFF across top fashion, apparel & footwear brands at Pokhara Trade Mall!',
     imageUrl: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80',
-    href: '/page/events',
+    href: '/latest#events',
   },
   {
     id: 'qfx-upgrade',
@@ -32,7 +32,7 @@ const latestNewsAndEvents: NewsItem[] = [
     date: 'Aug 20',
     summary: 'Experience ultra-crisp 4K Laser Projection and immersive Dolby Atmos surround sound at Screen 2.',
     imageUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80',
-    href: '/page/events',
+    href: '/latest#events',
   },
   {
     id: 'food-fest',
@@ -41,7 +41,7 @@ const latestNewsAndEvents: NewsItem[] = [
     date: 'Aug 28',
     summary: 'Taste authentic Himalayan Thakali delicacies and local artisan fruit wines on the rooftop terrace.',
     imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80',
-    href: '/page/blogs',
+    href: '/latest#blogs',
   },
   {
     id: 'boutiques',

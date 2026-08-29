@@ -11,23 +11,9 @@ const NavigationBar: React.FC = () => {
   const [openMobileSubmenu, setOpenMobileSubmenu] = useState<string | null>(null);
 
   return (
-    <header className="relative w-full" style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}>
-      {/* Hero Section */}
-      <div className="relative h-[120px] sm:h-[160px] md:h-[180px] w-full overflow-hidden">
-        <img
-          src="/mall_images/ptm_hero.webp"
-          alt="Hero Background"
-          className="object-cover w-full h-full blur-[2px] scale-105"
-        />
-        {/* Minimal Smooth Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1b1c54]/80 to-[#231528]/80" />
-
-        {/* Subtle animated gradient */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-      </div>
-
+    <header className="relative w-full z-50" style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}>
       {/* Navigation Menu */}
-      <nav className="absolute top-0 left-0 right-0 z-50 bg-gray-100/95 backdrop-blur-md border-b border-gray-200/90 shadow-md">
+      <nav className="w-full bg-gray-100/95 backdrop-blur-md border-b border-gray-200/90 shadow-sm">
         <div className="w-full px-3 sm:px-6 md:px-8 lg:px-12">
           <div className="relative flex h-18 sm:h-22 md:h-26 py-2 sm:py-3 items-center justify-between">
             <div className="relative z-20 flex items-center flex-shrink-0">

@@ -9,7 +9,7 @@ export interface NavItem {
 }
 
 export const navItems: NavItem[] = [
-  { name: 'Happenings', icon: MdBusinessCenter, page: '/blogs', outlink: false },
+  { name: 'Happenings', icon: MdBusinessCenter, page: '/latest', outlink: false },
   { name: 'Shopping', icon: MdOutlineVisibility, page: '/shops/retail', outlink: false },
   { name: 'Dining', icon: MdOutlinePeople, page: '/shops/eatery', outlink: false },
   { name: '31 Park Hotel', icon: MdOutlineContactMail, page: '/shops/details/31_park_hotel', outlink: false },

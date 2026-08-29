@@ -81,8 +81,8 @@ const Footer: React.FC = () => {
               </Link>
             </li>
             <li>
-              <Link to="/blogs" className="text-gray-700 hover:text-[#801424] transition-colors">
-                Events
+              <Link to="/latest" className="text-gray-700 hover:text-[#801424] transition-colors">
+                Latest & Events
               </Link>
             </li>
             <li>

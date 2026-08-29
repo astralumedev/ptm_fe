@@ -5,7 +5,7 @@ import './globals.css';
 import HomePage from '../pages/HomePage';
 import ShopTypePage from '../pages/ShopTypePage';
 import ShopDetailPage from '../pages/ShopDetailPage';
-import BlogListPage from '../pages/BlogListPage';
+import LatestPage from '../pages/LatestPage';
 import BlogDetailPage from '../pages/BlogDetailPage';
 import ContactPage from '../pages/ContactPage';
 import ContentPage from '../pages/ContentPage';
@@ -19,8 +19,11 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/shops/:type" element={<ShopTypePage />} />
           <Route path="/shops/details/:slug" element={<ShopDetailPage />} />
-          <Route path="/blogs" element={<BlogListPage />} />
+          <Route path="/latest" element={<LatestPage />} />
+          <Route path="/blogs" element={<LatestPage />} />
           <Route path="/blogs/:slug" element={<BlogDetailPage />} />
+          <Route path="/events" element={<LatestPage />} />
+          <Route path="/offers" element={<LatestPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/page/:slug" element={<ContentPage />} />
           <Route path="/mall-map" element={<MallMapPage />} />

@@ -20,9 +20,10 @@ export const menuItems: MenuItem[] = [
     subGroups: [
       {
         items: [
-          { label: "Latest", href: "/blogs" },
-          { label: "Events", href: "/page/events" },
-          { label: "Offers", href: "/page/offers" },
+          { label: "All Latest", href: "/latest" },
+          { label: "Blogs & Stories", href: "/latest#blogs" },
+          { label: "Events & Happenings", href: "/latest#events" },
+          { label: "Offers & Deals", href: "/latest#offers" },
         ],
       },
     ],

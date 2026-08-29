@@ -167,9 +167,9 @@ export const mockBlogs: Blog[] = [
     status: 'published',
     owner: {
       id: 1,
-      first_name: 'PTM',
-      last_name: 'Team',
-      email: 'info@pokharatrademall.com',
+      first_name: 'Aayush',
+      last_name: 'Sharma',
+      email: 'lifestyle@pokharatrademall.com',
       status: 'active',
       role: 1,
       external_id: null,
@@ -178,13 +178,24 @@ export const mockBlogs: Blog[] = [
       locale: 'en',
       avatar: null,
       company: 'Pokhara Trade Mall',
-      title: 'Editor',
+      title: 'Senior Lifestyle Editor',
     },
-    created_on: '2026-02-01T10:00:00Z',
+    created_on: '2026-08-20T10:00:00Z',
     updated_on: null,
-    title: 'Grand Festive Celebration & Shopping Extravaganza at Pokhara Trade Mall',
-    slug: 'grand-festive-celebration-ptm',
-    content: '<p>Join us at Pokhara Trade Mall for our seasonal shopping celebration! Enjoy up to 50% discounts across top clothing brands, food court vouchers, and live music performances every weekend in Chipledhunga, Pokhara.</p>',
+    title: 'The Ultimate Pokhara Trade Mall Experience: Shopping, Dining & Cinema Guide',
+    slug: 'ultimate-pokhara-trade-mall-guide',
+    content: `
+      <p class="lead">Nestled in the bustling hub of Chiple Dhunga, Pokhara Trade Mall stands as the city's quintessential lifestyle hub. Whether you are a local resident catching up with friends or a traveler exploring Pokhara, here is your definitive insider walkthrough to maximizing your day.</p>
+      
+      <h3>1. Morning Coffee & Retail Therapy</h3>
+      <p>Kick off your morning on the Ground Floor with artisanal espresso and fresh bakery treats. As the stores open, wander through the fashion wing housing premier apparel, Nepali pashmina scarves, high-grade trekking essentials, and footwear collections.</p>
+      
+      <h3>2. Authentic Himalayan Flavors at the Food Court</h3>
+      <p>By midday, take the escalators up to the 4th Floor Food Court. From sizzling Thakali sets with organic Jimbu ghee to aromatic authentic momos and Continental burgers, the dining terrace offers breathtaking panoramic views of the Pokhara valley.</p>
+      
+      <h3>3. 4K Cinema & Entertainment</h3>
+      <p>Cap off your afternoon at QFX Cinemas featuring state-of-the-art 4K laser projection and Dolby Atmos sound, or unleash your gaming spirit at the 4D VR Game Zone with thrilling arcade simulators.</p>
+    `,
     cover_image: {
       data: {
         full_url: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1200&q=80',
@@ -199,10 +210,10 @@ export const mockBlogs: Blog[] = [
     id: 2,
     status: 'published',
     owner: {
-      id: 1,
-      first_name: 'PTM',
-      last_name: 'Events',
-      email: 'events@pokharatrademall.com',
+      id: 2,
+      first_name: 'Priyanka',
+      last_name: 'Gurung',
+      email: 'fashion@pokharatrademall.com',
       status: 'active',
       role: 1,
       external_id: null,
@@ -211,18 +222,147 @@ export const mockBlogs: Blog[] = [
       locale: 'en',
       avatar: null,
       company: 'Pokhara Trade Mall',
-      title: 'Events Manager',
+      title: 'Fashion & Trends Curator',
     },
-    created_on: '2026-02-10T14:30:00Z',
+    created_on: '2026-08-16T14:30:00Z',
     updated_on: null,
-    title: 'New Brands Open Their Doors at Pokhara Trade Mall',
-    slug: 'new-brands-opening-ptm',
-    content: '<p>We are delighted to welcome five new international and Nepali lifestyle brands to Pokhara Trade Mall. Visit our updated retail wings to explore the latest fashion and gadgets!</p>',
+    title: 'Autumn Style Edit 2026: Must-Have Outfits & Trends at PTM Boutiques',
+    slug: 'autumn-style-edit-2026',
+    content: `
+      <p>As the cool autumn breeze sweeps down from the Himalayas, it's time to refresh your wardrobe with seasonal warmth and timeless chic elegance.</p>
+      
+      <h3>Earthy Tones & Layered Textures</h3>
+      <p>This season is all about rich olive greens, warm rust, soft camel coats, and tactile corduroy. Our retail partners across Level 1 and 2 have curated lightweight trench coats and knitted sweaters perfect for Pokhara evenings.</p>
+      
+      <h3>Fusion Festive Wear</h3>
+      <p>With major celebrations on the horizon, explore contemporary fusion sarees, lightweight embroidered kurtas, and handcrafted jewelry sets that strike the perfect balance between heritage and modernity.</p>
+    `,
     cover_image: {
       data: {
         full_url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80',
         url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80',
         asset_url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80',
+        thumbnails: [],
+        embed: null,
+      },
+    },
+  },
+  {
+    id: 3,
+    status: 'published',
+    owner: {
+      id: 3,
+      first_name: 'Rohan',
+      last_name: 'Shrestha',
+      email: 'dining@pokharatrademall.com',
+      status: 'active',
+      role: 1,
+      external_id: null,
+      theme: 'default',
+      timezone: 'Asia/Kathmandu',
+      locale: 'en',
+      avatar: null,
+      company: 'Pokhara Trade Mall',
+      title: 'Food & Culinary Critic',
+    },
+    created_on: '2026-08-10T11:15:00Z',
+    updated_on: null,
+    title: 'Foodie Guide: Top 6 Must-Try Delicacies at Pokhara Trade Mall Food Court',
+    slug: 'foodie-guide-top-delicacies-ptm',
+    content: `
+      <p>Food lovers, rejoice! The revamped 4th Floor Food Court at Pokhara Trade Mall brings together beloved street favorites and artisanal gourmet creations under one roof.</p>
+      
+      <h3>1. The Royal Thakali Set</h3>
+      <p>Served in shining traditional brass plates, enjoy aromatic local black dal, gundruk sandeko, tender mutton curry, and homemade Mustang radish pickles.</p>
+      
+      <h3>2. Jhol Momo Platters</h3>
+      <p>Steaming hot chicken and buff momos bathed in a tangy, spicy sesame-peanut broth that will warm your soul.</p>
+      
+      <h3>3. Stone-Oven Thin Crust Pizza</h3>
+      <p>Fresh mozzarella, local herbs, and hand-stretched sourdough crust baked to crisp perfection with artisanal chili olive oil drizzle.</p>
+    `,
+    cover_image: {
+      data: {
+        full_url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80',
+        url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80',
+        asset_url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80',
+        thumbnails: [],
+        embed: null,
+      },
+    },
+  },
+  {
+    id: 4,
+    status: 'published',
+    owner: {
+      id: 1,
+      first_name: 'Aayush',
+      last_name: 'Sharma',
+      email: 'lifestyle@pokharatrademall.com',
+      status: 'active',
+      role: 1,
+      external_id: null,
+      theme: 'default',
+      timezone: 'Asia/Kathmandu',
+      locale: 'en',
+      avatar: null,
+      company: 'Pokhara Trade Mall',
+      title: 'Senior Lifestyle Editor',
+    },
+    created_on: '2026-08-05T09:00:00Z',
+    updated_on: null,
+    title: 'QFX Cinemas Experience: Why Screen 2 4K Laser Projection is a Game Changer',
+    slug: 'qfx-cinemas-4k-laser-experience',
+    content: `
+      <p>Moviegoing in Pokhara has reached new heights. QFX Cineplex at Pokhara Trade Mall has introduced state-of-the-art 4K RGB Laser Projection paired with Dolby Atmos 3D audio.</p>
+      
+      <h3>Pristine Visuals & Contrast</h3>
+      <p>Witness deep, inky blacks and hyper-vibrant color gamuts that make every cinematic sequence breathtakingly lifelike.</p>
+      
+      <h3>Immersive 64-Channel Sound</h3>
+      <p>With overhead acoustic speakers and subwoofers placed meticulously across the auditorium, feel every explosion and whisper right around you.</p>
+    `,
+    cover_image: {
+      data: {
+        full_url: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80',
+        url: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80',
+        asset_url: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80',
+        thumbnails: [],
+        embed: null,
+      },
+    },
+  },
+  {
+    id: 5,
+    status: 'published',
+    owner: {
+      id: 2,
+      first_name: 'Priyanka',
+      last_name: 'Gurung',
+      email: 'fashion@pokharatrademall.com',
+      status: 'active',
+      role: 1,
+      external_id: null,
+      theme: 'default',
+      timezone: 'Asia/Kathmandu',
+      locale: 'en',
+      avatar: null,
+      company: 'Pokhara Trade Mall',
+      title: 'Fashion & Trends Curator',
+    },
+    created_on: '2026-07-28T16:00:00Z',
+    updated_on: null,
+    title: 'Self-Care Saturday: Holistic Spa, Grooming & Wellness at Pokhara Trade Mall',
+    slug: 'self-care-wellness-ptm',
+    content: `
+      <p>Take time off your busy work schedule and treat yourself to a revitalizing day of grooming and holistic wellness on our Dedicated Services floor.</p>
+      <p>From aromatherapy massages using organic Himalayan herbs to modern styling and manicures, discover the tranquil side of Pokhara Trade Mall.</p>
+    `,
+    cover_image: {
+      data: {
+        full_url: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80',
+        url: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80',
+        asset_url: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80',
         thumbnails: [],
         embed: null,
       },
