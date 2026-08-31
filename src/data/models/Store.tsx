@@ -86,6 +86,11 @@ export interface Store {
   contact_number: string | null;
   operation_hours: string | null;
   subtitle: string | null;
+  floor?: string;
+  category?: string;
+  categorySlug?: string;
+  unitNumber?: string;
+  tags?: string[];
 }
 
 export interface StoreResponse {

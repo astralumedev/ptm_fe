@@ -3,7 +3,11 @@ import './globals.css';
 
 // Import pages
 import HomePage from '../pages/HomePage';
-import ShopTypePage from '../pages/ShopTypePage';
+import ShopPage from '../pages/ShopPage';
+import ShopDirectoryPage from '../pages/ShopDirectoryPage';
+import DinePage from '../pages/DinePage';
+import EntertainPage from '../pages/EntertainPage';
+import ServicesPage from '../pages/ServicesPage';
 import ShopDetailPage from '../pages/ShopDetailPage';
 import LatestPage from '../pages/LatestPage';
 import BlogDetailPage from '../pages/BlogDetailPage';
@@ -17,7 +21,16 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/shops/:type" element={<ShopTypePage />} />
+          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/shops" element={<ShopPage />} />
+          <Route path="/shops/directory" element={<ShopDirectoryPage />} />
+          <Route path="/shop/directory" element={<ShopDirectoryPage />} />
+          <Route path="/shops/retail" element={<ShopDirectoryPage />} />
+          <Route path="/dine" element={<DinePage />} />
+          <Route path="/shops/eatery" element={<DinePage />} />
+          <Route path="/entertain" element={<EntertainPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/shops/service" element={<ServicesPage />} />
           <Route path="/shops/details/:slug" element={<ShopDetailPage />} />
           <Route path="/latest" element={<LatestPage />} />
           <Route path="/blogs" element={<LatestPage />} />

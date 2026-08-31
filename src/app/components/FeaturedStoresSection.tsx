@@ -116,7 +116,7 @@ export default function FeaturedStoresSection() {
           {/* Right Aligned Controls: See All Link */}
           <div className="flex-shrink-0 self-center md:self-end pb-1">
             <Link
-              to="/shops/retail"
+              to="/shop"
               className="inline-flex items-center gap-2 text-base md:text-lg font-medium text-gray-900 hover:text-[#801424] transition-colors group whitespace-nowrap !no-underline hover:!no-underline focus:!no-underline"
               style={{ fontFamily: "'Montserrat', sans-serif", textDecoration: 'none' }}
             >
