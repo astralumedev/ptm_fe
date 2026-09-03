@@ -1,15 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { FaPhoneAlt, FaGlobe, FaFacebook, FaInstagram, FaTiktok, FaMapMarkerAlt, FaArrowLeft, FaStore } from 'react-icons/fa';
 import NavigationBar from '../app/components/NavigationBar';
+import PageHeader from '../app/components/PageHeader';
 import Footer from '../app/components/Footer';
 import api from '../services/api';
 import { Store } from '../data/models/Store';
-import { FaFacebook, FaInstagram, FaTiktok, FaGlobe, FaPhoneAlt } from 'react-icons/fa';
-
-interface StoreFilter {
-  status: 'published';
-  slug: string;
-}
 
 export default function ShopDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -19,48 +15,34 @@ export default function ShopDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function getShop() {
-      if (!slug) {
-        setError('No shop slug provided');
-        setLoading(false);
-        return;
-      }
-
+    const fetchShop = async () => {
       try {
-        const filter: StoreFilter = {
-          status: 'published',
-          slug: slug
-        };
-
-        const response = await api.getStores({
-          fields: '*,logo.data.full_url,cover.data.full_url,store_gallery.directus_files_id.*',
-          filter
-        });
-
-        if (!response.data || response.data.length === 0) {
-          setError('Shop not found');
-          setLoading(false);
-          return;
+        setLoading(true);
+        if (!slug) return;
+        const response = await api.getStores({ filter: { slug } });
+        if (response.data && response.data.length > 0) {
+          setShop(response.data[0]);
+        } else {
+          setError('Store not found');
         }
-
-        setShop(response.data[0] as Store);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching shop:', error);
-        setError('Failed to load shop');
+      } catch (err) {
+        console.error('Error loading store details:', err);
+        setError('Failed to load store');
+      } finally {
         setLoading(false);
       }
-    }
+    };
 
-    getShop();
+    fetchShop();
   }, [slug]);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white font-montserrat flex flex-col justify-between">
         <NavigationBar />
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-xl text-gray-600">Loading...</div>
+        <div className="flex flex-col items-center justify-center py-32 space-y-4">
+          <div className="w-10 h-10 border-4 border-[#801424] border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm font-semibold text-gray-500">Loading store profile...</p>
         </div>
         <Footer />
       </div>
@@ -69,15 +51,21 @@ export default function ShopDetailPage() {
 
   if (error || !shop) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white font-montserrat flex flex-col justify-between">
         <NavigationBar />
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="text-xl text-gray-600 mb-4">{error || 'Shop not found'}</div>
-            <button 
-              onClick={() => navigate('/')}
-              className="px-4 py-2 bg-mall-brown text-white rounded hover:bg-mall-accent transition-colors"
-            >
+        <div className="max-w-md mx-auto my-32 p-8 bg-white border border-gray-200 rounded-3xl text-center space-y-4 shadow-sm">
+          <div className="w-14 h-14 bg-red-50 text-[#801424] rounded-full flex items-center justify-center mx-auto text-2xl">
+            <FaStore />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 font-arizona-flare">{error || 'Store Not Found'}</h2>
+          <p className="text-xs text-gray-500">
+            We couldn't find the store or boutique you were searching for.
+          </p>
+          <div className="pt-2 flex justify-center gap-3">
+            <button onClick={() => navigate('/shops/directory')} className="btn-primary text-xs">
+              Explore Directory
+            </button>
+            <button onClick={() => navigate('/')} className="btn-secondary text-xs">
               Go Home
             </button>
           </div>
@@ -88,145 +76,200 @@ export default function ShopDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+    <div className="min-h-screen font-montserrat bg-neutral-50/50 text-gray-900">
       <NavigationBar />
 
-      {/* Main Content */}
-      <section className="w-full px-4 md:px-12 py-20 bg-white">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-2 gap-12">
-            {/* Left Column */}
-            <div className="my-6">
-              <h2 className="text-3xl text-center font-lora text-shadow-mall-brown md:text-4xl font-bold text-gray-600 tracking-widest">
-                {shop.name.toUpperCase()}
-              </h2>
+      <PageHeader
+        title={shop.name}
+        subtitle={shop.subtitle || `Explore ${shop.name} at Pokhara Trade Mall`}
+        badge={shop.type?.toUpperCase() || 'RETAIL OUTLET'}
+        breadcrumbs={[
+          { label: 'Directory', href: '/shops/directory' },
+          { label: shop.name }
+        ]}
+      />
 
-              {shop.subtitle && (
-                <p className="text-base text-center tracking-wider mt-2 font-light font-montserrat text-mall-accent-dark">
-                  {shop.subtitle.toUpperCase()}
-                </p>
-              )}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        
+        {/* Back Link */}
+        <div className="mb-8">
+          <Link
+            to="/shops/directory"
+            className="btn-link"
+          >
+            <FaArrowLeft className="w-3.5 h-3.5" />
+            <span>Back to Store Directory</span>
+          </Link>
+        </div>
 
-              {/* Social Links */}
-              <div className="flex justify-center items-center mt-2 gap-8 rounded-full p-2">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          
+          {/* Left Column: Details & Description */}
+          <div className="lg:col-span-7 space-y-8">
+            
+            <div className="bg-white p-8 sm:p-10 rounded-3xl border border-gray-200/80 shadow-xs space-y-6">
+              
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-6">
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 font-arizona-flare">
+                    {shop.name}
+                  </h2>
+                  {shop.subtitle && (
+                    <p className="text-xs font-semibold uppercase tracking-wider text-[#801424] mt-1">
+                      {shop.subtitle}
+                    </p>
+                  )}
+                </div>
+
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 border border-red-200 text-[#801424] text-xs font-bold">
+                  <FaMapMarkerAlt className="w-3.5 h-3.5" />
+                  <span>Floor: {shop.floor || 'Level 1'}</span>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="prose prose-sm max-w-none text-gray-600 leading-relaxed">
+                <div dangerouslySetInnerHTML={{ __html: shop.store_description || 'Welcome to ' + shop.name + ' at Pokhara Trade Mall.' }} />
+              </div>
+
+              {/* Social Channels */}
+              <div className="pt-4 border-t border-gray-100 flex flex-wrap items-center gap-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-400 mr-2">Connect:</span>
                 {shop.website && (
-                  <a 
-                    href={shop.website} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="text-mall-brown hover:text-mall-accent transition-colors"
+                  <a
+                    href={shop.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-700 hover:text-[#801424] hover:bg-red-50 transition-colors"
                   >
-                    <FaGlobe className="w-6 h-6 text-mall-reseda-green" />
+                    <FaGlobe className="w-4 h-4" />
                   </a>
                 )}
                 {shop.facebook && (
-                  <a 
-                    href={shop.facebook} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="text-mall-brown hover:text-mall-accent transition-colors"
+                  <a
+                    href={shop.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-700 hover:text-[#801424] hover:bg-red-50 transition-colors"
                   >
-                    <FaFacebook className="w-6 h-6 text-mall-reseda-green" />
+                    <FaFacebook className="w-4 h-4" />
                   </a>
                 )}
                 {shop.instagram && (
-                  <a 
-                    href={shop.instagram} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="text-mall-brown hover:text-mall-accent transition-colors"
+                  <a
+                    href={shop.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-700 hover:text-[#801424] hover:bg-red-50 transition-colors"
                   >
-                    <FaInstagram className="w-6 h-6 text-mall-reseda-green" />
+                    <FaInstagram className="w-4 h-4" />
                   </a>
                 )}
                 {shop.tiktok && (
-                  <a 
-                    href={shop.tiktok} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="text-mall-brown hover:text-mall-accent transition-colors"
+                  <a
+                    href={shop.tiktok}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-700 hover:text-[#801424] hover:bg-red-50 transition-colors"
                   >
-                    <FaTiktok className="w-6 h-6 text-mall-reseda-green" />
-                  </a>
-                )}
-                {shop.contact_number && (
-                  <a 
-                    href={`tel:${shop.contact_number || ''}`}
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="text-mall-brown hover:text-mall-accent transition-colors"
-                  >
-                    <FaPhoneAlt className="w-6 h-6 text-mall-reseda-green" />
+                    <FaTiktok className="w-4 h-4" />
                   </a>
                 )}
               </div>
 
-              <div className="w-120 h-px bg-gradient-to-r from-transparent via-mall-accent-dark to-transparent mt-6 mb-6" />
-
-              {/* Store Description */}
-              <div className="prose prose-lg max-w-none mb-8">
-                <div 
-                  className="text-gray-700 leading-relaxed font-lora bg-mall-accent p-8 rounded-2xl"
-                  dangerouslySetInnerHTML={{ __html: shop.store_description }}
-                />
-
-                <div className="w-full mt-12">
-                  <div className="bg-mall-accent rounded-2xl p-6">
-                    <h3 className="text-xl font-bold mb-4 tracking-wider font-montserrat text-mall-brown">CONTACT</h3>
-                    <div className="space-y-4 text-gray-600">
-                      {shop.operation_hours && shop.operation_hours !== undefined && shop.type !== 'hotel' && (
-                        <p className="text-gray-700 leading-relaxed">
-                          Opening Hours : <span dangerouslySetInnerHTML={{ __html: shop.operation_hours }} />
-                        </p>
-                      )}
-                      {shop.operation_hours && shop.operation_hours !== undefined && shop.type === 'hotel' && (
-                        <p className="text-gray-700 leading-relaxed">
-                          <span dangerouslySetInnerHTML={{ __html: shop.operation_hours }} />
-                        </p>
-                      )}
-
-                      {/* Store Contact Number */}
-                      {shop.contact_number && shop.contact_number.length > 0 && (
-                        <div>
-                          {shop.type === 'hotel' && (
-                            <p className="text-gray-700 font-medium mb-2">For bookings & reservations:</p>
-                          )}
-                          <a
-                            href={`tel:${shop.contact_number || ''}`}
-                            className="text-gray-300 hover:text-white transition-colors"
-                          >
-                            <FaPhoneAlt className="w-4 h-4 inline mr-2" />
-                            {shop.contact_number || ''}
-                          </a>
-                        </div>                
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
 
-            {/* Right Column - Gallery */}
-            {shop.store_gallery && shop.store_gallery.length > 0 && (
-              <div className="grid grid-cols-2 gap-4">
-                {shop.store_gallery.slice(0, 4).map((image, index) => (
-                  <div 
-                    key={index}
-                    className={`relative overflow-hidden rounded-lg ${
-                      index % 3 === 0 ? 'col-span-2 aspect-[16/9]' : 'aspect-square'
-                    }`}
+            {/* Practical Info Card */}
+            <div className="bg-white p-8 rounded-3xl border border-gray-200/80 shadow-xs space-y-4">
+              <h3 className="text-base font-bold text-gray-900 font-arizona-flare uppercase tracking-wider">
+                Store Information
+              </h3>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-xs">
+                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-1">
+                  <span className="font-semibold text-gray-500 uppercase tracking-wider block">Hours</span>
+                  <p className="font-bold text-gray-800">
+                    {shop.operation_hours || '10:00 AM – 8:00 PM'}
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-1">
+                  <span className="font-semibold text-gray-500 uppercase tracking-wider block">Direct Phone</span>
+                  <p className="font-bold text-[#801424]">
+                    {shop.contact_number || '+977 61-520000'}
+                  </p>
+                </div>
+              </div>
+
+              {shop.contact_number && (
+                <div className="pt-2">
+                  <a
+                    href={`tel:${shop.contact_number.replace(/\s+/g, '')}`}
+                    className="btn-primary w-full"
                   >
-                    <img
-                      src={image.directus_files_id.data.full_url}
-                      alt={`${shop.name} gallery image ${index + 1}`}
-                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
-                    />
-                  </div>
-                ))}
+                    <FaPhoneAlt className="w-3.5 h-3.5" />
+                    <span>Call Store Directly</span>
+                  </a>
+                </div>
+              )}
+            </div>
+
+          </div>
+
+          {/* Right Column: Imagery & Gallery */}
+          <div className="lg:col-span-5 space-y-6">
+            
+            {/* Primary Cover Image */}
+            <div className="bg-white p-3 rounded-3xl border border-gray-200/80 shadow-md overflow-hidden aspect-[4/3] group">
+              <img
+                src={shop.cover?.data?.full_url || shop.logo?.data?.full_url || '/mall_images/ptm_hero.webp'}
+                alt={shop.name}
+                className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+
+            {/* Gallery Grid if available */}
+            {shop.store_gallery && shop.store_gallery.length > 0 && (
+              <div className="bg-white p-6 rounded-3xl border border-gray-200/80 shadow-xs space-y-4">
+                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
+                  Store Gallery
+                </h4>
+                <div className="grid grid-cols-2 gap-3">
+                  {shop.store_gallery.slice(0, 4).map((image, index) => (
+                    <div
+                      key={index}
+                      className="rounded-xl overflow-hidden aspect-square bg-gray-100 border border-gray-200"
+                    >
+                      <img
+                        src={image.directus_files_id.data.full_url}
+                        alt={`${shop.name} photo ${index + 1}`}
+                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
+
+            {/* Wayfinding Card */}
+            <div className="bg-gradient-to-br from-gray-900 to-gray-950 text-white p-8 rounded-3xl shadow-xl space-y-4">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-red-400">Navigation</span>
+              <h3 className="text-xl font-bold font-arizona-flare">Find in Mall Map</h3>
+              <p className="text-xs text-gray-300 leading-relaxed">
+                Locate {shop.name} with step-by-step turn guidance, escalators, and nearest parking lifts.
+              </p>
+              <Link
+                to={`/mall-map?search=${encodeURIComponent(shop.name)}`}
+                className="btn-white w-full"
+              >
+                <span>Navigate on Interactive Map</span>
+              </Link>
+            </div>
+
           </div>
+
         </div>
+
       </section>
 
       <Footer />

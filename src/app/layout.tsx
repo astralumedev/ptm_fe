@@ -14,6 +14,8 @@ import BlogDetailPage from '../pages/BlogDetailPage';
 import ContactPage from '../pages/ContactPage';
 import ContentPage from '../pages/ContentPage';
 import MallMapPage from '../pages/MallMapPage';
+import AboutPage from '../pages/AboutPage';
+import PrivacyPolicyPage from '../pages/PrivacyPolicyPage';
 
 function App() {
   return (
@@ -37,6 +39,15 @@ function App() {
           <Route path="/blogs/:slug" element={<BlogDetailPage />} />
           <Route path="/events" element={<LatestPage />} />
           <Route path="/offers" element={<LatestPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/about-us" element={<AboutPage />} />
+          <Route path="/page/about_us" element={<AboutPage />} />
+          <Route path="/page/about-us" element={<AboutPage />} />
+          <Route path="/page/about" element={<AboutPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/page/privacy_policy" element={<PrivacyPolicyPage />} />
+          <Route path="/page/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/page/:slug" element={<ContentPage />} />
           <Route path="/mall-map" element={<MallMapPage />} />

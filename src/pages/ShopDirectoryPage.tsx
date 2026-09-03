@@ -344,7 +344,7 @@ export default function ShopDirectoryPage() {
             </p>
             <button
               onClick={handleResetFilters}
-              className="px-6 py-2.5 bg-[#801424] text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-[#600f1b] transition-colors cursor-pointer"
+              className="btn-primary text-xs"
             >
               Reset All Filters
             </button>
@@ -519,7 +519,7 @@ export default function ShopDirectoryPage() {
                   )}
                   <Link
                     to={`/shops/details/${store.slug}`}
-                    className="px-4 py-2 bg-[#801424] text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-[#600f1b] transition-all no-underline shadow-xs flex items-center gap-1.5"
+                    className="btn-primary-sm"
                   >
                     <span>Details</span>
                     <FaArrowRight className="w-2.5 h-2.5" />

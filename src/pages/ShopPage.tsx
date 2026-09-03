@@ -370,14 +370,14 @@ export default function ShopPage() {
           <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 justify-center">
             <Link
               to="/shops/directory"
-              className="px-6 py-3.5 bg-[#801424] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl hover:bg-[#600f1b] transition-all no-underline text-center shadow-md flex items-center justify-center gap-2"
+              className="btn-primary"
             >
               <FaSearch className="w-3.5 h-3.5" />
               <span>Open Store Directory</span>
             </Link>
             <Link
               to="/mall-map"
-              className="px-6 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition-all no-underline text-center flex items-center justify-center gap-2"
+              className="btn-secondary"
             >
               <FaCompass className="w-3.5 h-3.5 text-[#801424]" />
               <span>Interactive Mall Map</span>

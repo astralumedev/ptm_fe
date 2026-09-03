@@ -424,7 +424,7 @@ export default function ServicesPage() {
             <div className="flex-shrink-0 flex flex-wrap gap-3">
               <Link
                 to="/contact"
-                className="px-6 py-3 bg-[#801424] text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-[#9d192c] transition-all no-underline shadow-lg flex items-center gap-2"
+                className="btn-primary"
               >
                 <FaEnvelope className="w-3.5 h-3.5" />
                 <span>Contact Us</span>

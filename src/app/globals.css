@@ -10,18 +10,18 @@
   --color-avocado-400: oklch(0.92 0.19 114.08);
   --color-avocado-500: oklch(0.84 0.18 117.33);
   --color-avocado-600: oklch(0.53 0.12 118.34);
-  --ease-fluid: cubic-bezier(0.3, 0, 0, 1);
+  --ease-fluid: cubic-bezier(0.3, 0, 1);
   --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
-  --color-mall-primary: #2e3094;
-  --color-mall-secondary: #801424;
+  --color-mall-primary: #801424;
+  --color-mall-secondary: #600f1b;
   --color-mall-blue: #2e3094;
   --color-mall-red: #801424;
   --color-mall-background: #F8FAFC;
   --color-mall-accent: #F1F4F9;
   --color-mall-accent-dark: #16194A;
   --color-mall-cream: #FAFAFD;
-  --color-mall-brown: #181A40;
-  --color-mall-reseda-green: #2e3094;
+  --color-mall-brown: #801424;
+  --color-mall-reseda-green: #801424;
   --color-mall-sage: #64748B;
   --color-mall-dark-sage: #334155;
 }
@@ -73,18 +73,209 @@ html,
 body {
   padding: 0;
   margin: 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-a:hover{
-  text-decoration-line: underline !important;
+  color: #111827;
+  background-color: #ffffff;
 }
 
 * {
   box-sizing: border-box;
 }
 
+/* Base link behavior */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   UNIFIED BUTTON & ACTION COMPONENT SCHEMES
+   ========================================================================== */
+
+/* Primary Brand Action Button */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  background-color: #801424;
+  color: #ffffff !important;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-decoration: none !important;
+  box-shadow: 0 4px 14px -2px rgba(128, 20, 36, 0.25);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn-primary:hover {
+  background-color: #600f1b;
+  color: #ffffff !important;
+  text-decoration: none !important;
+  box-shadow: 0 6px 20px -2px rgba(96, 15, 27, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Compact Primary Button */
+.btn-primary-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.625rem;
+  background-color: #801424;
+  color: #ffffff !important;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-decoration: none !important;
+  box-shadow: 0 2px 8px -1px rgba(128, 20, 36, 0.2);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn-primary-sm:hover {
+  background-color: #600f1b;
+  color: #ffffff !important;
+  text-decoration: none !important;
+  transform: translateY(-1px);
+}
+
+/* Secondary / Outline Button */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  background-color: #ffffff;
+  color: #1f2937 !important;
+  border: 1px solid #d1d5db;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-decoration: none !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: #f9fafb;
+  color: #801424 !important;
+  border-color: rgba(128, 20, 36, 0.4);
+  text-decoration: none !important;
+  transform: translateY(-1px);
+}
+
+/* White High-Contrast Button (For dark banners / red cards) */
+.btn-white {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  background-color: #ffffff;
+  color: #801424 !important;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-decoration: none !important;
+  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn-white:hover {
+  background-color: #f3f4f6;
+  color: #600f1b !important;
+  text-decoration: none !important;
+  transform: translateY(-1px);
+}
+
+/* Translucent Dark Button */
+.btn-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-decoration: none !important;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.btn-dark:hover {
+  background-color: rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #ffffff !important;
+  text-decoration: none !important;
+  transform: translateY(-1px);
+}
+
+/* Ghost Link Action */
+.btn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #801424 !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-link:hover {
+  color: #600f1b !important;
+  text-decoration: none !important;
+  transform: translateX(2px);
+}
+
+/* Ensure no anchor button gets underlined */
+a[class*="btn-"],
+button[class*="btn-"] {
+  text-decoration: none !important;
+}
+
+a[class*="btn-"]:hover,
+button[class*="btn-"]:hover {
+  text-decoration: none !important;
+}

@@ -404,7 +404,7 @@ export default function DinePage() {
             <div className="pt-4 flex flex-wrap items-center gap-4">
               <Link
                 to="/mall-map"
-                className="px-6 py-3 bg-[#801424] text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-[#9d192c] transition-all no-underline shadow-lg flex items-center gap-2"
+                className="btn-primary"
               >
                 <span>Find Food Court on Map</span>
                 <FaArrowRight className="w-3 h-3" />

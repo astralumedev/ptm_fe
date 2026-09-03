@@ -72,23 +72,24 @@ const HeaderSection = () => {
 
   return (
     <header className="relative w-full" style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}>
-      {/* Hero Section with Matching Opening Soon Dark Gradient & Fixed Background Image */}
-      <div className="relative w-full min-h-[580px] md:min-h-[620px] lg:min-h-[660px] overflow-hidden bg-gray-900 text-white flex items-center">
-        {/* Single Fixed Mall Background Image (Vivid & Clear) */}
+      {/* Hero Section with Dine Terrace Style Dark Gradient & Subtle Image Blend */}
+      <div className="relative w-full min-h-[580px] md:min-h-[620px] lg:min-h-[660px] overflow-hidden bg-gradient-to-r from-gray-900 via-[#1e1316] to-gray-900 text-white flex items-center shadow-xl border-b border-gray-800">
+        {/* Ambient Red Glow Highlights (Matching Dine Terrace) */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#801424]/20 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Subtle Background Image Overlay */}
         <img
           src="/mall_images/ptm_hero.webp"
           alt="Pokhara Trade Mall Building"
-          className="absolute inset-0 object-cover w-full h-full opacity-75"
+          className="absolute inset-0 object-cover w-full h-full opacity-20 mix-blend-luminosity pointer-events-none"
         />
 
-        {/* Semi-Transparent Opening Soon Dark Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950/98 via-gray-900/95 to-[#4a020d]/85 z-10 pointer-events-none" />
-
-        {/* Divided Hero Content Container (Left: Text + Timings, Right: Auto-Cycling Gallery Widget) */}
+        {/* Hero Content Container */}
         <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-20 pt-28 pb-10 sm:pt-32 sm:pb-10 md:pt-40 md:pb-14 flex flex-col lg:flex-row items-center lg:items-stretch justify-between gap-8 lg:gap-8">
           
-          {/* Left Section: ELEVATE YOUR SHOPPING EXPERIENCE Text + Timings & Mall Map */}
-          <div className="w-full lg:w-5/12 text-center lg:text-left flex flex-col items-center lg:items-start">
+          {/* Left Section: ELEVATE YOUR SHOPPING EXPERIENCE Text + Action Links */}
+          <div className="w-full lg:w-5/12 text-center lg:text-left flex flex-col items-center lg:items-start justify-center">
             <h1
               className="text-xl sm:text-3xl md:text-4xl font-bold text-white tracking-wider uppercase leading-snug sm:leading-tight drop-shadow-md text-center lg:text-left"
               style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
@@ -99,52 +100,28 @@ const HeaderSection = () => {
             <div className="w-12 sm:w-16 h-0.5 bg-[#801424] my-2.5 sm:my-3.5 rounded-full mx-auto lg:mx-0" />
 
             <p
-              className="text-gray-200 text-xs sm:text-sm leading-relaxed max-w-lg font-light mb-4 sm:mb-6 text-center lg:text-left"
+              className="text-gray-200 text-xs sm:text-sm leading-relaxed max-w-lg font-light mb-6 text-center lg:text-left"
               style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
               Your premier lifestyle destination for global fashion brands, gourmet Thakali dining, QFX cinemas, and everyday essentials in Pokhara.
             </p>
 
-            {/* Mall Timings & Mall Map Pill Widget */}
-            <div className="w-auto inline-flex items-center space-x-2.5 sm:space-x-3.5 bg-black/60 backdrop-blur-xl border border-white/20 px-4 py-2 sm:px-4 sm:py-2.5 rounded-full text-white shadow-xl">
-              {/* Mall Timings */}
-              <div className="relative group cursor-pointer flex items-center space-x-1.5 sm:space-x-2 text-xs font-semibold tracking-wide">
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-gray-300 uppercase tracking-widest text-[9px] sm:text-[10px]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                  TIMINGS:
-                </span>
-                <span className="text-white font-bold text-[11px] sm:text-xs whitespace-nowrap">10 AM - 8 PM</span>
-
-                {/* Hover Schedule Popup */}
-                <div className="absolute bottom-full left-0 mb-2.5 hidden group-hover:block bg-black/95 backdrop-blur-2xl border border-white/20 rounded-xl p-3 shadow-2xl text-xs text-white min-w-[210px] z-50">
-                  <div className="text-[10px] font-bold text-rose-400 uppercase tracking-widest pb-1 border-b border-white/15 mb-2">
-                    Mall Operating Hours
-                  </div>
-                  <div className="space-y-1 text-gray-200" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                    <div className="flex justify-between"><span>Weekdays:</span> <span className="font-semibold text-white">10:00 AM - 8:00 PM</span></div>
-                    <div className="flex justify-between"><span>Weekends:</span> <span className="font-semibold text-white">10:00 AM - 10:00 PM</span></div>
-                  </div>
-                </div>
-              </div>
-
-              <span className="text-white/25">|</span>
-
-              {/* Mall Map Link */}
+            {/* Direct Action Buttons */}
+            <div className="flex flex-wrap items-center gap-3.5 pt-1">
               <Link
-                to="/page/wayfinding"
-                className="flex items-center space-x-1 sm:space-x-1.5 text-xs font-bold text-white hover:text-rose-300 no-underline hover:no-underline transition-colors whitespace-nowrap group"
-                style={{ fontFamily: "'Montserrat', sans-serif", textDecoration: 'none' }}
+                to="/shops/directory"
+                className="btn-primary"
               >
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span className="text-[11px] sm:text-xs">MALL MAP</span>
-                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-rose-400 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span>Explore Stores</span>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>
+              </Link>
+              <Link
+                to="/latest"
+                className="btn-dark"
+              >
+                <span>What's On & Events</span>
               </Link>
             </div>
           </div>
@@ -248,12 +225,13 @@ const HeaderSection = () => {
         </div>
       </div>
 
-      {/* Navigation Menu */}
+      {/* Navigation Menu (Matching NavigationBar Design & Persistent Snippet) */}
       <nav className="absolute top-0 left-0 right-0 z-50 bg-gray-100/95 backdrop-blur-md border-b border-gray-200/90 shadow-md">
-        <div className="container mx-auto px-3 sm:px-6 md:px-8">
-          <div className="flex h-18 sm:h-22 md:h-26 py-2 sm:py-3 items-center justify-between">
-            {/* Logo on Left (Aligned with ELEVATE text) */}
-            <div className="flex items-center flex-shrink-0">
+        <div className="w-full px-3 sm:px-6 md:px-8 lg:px-12">
+          <div className="relative flex h-18 sm:h-22 md:h-26 py-2 sm:py-3 items-center justify-between">
+            
+            {/* Logo on Left */}
+            <div className="relative z-20 flex items-center flex-shrink-0">
               <Link to="/" className="flex items-center no-underline hover:no-underline">
                 <img
                   src="/tm_logo_nobg.png"
@@ -263,18 +241,19 @@ const HeaderSection = () => {
               </Link>
             </div>
 
-            {/* Navigation Items Aligned Right (Aligned with WHAT'S ON section) */}
-            <div className="hidden md:flex items-center space-x-6 lg:space-x-8 text-gray-800">
-              {menuItems.map((item) => {
+            {/* Navigation Items Centered (Exact Horizontal Center) */}
+            <div className="hidden md:flex items-center space-x-5 lg:space-x-8 text-gray-800 absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-20">
+              {menuItems.map((item, index) => {
                 const hasSub = !!item.subGroups;
                 const isDropdownOpen = activeDropdown === item.label;
+                const isRightAligned = index >= menuItems.length / 2;
 
                 if (!hasSub) {
                   return (
                     <Link
                       key={item.label}
                       to={item.href || '#'}
-                      className={`text-sm font-semibold tracking-widest whitespace-nowrap text-gray-800 no-underline hover:no-underline hover:text-red-700 transition-colors ${styles.navLink}`}
+                      className={`text-gray-800 font-semibold text-sm tracking-widest no-underline hover:no-underline hover:text-red-700 ${styles.navLink} transition-colors whitespace-nowrap`}
                       style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                     >
                       {item.label.toUpperCase()}
@@ -314,7 +293,9 @@ const HeaderSection = () => {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 8, scale: 0.98 }}
                           transition={{ duration: 0.2, ease: "easeOut" }}
-                          className={`absolute top-full right-0 mt-2 bg-white/98 backdrop-blur-xl border border-gray-200/90 rounded-xl shadow-2xl p-4 z-50 text-gray-800 ${
+                          className={`absolute top-full mt-2 bg-white/98 backdrop-blur-xl border border-gray-200/90 rounded-xl shadow-2xl p-4 z-50 text-gray-800 ${
+                            isRightAligned ? 'right-0 left-auto' : 'left-0 right-auto'
+                          } ${
                             item.subGroups && item.subGroups.length > 1 ? 'w-[440px] max-w-[90vw] grid grid-cols-2 gap-6' : 'min-w-[220px] whitespace-nowrap'
                           }`}
                         >
@@ -346,6 +327,44 @@ const HeaderSection = () => {
                   </div>
                 );
               })}
+            </div>
+
+            {/* Persistent Right Section: Mall Timings & Mall Map (Identical to other pages) */}
+            <div className="hidden xl:flex items-center space-x-3.5 bg-gray-100/90 border border-gray-200/90 px-4 py-2 rounded-full text-gray-800 shadow-sm flex-shrink-0">
+              {/* Mall Timings */}
+              <div className="relative group cursor-pointer flex items-center space-x-1.5 text-xs font-semibold tracking-wide">
+                <svg className="w-3.5 h-3.5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-gray-500 uppercase tracking-widest text-[10px]">TIMINGS:</span>
+                <span className="text-gray-900 font-bold text-xs whitespace-nowrap">10 AM - 8 PM</span>
+
+                {/* Hover Schedule Popup */}
+                <div className="absolute top-full right-0 mt-2.5 hidden group-hover:block bg-white border border-gray-200 rounded-xl p-3 shadow-2xl text-xs text-gray-800 min-w-[210px] z-50">
+                  <div className="text-[10px] font-bold text-red-700 uppercase tracking-widest pb-1 border-b border-gray-200 mb-2">Mall Operating Hours</div>
+                  <div className="space-y-1 text-gray-600">
+                    <div className="flex justify-between"><span>Weekdays:</span> <span className="font-semibold text-gray-900">10:00 AM - 8:00 PM</span></div>
+                    <div className="flex justify-between"><span>Weekends:</span> <span className="font-semibold text-gray-900">10:00 AM - 10:00 PM</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <span className="text-gray-300">|</span>
+
+              {/* Mall Map Link */}
+              <Link
+                to="/mall-map"
+                className="flex items-center space-x-1 text-xs font-bold text-gray-900 hover:text-red-700 no-underline hover:no-underline transition-colors whitespace-nowrap group"
+              >
+                <svg className="w-3.5 h-3.5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>MALL MAP</span>
+                <svg className="w-3 h-3 text-red-600 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}

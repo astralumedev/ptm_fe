@@ -773,7 +773,7 @@ export default function ShopTypePage() {
               </p>
               <button
                 onClick={handleResetFilters}
-                className="px-6 py-2.5 bg-[#801424] text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-[#600f1b] transition-colors cursor-pointer"
+                className="btn-primary text-xs"
               >
                 Reset All Filters
               </button>
@@ -973,7 +973,7 @@ export default function ShopTypePage() {
                     )}
                     <Link
                       to={`/shops/details/${store.slug}`}
-                      className="px-4 py-2 bg-[#801424] text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-[#600f1b] transition-all no-underline shadow-xs flex items-center gap-1.5"
+                      className="btn-primary-sm"
                     >
                       <span>Details</span>
                       <FaArrowRight className="w-2.5 h-2.5" />
@@ -1010,14 +1010,14 @@ export default function ShopTypePage() {
             <div className="pt-4 flex flex-wrap items-center gap-4">
               <Link
                 to="/mall-map"
-                className="px-6 py-3 bg-[#801424] text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-[#9d192c] transition-all no-underline shadow-lg flex items-center gap-2"
+                className="btn-primary"
               >
+                <FaCompass className="w-3.5 h-3.5" />
                 <span>Open Mall Map</span>
-                <FaArrowRight className="w-3 h-3" />
               </Link>
               <Link
                 to="/contact"
-                className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-widest rounded-xl transition-colors no-underline border border-white/20"
+                className="btn-dark"
               >
                 <span>Guest Services & Info</span>
               </Link>

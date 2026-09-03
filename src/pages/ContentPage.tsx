@@ -92,11 +92,11 @@ export default function ContentPage() {
         </section>
       )}
       
-      <section className="w-full px-4 md:px-12 py-20 bg-white">
-        <div className="container mx-auto max-w-6xl">
+      <section className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-neutral-50/50">
+        <div className="container mx-auto max-w-5xl bg-white p-8 sm:p-12 rounded-3xl border border-gray-200/80 shadow-sm">
           <div className="prose prose-lg max-w-none">
             <div 
-              className="text-gray-700 leading-relaxed text-xl prose-headings:font-bold prose-headings:text-[#760316] prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-[#760316] prose-a:no-underline hover:prose-a:underline"
+              className="text-gray-700 leading-relaxed prose-headings:font-bold prose-headings:font-arizona-flare prose-headings:text-gray-900 prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-p:text-gray-600 prose-p:leading-relaxed prose-a:text-[#801424] prose-a:font-semibold hover:prose-a:underline"
               dangerouslySetInnerHTML={{ __html: page.content }}
             />
           </div>

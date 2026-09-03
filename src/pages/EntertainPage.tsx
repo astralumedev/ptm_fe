@@ -129,14 +129,14 @@ export default function EntertainPage() {
                 href="https://qfxcinemas.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-6 py-3 bg-[#801424] text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-[#600f1b] transition-all no-underline shadow-md flex items-center gap-2"
+                className="btn-primary"
               >
                 <FaTicketAlt className="w-3.5 h-3.5" />
                 <span>Check Showtimes & Book</span>
               </a>
               <Link
                 to="/mall-map"
-                className="px-5 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold uppercase tracking-wider rounded-xl transition-colors no-underline flex items-center gap-1.5"
+                className="btn-secondary"
               >
                 <span>5th Floor Map</span>
               </Link>
@@ -233,7 +233,7 @@ export default function EntertainPage() {
             <div className="pt-4 border-t border-gray-100 flex flex-wrap items-center gap-3">
               <Link
                 to="/mall-map"
-                className="px-6 py-3 bg-[#801424] text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-[#600f1b] transition-all no-underline shadow-md flex items-center gap-2"
+                className="btn-primary"
               >
                 <span>Find Game Zone on Map</span>
                 <FaArrowRight className="w-3.5 h-3.5" />
@@ -265,16 +265,16 @@ export default function EntertainPage() {
             <div className="pt-4 flex flex-wrap items-center gap-4">
               <Link
                 to="/contact"
-                className="px-6 py-3 bg-[#801424] text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-[#9d192c] transition-all no-underline shadow-lg flex items-center gap-2"
+                className="btn-primary"
               >
                 <span>Book Birthday / Event Space</span>
                 <FaArrowRight className="w-3 h-3" />
               </Link>
               <Link
-                to="/page/info"
-                className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-widest rounded-xl transition-colors no-underline border border-white/20"
+                to="/page/about_us"
+                className="btn-dark"
               >
-                <span>Mall Safety & Amenities</span>
+                <span>About Kids Zone</span>
               </Link>
             </div>
           </div>

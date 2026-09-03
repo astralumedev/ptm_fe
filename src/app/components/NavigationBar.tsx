@@ -135,7 +135,7 @@ const NavigationBar: React.FC = () => {
 
               {/* Mall Map Link */}
               <Link
-                to="/page/wayfinding"
+                to="/mall-map"
                 className="flex items-center space-x-1 text-xs font-bold text-gray-900 hover:text-red-700 no-underline hover:no-underline transition-colors whitespace-nowrap group"
               >
                 <svg className="w-3.5 h-3.5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
