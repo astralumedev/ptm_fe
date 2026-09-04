@@ -97,7 +97,11 @@ const HeaderSection = () => {
               ELEVATE YOUR SHOPPING EXPERIENCE
             </h1>
 
-            <div className="w-12 sm:w-16 h-0.5 bg-[#801424] my-2.5 sm:my-3.5 rounded-full mx-auto lg:mx-0" />
+            <div className="flex items-center justify-center lg:justify-start gap-2 my-2.5 sm:my-3.5">
+              <div className="w-8 h-0.5 bg-[#801424] rounded-full" />
+              <div className="w-2 h-2 rotate-45 bg-[#801424] rounded-xs" />
+              <div className="w-8 h-0.5 bg-[#801424] rounded-full" />
+            </div>
 
             <p
               className="text-gray-200 text-xs sm:text-sm leading-relaxed max-w-lg font-light mb-6 text-center lg:text-left"
@@ -128,25 +132,27 @@ const HeaderSection = () => {
 
           {/* Right Section: Elegant Glass Hero Showcase for WHAT'S ON */}
           <div className="w-full lg:w-6/12 flex justify-center lg:justify-end">
-            <div className="w-full bg-black/40 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-white/15 p-4 sm:p-6 md:p-7 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col justify-between min-h-[340px] sm:min-h-[420px]">
+            <div className="w-full bg-black/40 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-white/10 p-4 sm:p-6 md:p-7 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col justify-between min-h-[340px] sm:min-h-[420px]">
               
               {/* Header: WHAT'S ON Title */}
-              <div className="flex items-center justify-between pb-2.5 sm:pb-3.5 border-b border-white/10 mb-3 sm:mb-4">
-                <div className="flex items-center gap-2 sm:gap-2.5">
-                  <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-rose-500 animate-pulse shadow-[0_0_8px_#f43f5e]" />
-                  <h3
-                    className="text-base sm:text-lg font-bold text-white tracking-widest uppercase"
-                    style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
-                  >
-                    WHAT'S ON
-                  </h3>
+              <div className="text-center pb-1 sm:pb-2 mb-2 sm:mb-3">
+                <h3
+                  className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-widest uppercase"
+                  style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
+                >
+                  WHAT'S ON
+                </h3>
+                <div className="flex items-center justify-center gap-2 my-2">
+                  <div className="w-8 h-0.5 bg-[#801424] rounded-full" />
+                  <div className="w-2 h-2 rotate-45 bg-[#801424] rounded-xs" />
+                  <div className="w-8 h-0.5 bg-[#801424] rounded-full" />
                 </div>
               </div>
 
               {/* Main Animated Showcase Display (Entire Card Clickable) */}
               <Link
                 to={activeStory.href}
-                className="block relative rounded-xl sm:rounded-2xl overflow-hidden h-[200px] sm:h-[260px] border border-white/10 group shadow-xl my-1 cursor-pointer !no-underline"
+                className="block relative rounded-xl sm:rounded-2xl overflow-hidden h-[200px] sm:h-[260px] group shadow-lg my-1 cursor-pointer !no-underline"
               >
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -199,22 +205,12 @@ const HeaderSection = () => {
                       key={item.id}
                       onClick={() => setActiveStoryIndex(idx)}
                       aria-label={`Go to slide ${idx + 1}: ${item.title}`}
-                      className={`relative overflow-hidden rounded-full transition-all duration-300 cursor-pointer ${
+                      className={`rounded-full transition-all duration-300 cursor-pointer ${
                         isActive
-                          ? 'w-8 sm:w-9 h-2 sm:h-2.5 bg-rose-500/30 border border-rose-400/50 shadow-[0_0_10px_rgba(244,63,94,0.4)]'
-                          : 'w-2 sm:w-2.5 h-2 sm:h-2.5 bg-white/30 hover:bg-white/60 border border-transparent'
+                          ? 'w-2 sm:w-2.5 h-2 sm:h-2.5 bg-white scale-110 shadow-[0_0_8px_rgba(255,255,255,0.7)]'
+                          : 'w-2 sm:w-2.5 h-2 sm:h-2.5 bg-white/30 hover:bg-white/60'
                       }`}
-                    >
-                      {isActive && (
-                        <motion.div
-                          key={`progress-${idx}`}
-                          initial={{ scaleX: 0 }}
-                          animate={{ scaleX: 1 }}
-                          transition={{ duration: 4.5, ease: 'linear' }}
-                          className="absolute inset-0 bg-rose-500 origin-left rounded-full"
-                        />
-                      )}
-                    </button>
+                    />
                   );
                 })}
               </div>

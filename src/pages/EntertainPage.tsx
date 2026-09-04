@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import {
   FaFilm,
   FaGamepad,
-  FaChild,
+  FaCalendarAlt,
   FaClock,
   FaMapMarkerAlt,
   FaPhoneAlt,
@@ -13,6 +13,7 @@ import {
   FaCouch,
   FaVrCardboard,
   FaStar,
+  FaUsers,
 } from 'react-icons/fa';
 import NavigationBar from '../app/components/NavigationBar';
 import PageHeader from '../app/components/PageHeader';
@@ -27,7 +28,7 @@ export default function EntertainPage() {
       {/* Hero Header */}
       <PageHeader
         title="Cinema & Entertainment"
-        subtitle="Experience high-definition 4K laser cinema with Dolby Atmos, immerse yourself in 360° virtual reality gaming, and enjoy family entertainment on our 5th-floor deck."
+        subtitle="Experience high-definition 4K laser cinema with Dolby Atmos, immerse yourself in 360° virtual reality gaming, and celebrate memorable gatherings on our Level 5 entertainment deck."
         badge="LEVEL 5 ENTERTAINMENT DECK"
         breadcrumbs={[
           { label: 'Entertain' },
@@ -243,38 +244,38 @@ export default function EntertainPage() {
         </section>
 
         {/* ========================================================================= */}
-        {/* SPOTLIGHT 3: KIDS LEISURE & FAMILY PLAY ARENA */}
+        {/* SPOTLIGHT 3: LIVE EVENTS, PRIVATE SCREENINGS & GATHERINGS */}
         {/* ========================================================================= */}
         <section className="bg-gradient-to-r from-gray-900 via-[#191114] to-gray-900 text-white rounded-3xl p-8 sm:p-10 md:p-12 relative overflow-hidden shadow-xl border border-gray-800">
           <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 max-w-3xl space-y-4">
             <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-red-400 uppercase">
-              <FaChild className="w-3.5 h-3.5" />
-              <span>Kids & Family Leisure</span>
+              <FaCalendarAlt className="w-3.5 h-3.5" />
+              <span>Live Events & Private Screenings</span>
             </div>
             <h2
               className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-wide leading-tight"
               style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
             >
-              Safe Soft-Play Arena & Birthday Packages
+              Host Private Screenings, Community Meetups & Festive Galas
             </h2>
             <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-light">
-              Designed with padded safety obstacles, giant slides, interactive foam ball pits, and toddler exploration zones. Fully supervised by trained attendants so parents can enjoy a worry-free shopping or dining experience.
+              From corporate movie nights and private cinema bookings at QFX Cinemas to seasonal music showcases, cultural festivals, and pop-up activations, Pokhara Trade Mall provides a premier stage for unforgettable entertainment experiences.
             </p>
             <div className="pt-4 flex flex-wrap items-center gap-4">
               <Link
                 to="/contact"
                 className="btn-primary"
               >
-                <span>Book Birthday / Event Space</span>
-                <FaArrowRight className="w-3 h-3" />
+                <FaUsers className="w-3.5 h-3.5" />
+                <span>Plan A Gathering or Event</span>
               </Link>
               <Link
-                to="/page/about_us"
+                to="/latest"
                 className="btn-dark"
               >
-                <span>About Kids Zone</span>
+                <span>Explore Latest Events & Shows</span>
               </Link>
             </div>
           </div>

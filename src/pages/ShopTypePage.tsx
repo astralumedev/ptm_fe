@@ -418,95 +418,99 @@ export default function ShopTypePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: idx * 0.06 }}
-                className="group bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
+                className="h-full"
               >
-                {/* Store Cover Image */}
-                <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-gray-100">
-                  <img
-                    src={store.cover.data.full_url}
-                    alt={store.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80" />
+                <Link
+                  to={`/shops/details/${store.slug}`}
+                  className="group bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between h-full cursor-pointer !no-underline text-inherit block"
+                >
+                  {/* Store Cover Image */}
+                  <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-gray-100">
+                    <img
+                      src={store.cover.data.full_url}
+                      alt={store.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80" />
 
-                  {/* Floor Location Badge */}
-                  <span className="absolute top-3 right-3 text-[11px] font-semibold text-gray-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/80 flex items-center gap-1">
-                    <FaMapMarkerAlt className="w-2.5 h-2.5 text-[#801424]" />
-                    {store.floor || 'Pokhara Trade Mall'}
-                  </span>
+                    {/* Floor Location Badge */}
+                    <span className="absolute top-3 right-3 text-[11px] font-semibold text-gray-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/80 flex items-center gap-1">
+                      <FaMapMarkerAlt className="w-2.5 h-2.5 text-[#801424]" />
+                      {store.floor || 'Pokhara Trade Mall'}
+                    </span>
 
-                  {/* Category Pill on Image */}
-                  <span className="absolute bottom-3 left-3 text-[10px] font-bold uppercase tracking-widest text-white bg-[#801424]/90 backdrop-blur-xs px-2.5 py-0.5 rounded-full shadow-xs">
-                    {store.category || store.type.toUpperCase()}
-                  </span>
-                </div>
+                    {/* Category Pill on Image */}
+                    <span className="absolute bottom-3 left-3 text-[10px] font-bold uppercase tracking-widest text-white bg-[#801424]/90 backdrop-blur-xs px-2.5 py-0.5 rounded-full shadow-xs">
+                      {store.category || store.type.toUpperCase()}
+                    </span>
+                  </div>
 
-                {/* Card Body */}
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                  <div>
-                    {/* Logo + Store Title Header */}
-                    <div className="flex items-start gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
-                        <img
-                          src={store.logo.data.full_url}
-                          alt={`${store.name} logo`}
-                          className="w-full h-full object-cover"
-                        />
+                  {/* Card Body */}
+                  <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                    <div>
+                      {/* Logo + Store Title Header */}
+                      <div className="flex items-start gap-3 mb-2">
+                        <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
+                          <img
+                            src={store.logo.data.full_url}
+                            alt={`${store.name} logo`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div>
+                          <h3
+                            className="text-lg font-bold text-gray-900 group-hover:text-[#801424] transition-colors leading-snug"
+                            style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
+                          >
+                            {store.name}
+                          </h3>
+                          {store.unitNumber && (
+                            <p className="text-[11px] text-gray-500 font-medium">
+                              {store.unitNumber}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <h3
-                          className="text-lg font-bold text-gray-900 group-hover:text-[#801424] transition-colors leading-snug"
-                          style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
-                        >
-                          {store.name}
-                        </h3>
-                        {store.unitNumber && (
-                          <p className="text-[11px] text-gray-500 font-medium">
-                            {store.unitNumber}
-                          </p>
-                        )}
-                      </div>
+
+                      {/* Subtitle */}
+                      {store.subtitle && (
+                        <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
+                          {store.subtitle}
+                        </p>
+                      )}
+
+                      {/* Tags */}
+                      {store.tags && store.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-3">
+                          {store.tags.slice(0, 3).map((tag, tIdx) => (
+                            <span
+                              key={tIdx}
+                              className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-medium"
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
-                    {/* Subtitle */}
-                    {store.subtitle && (
-                      <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
-                        {store.subtitle}
-                      </p>
-                    )}
-
-                    {/* Tags */}
-                    {store.tags && store.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-3">
-                        {store.tags.slice(0, 3).map((tag, tIdx) => (
-                          <span
-                            key={tIdx}
-                            className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-medium"
-                          >
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    {/* Card Footer Actions */}
+                    <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
+                      {store.operation_hours && (
+                        <div className="flex items-center text-[11px] text-gray-500 gap-1">
+                          <FaClock className="w-3 h-3 text-[#801424]" />
+                          <span>{store.operation_hours.split(';')[0]}</span>
+                        </div>
+                      )}
+                      <span
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-[#801424] group-hover:translate-x-0.5 transition-all ml-auto"
+                      >
+                        <span>Explore</span>
+                        <FaArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
                   </div>
-
-                  {/* Card Footer Actions */}
-                  <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
-                    {store.operation_hours && (
-                      <div className="flex items-center text-[11px] text-gray-500 gap-1">
-                        <FaClock className="w-3 h-3 text-[#801424]" />
-                        <span>{store.operation_hours.split(';')[0]}</span>
-                      </div>
-                    )}
-                    <Link
-                      to={`/shops/details/${store.slug}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#801424] hover:text-[#5a0c18] group-hover:translate-x-0.5 transition-all no-underline"
-                    >
-                      <span>Explore</span>
-                      <FaArrowRight className="w-3 h-3" />
-                    </Link>
-                  </div>
-                </div>
+                </Link>
               </motion.div>
             ))}
           </div>
@@ -785,123 +789,127 @@ export default function ShopTypePage() {
                 <motion.div
                   key={store.id}
                   initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.04 }}
-                  className="group bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
+                  className="h-full"
                 >
-                  {/* Cover Header */}
-                  <div className="relative h-48 w-full overflow-hidden bg-gray-100">
-                    <img
-                      src={store.cover.data.full_url}
-                      alt={store.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80" />
+                  <Link
+                    to={`/shops/details/${store.slug}`}
+                    className="group bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between h-full cursor-pointer !no-underline text-inherit block"
+                  >
+                    {/* Cover Header */}
+                    <div className="relative h-48 w-full overflow-hidden bg-gray-100">
+                      <img
+                        src={store.cover.data.full_url}
+                        alt={store.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80" />
 
-                    {/* Floor Badge */}
-                    <span className="absolute top-3 right-3 text-[11px] font-semibold text-gray-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/80 flex items-center gap-1">
-                      <FaMapMarkerAlt className="w-2.5 h-2.5 text-[#801424]" />
-                      {store.floor || 'Main Mall'}
-                    </span>
-
-                    {/* Category Pill */}
-                    <span className="absolute bottom-3 left-3 text-[10px] font-bold uppercase tracking-widest text-white bg-[#801424]/90 backdrop-blur-xs px-2.5 py-0.5 rounded-full shadow-xs">
-                      {store.category || store.type.toUpperCase()}
-                    </span>
-
-                    {/* Featured Checkmark */}
-                    {store.featured && (
-                      <span className="absolute top-3 left-3 text-[10px] font-bold text-amber-900 bg-amber-100/95 backdrop-blur-md px-2 py-0.5 rounded-full shadow-xs border border-amber-300 flex items-center gap-1">
-                        <FaCheckCircle className="w-2.5 h-2.5 text-amber-700" />
-                        Featured
+                      {/* Floor Badge */}
+                      <span className="absolute top-3 right-3 text-[11px] font-semibold text-gray-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/80 flex items-center gap-1">
+                        <FaMapMarkerAlt className="w-2.5 h-2.5 text-[#801424]" />
+                        {store.floor || 'Main Mall'}
                       </span>
-                    )}
-                  </div>
 
-                  {/* Card Content */}
-                  <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                    <div>
-                      {/* Logo + Store Title */}
-                      <div className="flex items-start gap-3 mb-2">
-                        <div className="w-11 h-11 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
-                          <img
-                            src={store.logo.data.full_url}
-                            alt={`${store.name} logo`}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <h3
-                            className="text-lg font-bold text-gray-900 group-hover:text-[#801424] transition-colors leading-snug"
-                            style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
-                          >
-                            {store.name}
-                          </h3>
-                          {store.unitNumber && (
-                            <p className="text-[11px] text-gray-500 font-medium">
-                              {store.unitNumber}
-                            </p>
-                          )}
-                        </div>
-                      </div>
+                      {/* Category Pill */}
+                      <span className="absolute bottom-3 left-3 text-[10px] font-bold uppercase tracking-widest text-white bg-[#801424]/90 backdrop-blur-xs px-2.5 py-0.5 rounded-full shadow-xs">
+                        {store.category || store.type.toUpperCase()}
+                      </span>
 
-                      {/* Subtitle / Description Snippet */}
-                      {store.subtitle && (
-                        <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed mt-1">
-                          {store.subtitle}
-                        </p>
+                      {/* Featured Checkmark */}
+                      {store.featured && (
+                        <span className="absolute top-3 left-3 text-[10px] font-bold text-amber-900 bg-amber-100/95 backdrop-blur-md px-2 py-0.5 rounded-full shadow-xs border border-amber-300 flex items-center gap-1">
+                          <FaCheckCircle className="w-2.5 h-2.5 text-amber-700" />
+                          Featured
+                        </span>
                       )}
+                    </div>
 
-                      {/* Tags */}
-                      {store.tags && store.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-3">
-                          {store.tags.slice(0, 3).map((tag, tIdx) => (
-                            <span
-                              key={tIdx}
-                              className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-medium"
+                    {/* Card Content */}
+                    <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                      <div>
+                        {/* Logo + Store Title */}
+                        <div className="flex items-start gap-3 mb-2">
+                          <div className="w-11 h-11 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
+                            <img
+                              src={store.logo.data.full_url}
+                              alt={`${store.name} logo`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <h3
+                              className="text-lg font-bold text-gray-900 group-hover:text-[#801424] transition-colors leading-snug"
+                              style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                             >
-                              #{tag}
-                            </span>
-                          ))}
+                              {store.name}
+                            </h3>
+                            {store.unitNumber && (
+                              <p className="text-[11px] text-gray-500 font-medium">
+                                {store.unitNumber}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                      )}
-                    </div>
 
-                    {/* Footer Info & Explore Button */}
-                    <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
-                      {store.operation_hours ? (
-                        <div className="flex items-center text-[11px] text-gray-500 gap-1">
-                          <FaClock className="w-3 h-3 text-[#801424]" />
-                          <span>{store.operation_hours.split(';')[0]}</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center text-[11px] text-gray-500 gap-1">
-                          <FaMapMarkerAlt className="w-3 h-3 text-[#801424]" />
-                          <span>Pokhara Trade Mall</span>
-                        </div>
-                      )}
-
-                      <div className="flex items-center gap-3">
-                        {store.contact_number && (
-                          <a
-                            href={`tel:${store.contact_number}`}
-                            className="text-gray-500 hover:text-[#801424] transition-colors p-1"
-                            title={`Call ${store.name}`}
-                          >
-                            <FaPhoneAlt className="w-3 h-3" />
-                          </a>
+                        {/* Subtitle / Description Snippet */}
+                        {store.subtitle && (
+                          <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed mt-1">
+                            {store.subtitle}
+                          </p>
                         )}
-                        <Link
-                          to={`/shops/details/${store.slug}`}
-                          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#801424] hover:text-[#5a0c18] group-hover:translate-x-0.5 transition-all no-underline"
-                        >
-                          <span>Explore</span>
-                          <FaArrowRight className="w-3 h-3" />
-                        </Link>
+
+                        {/* Tags */}
+                        {store.tags && store.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-3">
+                            {store.tags.slice(0, 3).map((tag, tIdx) => (
+                              <span
+                                key={tIdx}
+                                className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-medium"
+                              >
+                                #{tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Footer Info & Explore Button */}
+                      <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
+                        {store.operation_hours ? (
+                          <div className="flex items-center text-[11px] text-gray-500 gap-1">
+                            <FaClock className="w-3 h-3 text-[#801424]" />
+                            <span>{store.operation_hours.split(';')[0]}</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center text-[11px] text-gray-500 gap-1">
+                            <FaMapMarkerAlt className="w-3 h-3 text-[#801424]" />
+                            <span>Pokhara Trade Mall</span>
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-3">
+                          {store.contact_number && (
+                            <a
+                              href={`tel:${store.contact_number}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-gray-500 hover:text-[#801424] transition-colors p-1"
+                              title={`Call ${store.name}`}
+                            >
+                              <FaPhoneAlt className="w-3 h-3" />
+                            </a>
+                          )}
+                          <span
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#801424] group-hover:translate-x-0.5 transition-all"
+                          >
+                            <span>Explore</span>
+                            <FaArrowRight className="w-3 h-3" />
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 </motion.div>
               ))}
             </div>
@@ -909,9 +917,10 @@ export default function ShopTypePage() {
             /* List View Mode */
             <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden divide-y divide-gray-100">
               {filteredDirectoryStores.map((store) => (
-                <div
+                <Link
                   key={store.id}
-                  className="p-4 sm:p-5 hover:bg-gray-50/80 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
+                  to={`/shops/details/${store.slug}`}
+                  className="p-4 sm:p-5 hover:bg-gray-50/80 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 group block !no-underline text-inherit cursor-pointer"
                 >
                   <div className="flex items-start sm:items-center gap-4">
                     {/* Logo */}
@@ -926,13 +935,12 @@ export default function ShopTypePage() {
                     {/* Info */}
                     <div className="space-y-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <Link
-                          to={`/shops/details/${store.slug}`}
-                          className="text-base font-bold text-gray-900 group-hover:text-[#801424] transition-colors no-underline"
+                        <span
+                          className="text-base font-bold text-gray-900 group-hover:text-[#801424] transition-colors"
                           style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                         >
                           {store.name}
-                        </Link>
+                        </span>
                         {store.featured && (
                           <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
                             Featured
@@ -965,21 +973,21 @@ export default function ShopTypePage() {
                     {store.contact_number && (
                       <a
                         href={`tel:${store.contact_number}`}
+                        onClick={(e) => e.stopPropagation()}
                         className="p-2 text-gray-500 hover:text-[#801424] hover:bg-red-50 rounded-lg transition-colors"
                         title={`Call ${store.name}`}
                       >
                         <FaPhoneAlt className="w-3.5 h-3.5" />
                       </a>
                     )}
-                    <Link
-                      to={`/shops/details/${store.slug}`}
+                    <span
                       className="btn-primary-sm"
                     >
                       <span>Details</span>
                       <FaArrowRight className="w-2.5 h-2.5" />
-                    </Link>
+                    </span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

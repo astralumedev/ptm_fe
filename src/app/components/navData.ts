@@ -40,6 +40,8 @@ export const menuItems: MenuItem[] = [
           { label: "Beauty & Wellness", href: "/services#beauty" },
           { label: "Banks & Financial Services", href: "/services#finance" },
           { label: "Abroad Study & Education", href: "/services#education" },
+          { label: "IT & Software Studios", href: "/services#it-tech" },
+          { label: "Health & Fitness", href: "/services#health-fitness" },
           { label: "Engineering & Consultancies", href: "/services#consultancy" },
           { label: "All Services Directory", href: "/services" },
         ],

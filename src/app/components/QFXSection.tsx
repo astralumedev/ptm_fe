@@ -118,7 +118,11 @@ export default function QFXSection() {
             >
               QFX CINEMAS
             </h2>
-            <div className="w-12 md:w-16 h-0.5 bg-[#801424]/60 rounded-full mb-3 mx-auto md:mx-0" />
+            <div className="flex items-center justify-center md:justify-start gap-2 my-3">
+              <div className="w-8 h-0.5 bg-[#801424] rounded-full" />
+              <div className="w-2 h-2 rotate-45 bg-[#801424] rounded-xs" />
+              <div className="w-8 h-0.5 bg-[#801424] rounded-full" />
+            </div>
 
             <p
               className="text-gray-600 text-sm md:text-base leading-relaxed"

@@ -16,6 +16,8 @@ import {
   FaWheelchair,
   FaInfoCircle,
   FaEnvelope,
+  FaLaptopCode,
+  FaDumbbell,
 } from 'react-icons/fa';
 import NavigationBar from '../app/components/NavigationBar';
 import PageHeader, { PageHeaderTab } from '../app/components/PageHeader';
@@ -28,7 +30,7 @@ export default function ServicesPage() {
   const [allServices, setAllServices] = useState<Store[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Sync scroll hash (e.g. #beauty, #finance, #education, #consultancy, #parking)
+  // Sync scroll hash
   useEffect(() => {
     if (location.hash) {
       const elementId = location.hash.replace('#', '');
@@ -60,7 +62,7 @@ export default function ServicesPage() {
   }, []);
 
   const beautyServices = allServices.filter(
-    (s) => s.categorySlug === 'beauty' || s.tags?.some((t) => ['spa', 'salon', 'massage'].includes(t.toLowerCase()))
+    (s) => s.categorySlug === 'beauty-wellness' || s.categorySlug === 'beauty' || s.tags?.some((t) => ['spa', 'salon', 'massage'].includes(t.toLowerCase()))
   );
 
   const financeServices = allServices.filter(
@@ -71,14 +73,24 @@ export default function ServicesPage() {
     (s) => s.categorySlug === 'education' || s.tags?.some((t) => ['ielts', 'pte', 'study abroad', 'education'].includes(t.toLowerCase()))
   );
 
+  const itServices = allServices.filter(
+    (s) => s.categorySlug === 'it-tech' || s.tags?.some((t) => ['it', 'software', 'cloud', 'cybersecurity'].includes(t.toLowerCase()))
+  );
+
+  const fitnessServices = allServices.filter(
+    (s) => s.categorySlug === 'health-fitness' || s.tags?.some((t) => ['gym', 'fitness', 'crossfit', 'workout'].includes(t.toLowerCase()))
+  );
+
   const consultancyServices = allServices.filter(
-    (s) => s.categorySlug === 'consultancy' || s.tags?.some((t) => ['architecture', 'engineering', 'surveying', 'consulting'].includes(t.toLowerCase()))
+    (s) => s.categorySlug === 'professional' || s.categorySlug === 'consultancy' || s.tags?.some((t) => ['architecture', 'engineering', 'surveying', 'consulting'].includes(t.toLowerCase()))
   );
 
   const tabs: PageHeaderTab[] = [
     { id: 'beauty', label: 'Beauty & Wellness', icon: <FaSpa className="w-3.5 h-3.5" /> },
     { id: 'finance', label: 'Banks & Finance', icon: <FaUniversity className="w-3.5 h-3.5" /> },
     { id: 'education', label: 'Abroad Study', icon: <FaGraduationCap className="w-3.5 h-3.5" /> },
+    { id: 'it-tech', label: 'IT & Software Studios', icon: <FaLaptopCode className="w-3.5 h-3.5" /> },
+    { id: 'health-fitness', label: 'Health & Fitness', icon: <FaDumbbell className="w-3.5 h-3.5" /> },
     { id: 'consultancy', label: 'Engineering & Consultancies', icon: <FaDraftingCompass className="w-3.5 h-3.5" /> },
     { id: 'parking', label: 'Mall Parking & Map', icon: <FaParking className="w-3.5 h-3.5" /> },
   ];
@@ -99,88 +111,93 @@ export default function ServicesPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.3, delay: index * 0.05 }}
-          className="group bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
+          className="h-full"
         >
-          <div className="relative h-44 w-full overflow-hidden bg-gray-100">
-            <img
-              src={store.cover.data.full_url}
-              alt={store.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80" />
+          <Link
+            to={`/shops/details/${store.slug}`}
+            className="group bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between h-full cursor-pointer !no-underline text-inherit block"
+          >
+            <div className="relative h-44 w-full overflow-hidden bg-gray-100">
+              <img
+                src={store.cover.data.full_url}
+                alt={store.name}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80" />
 
-            <span className="absolute top-3 right-3 text-[11px] font-semibold text-gray-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/80 flex items-center gap-1">
-              <FaMapMarkerAlt className="w-2.5 h-2.5 text-[#801424]" />
-              {store.floor || '3rd Floor'}
-            </span>
+              <span className="absolute top-3 right-3 text-[11px] font-semibold text-gray-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/80 flex items-center gap-1">
+                <FaMapMarkerAlt className="w-2.5 h-2.5 text-[#801424]" />
+                {store.floor || '3rd Floor'}
+              </span>
 
-            <span className="absolute bottom-3 left-3 text-[10px] font-bold uppercase tracking-widest text-white bg-[#801424]/90 backdrop-blur-xs px-2.5 py-0.5 rounded-full shadow-xs">
-              {store.category || 'Service'}
-            </span>
-          </div>
-
-          <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-            <div>
-              <div className="flex items-start gap-3 mb-2">
-                <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
-                  <img src={store.logo.data.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1">
-                  <h3
-                    className="text-base font-bold text-gray-900 group-hover:text-[#801424] transition-colors leading-snug"
-                    style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
-                  >
-                    {store.name}
-                  </h3>
-                  {store.unitNumber && (
-                    <p className="text-[11px] text-gray-500 font-medium">{store.unitNumber}</p>
-                  )}
-                </div>
-              </div>
-
-              {store.subtitle && (
-                <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed mt-1">{store.subtitle}</p>
-              )}
-
-              {store.tags && store.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-3">
-                  {store.tags.slice(0, 3).map((tag, tIdx) => (
-                    <span key={tIdx} className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-medium">
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              )}
+              <span className="absolute bottom-3 left-3 text-[10px] font-bold uppercase tracking-widest text-white bg-[#801424]/90 backdrop-blur-xs px-2.5 py-0.5 rounded-full shadow-xs">
+                {store.category || 'Service'}
+              </span>
             </div>
 
-            <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
-              {store.operation_hours && (
-                <div className="flex items-center text-[11px] text-gray-500 gap-1">
-                  <FaClock className="w-3 h-3 text-[#801424]" />
-                  <span>{store.operation_hours.split(';')[0]}</span>
+            <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+              <div>
+                <div className="flex items-start gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
+                    <img src={store.logo.data.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1">
+                    <h3
+                      className="text-base font-bold text-gray-900 group-hover:text-[#801424] transition-colors leading-snug"
+                      style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
+                    >
+                      {store.name}
+                    </h3>
+                    {store.unitNumber && (
+                      <p className="text-[11px] text-gray-500 font-medium">{store.unitNumber}</p>
+                    )}
+                  </div>
                 </div>
-              )}
 
-              <div className="flex items-center gap-3">
-                {store.contact_number && (
-                  <a
-                    href={`tel:${store.contact_number}`}
-                    className="text-gray-500 hover:text-[#801424] transition-colors p-1"
-                    title={`Call ${store.name}`}
-                  >
-                    <FaPhoneAlt className="w-3 h-3" />
-                  </a>
+                {store.subtitle && (
+                  <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed mt-1">{store.subtitle}</p>
                 )}
-                <Link
-                  to={`/shops/details/${store.slug}`}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#801424] hover:text-[#5a0c18] group-hover:translate-x-0.5 transition-all no-underline"
-                >
-                  <span>Inquire</span>
-                  <FaArrowRight className="w-3 h-3" />
-                </Link>
+
+                {store.tags && store.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-3">
+                    {store.tags.slice(0, 3).map((tag, tIdx) => (
+                      <span key={tIdx} className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-medium">
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
+                {store.operation_hours && (
+                  <div className="flex items-center text-[11px] text-gray-500 gap-1">
+                    <FaClock className="w-3 h-3 text-[#801424]" />
+                    <span>{store.operation_hours.split(';')[0]}</span>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-3 ml-auto">
+                  {store.contact_number && (
+                    <a
+                      href={`tel:${store.contact_number}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-gray-500 hover:text-[#801424] transition-colors p-1"
+                      title={`Call ${store.name}`}
+                    >
+                      <FaPhoneAlt className="w-3 h-3" />
+                    </a>
+                  )}
+                  <span
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#801424] group-hover:translate-x-0.5 transition-all"
+                  >
+                    <span>Inquire</span>
+                    <FaArrowRight className="w-3 h-3" />
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          </Link>
         </motion.div>
       ))}
     </div>
@@ -294,7 +311,65 @@ export default function ServicesPage() {
         </section>
 
         {/* ========================================================================= */}
-        {/* SECTION 4: ENGINEERING & PROFESSIONAL CONSULTANCIES */}
+        {/* SECTION 4: IT, SOFTWARE & DIGITAL SOLUTIONS */}
+        {/* ========================================================================= */}
+        <section id="it-tech" className="scroll-mt-28 space-y-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-gray-200">
+            <div>
+              <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-[#801424] uppercase mb-1">
+                <FaLaptopCode className="w-3.5 h-3.5" />
+                <span>Digital & Cloud Tech</span>
+              </div>
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 uppercase tracking-wide"
+                style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
+              >
+                IT, Software & Digital Solutions
+              </h2>
+            </div>
+            <p className="text-xs sm:text-sm text-gray-500 max-w-md">
+              Enterprise software development, corporate web engineering, network cybersecurity, and managed IT services.
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="py-12 flex justify-center"><div className="w-8 h-8 border-3 border-[#801424] border-t-transparent rounded-full animate-spin" /></div>
+          ) : (
+            renderServiceCards(itServices)
+          )}
+        </section>
+
+        {/* ========================================================================= */}
+        {/* SECTION 5: HEALTH, FITNESS & WELLNESS */}
+        {/* ========================================================================= */}
+        <section id="health-fitness" className="scroll-mt-28 space-y-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-gray-200">
+            <div>
+              <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-[#801424] uppercase mb-1">
+                <FaDumbbell className="w-3.5 h-3.5" />
+                <span>Active Living & Vitality</span>
+              </div>
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 uppercase tracking-wide"
+                style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
+              >
+                Health & Fitness
+              </h2>
+            </div>
+            <p className="text-xs sm:text-sm text-gray-500 max-w-md">
+              State-of-the-art gym, CrossFit conditioning, cardio training zones, private steam saunas, and certified nutrition coaches.
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="py-12 flex justify-center"><div className="w-8 h-8 border-3 border-[#801424] border-t-transparent rounded-full animate-spin" /></div>
+          ) : (
+            renderServiceCards(fitnessServices)
+          )}
+        </section>
+
+        {/* ========================================================================= */}
+        {/* SECTION 6: ENGINEERING & PROFESSIONAL CONSULTANCIES */}
         {/* ========================================================================= */}
         <section id="consultancy" className="scroll-mt-28 space-y-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-gray-200">

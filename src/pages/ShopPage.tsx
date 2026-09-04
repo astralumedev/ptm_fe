@@ -5,16 +5,18 @@ import {
   FaMapMarkerAlt,
   FaClock,
   FaArrowRight,
+  FaFemale,
   FaTshirt,
-  FaLaptop,
-  FaSpa,
+  FaChild,
+  FaHeart,
+  FaShoppingBag,
   FaGem,
+  FaSpa,
+  FaLaptop,
+  FaCouch,
   FaGift,
   FaSearch,
   FaCompass,
-  FaChild,
-  FaMountain,
-  FaShoppingBag,
 } from 'react-icons/fa';
 import NavigationBar from '../app/components/NavigationBar';
 import PageHeader from '../app/components/PageHeader';
@@ -22,13 +24,11 @@ import Footer from '../app/components/Footer';
 import api from '../services/api';
 import { Store } from '../data/models/Store';
 
-interface ShopCategoryTile {
+interface ShopCategoryItem {
   id: string;
   name: string;
   categorySlug: string;
-  tagline: string;
-  description: string;
-  image: string;
+  subtitle: string;
   icon: React.ReactNode;
   storeCount: number;
 }
@@ -55,85 +55,85 @@ export default function ShopPage() {
     fetchStores();
   }, []);
 
-  const categoryTiles: ShopCategoryTile[] = [
+  const retailCategories: ShopCategoryItem[] = [
     {
       id: 'womens-fashion',
-      name: "Women's Fashion & Couture",
+      name: "Women's Fashion",
       categorySlug: 'womens-fashion',
-      tagline: 'Modern Elegance & Ethnic Heritage',
-      description: 'Designer sarees, festive lehengas, contemporary dresses, and everyday casuals.',
-      image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80',
-      icon: <FaTshirt className="w-4 h-4" />,
+      subtitle: 'Ethnic & Western Couture',
+      icon: <FaFemale className="w-5 h-5" />,
       storeCount: 14,
     },
     {
       id: 'mens-fashion',
       name: "Men's Fashion & Denim",
       categorySlug: 'mens-fashion',
-      tagline: 'Tailored Suits, Casuals & Denim',
-      description: 'Original Levi\'s denim, smart casual shirts, tailored blazers, and urban streetwear.',
-      image: '/stores/levis_cover.webp',
-      icon: <FaShoppingBag className="w-4 h-4" />,
+      subtitle: 'Formal, Casual & Denim',
+      icon: <FaTshirt className="w-5 h-5" />,
       storeCount: 12,
     },
     {
-      id: 'electronics',
-      name: 'Tech, Mobiles & Gaming',
-      categorySlug: 'electronics',
-      tagline: 'Authorized Smartphones & Custom PC Rigs',
-      description: 'Latest iPhones, Samsung flagships, mechanical gaming gear, and certified repairs.',
-      image: '/stores/fone_decor_cover.jpeg',
-      icon: <FaLaptop className="w-4 h-4" />,
+      id: 'kids',
+      name: 'Kids & Baby Wear',
+      categorySlug: 'kids',
+      subtitle: 'Playwear & Nursery Kits',
+      icon: <FaChild className="w-5 h-5" />,
       storeCount: 8,
     },
     {
-      id: 'beauty',
-      name: 'Beauty, Skincare & Fragrance',
-      categorySlug: 'beauty',
-      tagline: 'International Cosmetics & Organic Glow',
-      description: 'Authentic K-beauty, luxury perfumes, dermatological skincare, and salon makeup.',
-      image: '/stores/obsession_cosmetics_cover.jpeg',
-      icon: <FaSpa className="w-4 h-4" />,
-      storeCount: 9,
-    },
-    {
-      id: 'jewelry',
-      name: 'Fine Jewelry & Luxury Watches',
-      categorySlug: 'womens-accessories',
-      tagline: '24K Hallmark Gold & Certified Diamonds',
-      description: 'Bridal gold sets, solitaire diamond rings, and premium Swiss & Japanese watches.',
-      image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&q=80',
-      icon: <FaGem className="w-4 h-4" />,
-      storeCount: 6,
-    },
-    {
-      id: 'handicrafts',
-      name: 'Nepali Pashmina & Local Crafts',
-      categorySlug: 'handicrafts',
-      tagline: 'Pure Cashmere, Wild Hemp & Souvenirs',
-      description: 'Hand-woven Himalayan pashminas, organic hemp backpacks, and authentic souvenirs.',
-      image: '/stores/woven_cover.jpg',
-      icon: <FaGift className="w-4 h-4" />,
-      storeCount: 7,
-    },
-    {
-      id: 'kids',
-      name: 'Kids Wear & Family Essentials',
-      categorySlug: 'womens-fashion',
-      tagline: 'Playful Clothing, Newborns & Toys',
-      description: 'Organic cotton baby clothing, festive childrenswear, and fun nursery essentials.',
-      image: '/stores/dadybird_cover.webp',
-      icon: <FaChild className="w-4 h-4" />,
+      id: 'lingerie',
+      name: 'Lingerie & Nightwear',
+      categorySlug: 'lingerie',
+      subtitle: 'Intimate & Loungewear',
+      icon: <FaHeart className="w-5 h-5" />,
       storeCount: 5,
     },
     {
-      id: 'outdoor',
-      name: 'Outdoor & Mountain Trekking Gear',
-      categorySlug: 'mens-fashion',
-      tagline: 'High-Altitude Apparel & Equipment',
-      description: 'Gore-Tex jackets, rugged trekking boots, sleeping bags, and Annapurna gear.',
-      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80',
-      icon: <FaMountain className="w-4 h-4" />,
+      id: 'footwear-bags',
+      name: 'Footwear & Luggage',
+      categorySlug: 'footwear-bags',
+      subtitle: 'Shoes, Sneakers & Bags',
+      icon: <FaShoppingBag className="w-5 h-5" />,
+      storeCount: 9,
+    },
+    {
+      id: 'jewelry-watches',
+      name: 'Jewelry & Watches',
+      categorySlug: 'jewelry-watches',
+      subtitle: 'Fine Gold & Luxury Watches',
+      icon: <FaGem className="w-5 h-5" />,
+      storeCount: 6,
+    },
+    {
+      id: 'beauty-fragrance',
+      name: 'Beauty & Fragrance',
+      categorySlug: 'beauty-fragrance',
+      subtitle: 'Cosmetics & K-Beauty',
+      icon: <FaSpa className="w-5 h-5" />,
+      storeCount: 10,
+    },
+    {
+      id: 'electronics',
+      name: 'Tech & Electronics',
+      categorySlug: 'electronics',
+      subtitle: 'Mobiles, PC Rigs & Gadgets',
+      icon: <FaLaptop className="w-5 h-5" />,
+      storeCount: 8,
+    },
+    {
+      id: 'home-living',
+      name: 'Home & Living',
+      categorySlug: 'home-living',
+      subtitle: 'Decor, Bedding & Lifestyle',
+      icon: <FaCouch className="w-5 h-5" />,
+      storeCount: 7,
+    },
+    {
+      id: 'handicrafts',
+      name: 'Nepali Handicrafts',
+      categorySlug: 'handicrafts',
+      subtitle: 'Pashmina & Souvenirs',
+      icon: <FaGift className="w-5 h-5" />,
       storeCount: 6,
     },
   ];
@@ -195,79 +195,83 @@ export default function ShopPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: index * 0.05 }}
-                  className="group bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
+                  className="h-full"
                 >
-                  {/* Image Cover */}
-                  <div className="relative h-48 w-full overflow-hidden bg-gray-100">
-                    <img
-                      src={store.cover.data.full_url}
-                      alt={store.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80" />
+                  <Link
+                    to={`/shops/details/${store.slug}`}
+                    className="group bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between h-full cursor-pointer !no-underline text-inherit block"
+                  >
+                    {/* Image Cover */}
+                    <div className="relative h-48 w-full overflow-hidden bg-gray-100">
+                      <img
+                        src={store.cover.data.full_url}
+                        alt={store.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80" />
 
-                    {/* Floor Badge */}
-                    <span className="absolute top-3 right-3 text-[10px] font-semibold text-gray-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/80 flex items-center gap-1">
-                      <FaMapMarkerAlt className="w-2.5 h-2.5 text-[#801424]" />
-                      {store.floor || '1st Floor'}
-                    </span>
+                      {/* Floor Badge */}
+                      <span className="absolute top-3 right-3 text-[10px] font-semibold text-gray-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/80 flex items-center gap-1">
+                        <FaMapMarkerAlt className="w-2.5 h-2.5 text-[#801424]" />
+                        {store.floor || '1st Floor'}
+                      </span>
 
-                    {/* Category Pill */}
-                    <span className="absolute bottom-3 left-3 text-[10px] font-bold uppercase tracking-widest text-white bg-[#801424]/90 backdrop-blur-xs px-2.5 py-0.5 rounded-full shadow-xs">
-                      {store.category || store.type}
-                    </span>
-                  </div>
+                      {/* Category Pill */}
+                      <span className="absolute bottom-3 left-3 text-[10px] font-bold uppercase tracking-widest text-white bg-[#801424]/90 backdrop-blur-xs px-2.5 py-0.5 rounded-full shadow-xs">
+                        {store.category || store.type}
+                      </span>
+                    </div>
 
-                  {/* Card Content */}
-                  <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                    <div>
-                      {/* Logo + Store Title */}
-                      <div className="flex items-start gap-3 mb-2">
-                        <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
-                          <img
-                            src={store.logo.data.full_url}
-                            alt={`${store.name} logo`}
-                            className="w-full h-full object-cover"
-                          />
+                    {/* Card Content */}
+                    <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                      <div>
+                        {/* Logo + Store Title */}
+                        <div className="flex items-start gap-3 mb-2">
+                          <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
+                            <img
+                              src={store.logo.data.full_url}
+                              alt={`${store.name} logo`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <h3
+                              className="text-base font-bold text-gray-900 group-hover:text-[#801424] transition-colors leading-snug"
+                              style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
+                            >
+                              {store.name}
+                            </h3>
+                            {store.unitNumber && (
+                              <p className="text-[11px] text-gray-500 font-medium">{store.unitNumber}</p>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <h3
-                            className="text-base font-bold text-gray-900 group-hover:text-[#801424] transition-colors leading-snug"
-                            style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
-                          >
-                            {store.name}
-                          </h3>
-                          {store.unitNumber && (
-                            <p className="text-[11px] text-gray-500 font-medium">{store.unitNumber}</p>
-                          )}
-                        </div>
+
+                        {/* Subtitle */}
+                        {store.subtitle && (
+                          <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed mt-1">
+                            {store.subtitle}
+                          </p>
+                        )}
                       </div>
 
-                      {/* Subtitle */}
-                      {store.subtitle && (
-                        <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed mt-1">
-                          {store.subtitle}
-                        </p>
-                      )}
+                      {/* Footer */}
+                      <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
+                        {store.operation_hours && (
+                          <div className="flex items-center text-[11px] text-gray-500 gap-1">
+                            <FaClock className="w-3 h-3 text-[#801424]" />
+                            <span>{store.operation_hours.split(';')[0]}</span>
+                          </div>
+                        )}
+                        <span
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#801424] group-hover:translate-x-0.5 transition-all ml-auto"
+                        >
+                          <span>Explore</span>
+                          <FaArrowRight className="w-3 h-3" />
+                        </span>
+                      </div>
                     </div>
-
-                    {/* Footer */}
-                    <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
-                      {store.operation_hours && (
-                        <div className="flex items-center text-[11px] text-gray-500 gap-1">
-                          <FaClock className="w-3 h-3 text-[#801424]" />
-                          <span>{store.operation_hours.split(';')[0]}</span>
-                        </div>
-                      )}
-                      <Link
-                        to={`/shops/details/${store.slug}`}
-                        className="inline-flex items-center gap-1.5 text-xs font-bold text-[#801424] hover:text-[#5a0c18] group-hover:translate-x-0.5 transition-all no-underline"
-                      >
-                        <span>Explore</span>
-                        <FaArrowRight className="w-3 h-3" />
-                      </Link>
-                    </div>
-                  </div>
+                  </Link>
                 </motion.div>
               ))}
             </div>
@@ -275,7 +279,7 @@ export default function ShopPage() {
         </section>
 
         {/* ========================================================================= */}
-        {/* SECTION 2: LARGE TILED CATEGORY SELECTION */}
+        {/* SECTION 2: ICON-BASED CATEGORY SELECTION */}
         {/* ========================================================================= */}
         <section className="space-y-8">
           <div className="text-center max-w-3xl mx-auto space-y-3">
@@ -287,59 +291,58 @@ export default function ShopPage() {
               className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 uppercase tracking-wide"
               style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
             >
-              Shop by Department
+              Shop by Category
             </h2>
+            <div className="flex items-center justify-center gap-2 my-2.5">
+              <div className="w-8 h-0.5 bg-[#801424] rounded-full" />
+              <div className="w-2 h-2 rotate-45 bg-[#801424] rounded-xs" />
+              <div className="w-8 h-0.5 bg-[#801424] rounded-full" />
+            </div>
             <p className="text-sm text-gray-600 leading-relaxed font-light">
-              Select any department below to view the dedicated collection and browse available stores in our interactive directory.
+              Select any category below to browse retail stores, specialty boutiques, and tech outlets in our directory.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categoryTiles.map((tile, index) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-5">
+            {retailCategories.map((cat, index) => (
               <motion.div
-                key={tile.id}
-                initial={{ opacity: 0, y: 20 }}
+                key={cat.id}
+                initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
+                transition={{ duration: 0.3, delay: index * 0.04 }}
+                className="h-full"
               >
                 <Link
-                  to={`/shops/directory?category=${tile.categorySlug}`}
-                  className="group relative block rounded-3xl overflow-hidden border border-gray-200/90 shadow-sm hover:shadow-2xl transition-all duration-500 h-80 flex flex-col justify-end p-6 text-white no-underline"
+                  to={`/shops/directory?category=${cat.categorySlug}`}
+                  className="group bg-white rounded-2xl border border-gray-200/90 hover:border-[#801424]/40 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-5 sm:p-6 flex flex-col items-center text-center justify-between h-full no-underline cursor-pointer"
                 >
-                  {/* Backdrop Photo with Gradient */}
-                  <img
-                    src={tile.image}
-                    alt={tile.name}
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 brightness-90"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent group-hover:from-black/95 transition-all duration-300" />
+                  <div className="flex flex-col items-center w-full">
+                    {/* Icon Container */}
+                    <div className="w-14 h-14 rounded-2xl bg-red-50 text-[#801424] group-hover:bg-[#801424] group-hover:text-white transition-all duration-300 flex items-center justify-center text-xl mb-3.5 shadow-xs group-hover:shadow-md group-hover:scale-105">
+                      {cat.icon}
+                    </div>
 
-                  {/* Top Badge */}
-                  <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-[11px] font-bold uppercase tracking-wider">
-                    {tile.icon}
-                    <span>{tile.storeCount} Outlets</span>
-                  </div>
-
-                  {/* Content on bottom */}
-                  <div className="relative z-10 space-y-2">
-                    <span className="text-[11px] uppercase tracking-widest text-red-300 font-bold block">
-                      {tile.tagline}
-                    </span>
+                    {/* Category Name */}
                     <h3
-                      className="text-xl sm:text-2xl font-bold text-white group-hover:text-red-200 transition-colors leading-snug"
+                      className="text-sm sm:text-base font-bold text-gray-900 group-hover:text-[#801424] transition-colors leading-tight mb-1"
                       style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                     >
-                      {tile.name}
+                      {cat.name}
                     </h3>
-                    <p className="text-xs text-gray-300 line-clamp-2 font-light leading-relaxed">
-                      {tile.description}
-                    </p>
 
-                    <div className="pt-2 flex items-center gap-2 text-xs font-bold text-red-300 group-hover:text-white transition-colors">
-                      <span>Browse Department</span>
-                      <FaArrowRight className="w-3 h-3 group-hover:translate-x-1.5 transition-transform" />
-                    </div>
+                    {/* Subtitle */}
+                    <p className="text-[11px] text-gray-500 font-medium line-clamp-1">
+                      {cat.subtitle}
+                    </p>
+                  </div>
+
+                  {/* Outlets Count Badge & Arrow */}
+                  <div className="pt-3 mt-3 border-t border-gray-100 w-full flex items-center justify-between text-[11px] font-semibold text-gray-500 group-hover:text-[#801424] transition-colors">
+                    <span className="bg-gray-50 group-hover:bg-red-50 px-2 py-0.5 rounded-md transition-colors">
+                      {cat.storeCount} Outlets
+                    </span>
+                    <FaArrowRight className="w-2.5 h-2.5 group-hover:translate-x-1 transition-transform text-[#801424]" />
                   </div>
                 </Link>
               </motion.div>
@@ -350,24 +353,26 @@ export default function ShopPage() {
         {/* ========================================================================= */}
         {/* SECTION 3: JUMP TO SEARCH DIRECTORY BANNER */}
         {/* ========================================================================= */}
-        <section className="bg-white rounded-3xl border border-gray-200/90 shadow-md p-8 sm:p-10 md:p-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          <div className="lg:col-span-8 space-y-4">
-            <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-[#801424] uppercase">
+        <section className="bg-gradient-to-r from-gray-900 via-[#1e1316] to-gray-900 text-white rounded-3xl p-8 sm:p-10 md:p-12 relative overflow-hidden shadow-xl border border-gray-800 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 lg:col-span-8 space-y-4">
+            <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-red-400 uppercase">
               <FaSearch className="w-3.5 h-3.5" />
               <span>Full Store Directory</span>
             </div>
             <h2
-              className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight"
               style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
             >
               Looking for a Specific Brand, Shutter or Floor?
             </h2>
-            <p className="text-sm sm:text-base text-gray-600 font-light leading-relaxed max-w-2xl">
+            <p className="text-sm sm:text-base text-gray-300 font-light leading-relaxed max-w-2xl">
               Access the complete, searchable directory with real-time keyword search, category filters, floor-by-floor listings, and interactive map links.
             </p>
           </div>
 
-          <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 justify-center">
+          <div className="relative z-10 lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 justify-center">
             <Link
               to="/shops/directory"
               className="btn-primary"
@@ -377,9 +382,9 @@ export default function ShopPage() {
             </Link>
             <Link
               to="/mall-map"
-              className="btn-secondary"
+              className="btn-dark"
             >
-              <FaCompass className="w-3.5 h-3.5 text-[#801424]" />
+              <FaCompass className="w-3.5 h-3.5 text-red-400" />
               <span>Interactive Mall Map</span>
             </Link>
           </div>
