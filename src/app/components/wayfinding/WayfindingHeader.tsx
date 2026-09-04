@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, X } from 'lucide-react';
+import { Search, X, MapPin, Store } from 'lucide-react';
 import { WayfindingStore, CATEGORIES, FLOOR_LABELS, FloorId } from '../../../types/wayfinding';
 import styles from './Wayfinding.module.css';
 
@@ -27,7 +26,7 @@ export const WayfindingHeader: React.FC<WayfindingHeaderProps> = ({
         .filter((store) => {
           const q = searchQuery.toLowerCase();
           const matchName = store.name.toLowerCase().includes(q);
-          const matchCat = store.cat.toLowerCase().includes(q);
+          const matchCat = (store.cat || '').toLowerCase().includes(q);
           const matchShutter = store.shutters?.some((s) => s.toLowerCase().includes(q));
           return matchName || matchCat || matchShutter;
         })
@@ -50,100 +49,137 @@ export const WayfindingHeader: React.FC<WayfindingHeaderProps> = ({
     onSelectStore(store);
   };
 
+  // Distinct category keys for dropdown
+  const categoryKeys = [
+    'womens-fashion',
+    'mens-fashion',
+    'kids',
+    'lingerie',
+    'footwear-bags',
+    'jewelry-watches',
+    'beauty-fragrance',
+    'electronics',
+    'home-living',
+    'handicrafts',
+    'thakali',
+    'restaurant',
+    'cafe',
+    'fast-food',
+    'cinema',
+    'gaming',
+    'beauty-wellness',
+    'finance',
+    'education',
+    'it-tech',
+    'health-fitness',
+    'professional',
+    'restroom',
+    'elevator',
+    'stairs',
+  ];
+
   return (
-    <header className={styles.header}>
-      <div className={styles.headerMain}>
-        <Link to="/" className={styles.logo} title="Return to Pokhara Trade Mall Home">
-          <img
-            src="/tm_logo_nobg.png"
-            alt="Pokhara Trade Mall Logo"
-            className={styles.logoImg}
-          />
-          <div className={styles.logoText}>
-            <h1>POKHARA TRADE MALL</h1>
-            <span>MALL WAYFINDING MAP</span>
-          </div>
-        </Link>
-
-        <div className={styles.searchBox} ref={searchRef}>
-          <Search className={styles.searchIcon} size={18} />
-          <input
-            type="text"
-            className={styles.searchInput}
-            placeholder="Search stores, brands, services..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setIsPopoverOpen(true);
+    <div className={styles.headerControlsBar}>
+      {/* Search Input Box */}
+      <div className={styles.searchBox} ref={searchRef}>
+        <Search className={styles.searchIcon} size={16} />
+        <input
+          type="text"
+          className={styles.searchInput}
+          placeholder="Search stores, brands, eateries, services, shutter..."
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setIsPopoverOpen(true);
+          }}
+          onFocus={() => setIsPopoverOpen(true)}
+        />
+        {searchQuery && (
+          <button
+            className={styles.clearBtn}
+            onClick={() => {
+              setSearchQuery('');
+              setIsPopoverOpen(false);
             }}
-            onFocus={() => setIsPopoverOpen(true)}
-          />
-          {searchQuery && (
-            <button
-              className={styles.clearBtn}
-              onClick={() => {
-                setSearchQuery('');
-                setIsPopoverOpen(false);
-              }}
-              aria-label="Clear search"
-            >
-              <X size={16} />
-            </button>
-          )}
+            aria-label="Clear search"
+          >
+            <X size={15} />
+          </button>
+        )}
 
-          {isPopoverOpen && suggestions.length > 0 && (
-            <div className={styles.suggestionsPopover}>
-              {suggestions.map((store) => {
-                const catInfo = CATEGORIES[store.cat] || CATEGORIES.service;
-                const shutterLabel =
-                  store.shutters && store.shutters[0]
-                    ? store.shutters[0].split(':')[1] || store.id
-                    : store.id;
+        {/* Autocomplete Suggestions */}
+        {isPopoverOpen && suggestions.length > 0 && (
+          <div className={styles.suggestionsPopover}>
+            {suggestions.map((store) => {
+              const catInfo = CATEGORIES[store.cat] || CATEGORIES.service;
+              const shutterLabel =
+                store.shutters && store.shutters[0]
+                  ? store.shutters[0].split(':')[1] || store.id
+                  : store.id;
 
-                return (
-                  <div
-                    key={store.id}
-                    className={styles.suggestionItem}
-                    onClick={() => handleSelectSuggestion(store)}
-                  >
-                    <span className={styles.suggestionShutter}>{shutterLabel}</span>
-                    <div className={styles.suggestionDetails}>
-                      <div className={styles.suggestionName}>{store.name}</div>
-                      <div className={styles.suggestionFloor}>
-                        {store.floor
-                          ? FLOOR_LABELS[store.floor as FloorId] || store.floor
-                          : 'Ground Floor'}
-                      </div>
-                    </div>
-                    <div
-                      className={styles.suggestionDot}
-                      style={{ backgroundColor: catInfo.color }}
-                      title={catInfo.label}
+              return (
+                <div
+                  key={store.id}
+                  className={styles.suggestionItem}
+                  onClick={() => handleSelectSuggestion(store)}
+                >
+                  {/* Thumbnail / Logo */}
+                  {store.logo ? (
+                    <img
+                      src={store.logo}
+                      alt={store.name}
+                      className={styles.suggestionLogo}
                     />
+                  ) : (
+                    <div className={styles.suggestionLogoFallback}>
+                      <Store size={14} />
+                    </div>
+                  )}
+
+                  <div className={styles.suggestionDetails}>
+                    <div className={styles.suggestionName}>{store.name}</div>
+                    <div className={styles.suggestionFloor}>
+                      <MapPin size={10} className="inline mr-1 text-[#801424]" />
+                      {store.floor
+                        ? FLOOR_LABELS[store.floor as FloorId] || store.floor
+                        : 'Ground Floor'}
+                      <span className="mx-1.5 opacity-40">&bull;</span>
+                      <span className={styles.suggestionShutter}>Unit {shutterLabel}</span>
+                    </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+
+                  <span
+                    className={styles.suggestionCategoryBadge}
+                    style={{ backgroundColor: `${catInfo.color}25`, color: catInfo.color, borderColor: `${catInfo.color}50` }}
+                  >
+                    {catInfo.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
+      {/* Category Dropdown */}
       <div className={styles.categorySelectContainer}>
         <select
           className={styles.selectInput}
           value={activeCategory || ''}
           onChange={(e) => onCategoryChange(e.target.value || null)}
         >
-          <option value="">All Categories</option>
-          {Object.entries(CATEGORIES)
-            .filter(([k]) => !['stairs', 'elevator', 'restroom', 'service', 'void', 'atrium'].includes(k))
-            .map(([k, v]) => (
-              <option key={k} value={k}>
-                {v.label}
+          <option value="">All Categories ({categoryKeys.length})</option>
+          {categoryKeys.map((key) => {
+            const cat = CATEGORIES[key];
+            if (!cat) return null;
+            return (
+              <option key={key} value={key}>
+                {cat.label}
               </option>
-            ))}
+            );
+          })}
         </select>
       </div>
-    </header>
+    </div>
   );
 };

@@ -20,7 +20,6 @@ interface WayfindingMapStageProps {
   startLocation: { name: string; floorId: FloorId; x: number; y: number } | null;
   routeNodePath: string[];
   graphNodeInfo: Record<string, GraphNode>;
-  showUnderlay: boolean;
   onSelectLocation: (loc: WayfindingLocation, store: WayfindingStore | null) => void;
   viewportState: { k: number; x: number; y: number };
   setViewportState: React.Dispatch<React.SetStateAction<{ k: number; x: number; y: number }>>;
@@ -36,7 +35,6 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
   startLocation,
   routeNodePath,
   graphNodeInfo,
-  showUnderlay,
   onSelectLocation,
   viewportState,
   setViewportState,
@@ -46,22 +44,51 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
 
-  // Auto-fit function based on container dimensions
+  // Auto-fit function based on container dimensions and actual floor content bounds
   const fitMap = useCallback(() => {
     if (!stageRef.current) return;
     const rect = stageRef.current.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return;
 
-    const W = 3508;
-    const H = 4962;
-    const padding = 24;
+    let minX = 400;
+    let minY = 400;
+    let maxX = 3100;
+    let maxY = 4500;
 
-    const k = Math.min((rect.width - padding * 2) / W, (rect.height - padding * 2) / H);
-    const x = (rect.width - W * k) / 2;
-    const y = (rect.height - H * k) / 2;
+    if (floorData?.locations && floorData.locations.length > 0) {
+      const xs = floorData.locations.map((l) => l.x);
+      const ys = floorData.locations.map((l) => l.y);
+      const rights = floorData.locations.map((l) => l.x + l.w);
+      const bottoms = floorData.locations.map((l) => l.y + l.h);
+
+      minX = Math.min(...xs);
+      minY = Math.min(...ys);
+      maxX = Math.max(...rights);
+      maxY = Math.max(...bottoms);
+    } else if (floorData?.silhouette && floorData.silhouette.length > 0) {
+      const xs = floorData.silhouette.map((p) => p.x);
+      const ys = floorData.silhouette.map((p) => p.y);
+      minX = Math.min(...xs);
+      minY = Math.min(...ys);
+      maxX = Math.max(...xs);
+      maxY = Math.max(...ys);
+    }
+
+    const contentW = Math.max(100, maxX - minX);
+    const contentH = Math.max(100, maxY - minY);
+    const paddingX = Math.max(20, rect.width * 0.06);
+    const paddingY = Math.max(20, rect.height * 0.06);
+
+    const k = Math.min(
+      (rect.width - paddingX * 2) / contentW,
+      (rect.height - paddingY * 2) / contentH
+    );
+
+    const x = (rect.width - contentW * k) / 2 - minX * k;
+    const y = (rect.height - contentH * k) / 2 - minY * k;
 
     setViewportState({ k, x, y });
-  }, [setViewportState]);
+  }, [floorData, setViewportState]);
 
   // Initial fit on mount & when floor changes
   useEffect(() => {
@@ -117,7 +144,7 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
     const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
 
     setViewportState((prev) => {
-      const newK = Math.max(0.08, Math.min(6.0, prev.k * zoomFactor));
+      const newK = Math.max(0.08, Math.min(8.0, prev.k * zoomFactor));
       if (!stageRef.current) return prev;
 
       const rect = stageRef.current.getBoundingClientRect();
@@ -165,30 +192,16 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
         <g
           transform={`translate(${viewportState.x}, ${viewportState.y}) scale(${viewportState.k})`}
         >
-          {/* Invisible Background Rect for easy panning drag capture */}
-          <rect x="-2000" y="-2000" width="8000" height="10000" fill="transparent" />
+          {/* Invisible Background Rect for smooth pan drag capture */}
+          <rect x="-4000" y="-4000" width="12000" height="14000" fill="transparent" />
 
-          {/* Background Floor Blueprint Image */}
-          <image
-            x="0"
-            y="0"
-            width="3508"
-            height="4962"
-            href={`/wayfinding/floor_plans/${currentFloor}.png`}
-            preserveAspectRatio="none"
-            style={{
-              opacity: showUnderlay ? 0.6 : 0,
-              transition: 'opacity 0.3s ease',
-            }}
-          />
-
-          {/* Floor Silhouette Polygon */}
+          {/* Floor Silhouette Polygon / Base */}
           {silhouettePointsStr && (
             <polygon
               points={silhouettePointsStr}
-              fill="rgba(255, 255, 255, 0.03)"
-              stroke="rgba(255, 255, 255, 0.2)"
-              strokeWidth={3 / viewportState.k}
+              fill="rgba(255, 255, 255, 0.04)"
+              stroke="rgba(255, 255, 255, 0.25)"
+              strokeWidth={4 / viewportState.k}
               strokeLinejoin="round"
             />
           )}
@@ -208,10 +221,10 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
               const rgb = hexToRgb(catInfo.color);
               const isSelected = selectedLocation?.id === loc.id;
               const fillColor = isSelected
-                ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`
-                : `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.25)`;
-              const strokeColor = isSelected ? '#ef4444' : catInfo.color;
-              const strokeWidth = isSelected ? 4 / viewportState.k : 2 / viewportState.k;
+                ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.65)`
+                : `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.28)`;
+              const strokeColor = isSelected ? '#ffffff' : catInfo.color;
+              const strokeWidth = isSelected ? 5 / viewportState.k : 2.5 / viewportState.k;
 
               const storeName = store ? store.name : loc.name || loc.id;
               const cx = loc.x + loc.w / 2;
@@ -222,7 +235,7 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
                   key={loc.id}
                   style={{
                     cursor: 'pointer',
-                    opacity: matchesFilter ? 1 : 0.15,
+                    opacity: matchesFilter ? 1 : 0.12,
                     pointerEvents: matchesFilter ? 'all' : 'none',
                   }}
                   onClick={(e) => {
@@ -244,10 +257,11 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
                     y={loc.y}
                     width={Math.max(1, loc.w)}
                     height={Math.max(1, loc.h)}
-                    rx={6}
+                    rx={8}
                     fill={fillColor}
                     stroke={strokeColor}
                     strokeWidth={strokeWidth}
+                    filter={isSelected ? 'drop-shadow(0 0 12px rgba(239, 68, 68, 0.7))' : undefined}
                     style={{ transition: 'fill 0.2s, stroke 0.2s' }}
                   />
                   <text
@@ -257,16 +271,16 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
                     dominantBaseline="central"
                     fill="#ffffff"
                     fontSize={Math.max(
-                      11,
-                      Math.min(loc.w / Math.max(storeName.length, 3) * 1.4, loc.h * 0.45, 26)
+                      12,
+                      Math.min(loc.w / Math.max(storeName.length, 3) * 1.5, loc.h * 0.45, 30)
                     )}
                     fontWeight="700"
                     style={{
-                      fontFamily: 'monospace',
+                      fontFamily: 'Montserrat, sans-serif',
                       paintOrder: 'stroke',
-                      stroke: 'rgba(0,0,0,0.85)',
-                      strokeWidth: '3.5px',
-                      opacity: viewportState.k > 0.3 || isSelected ? 0.9 : 0,
+                      stroke: 'rgba(0,0,0,0.9)',
+                      strokeWidth: '4px',
+                      opacity: viewportState.k > 0.25 || isSelected ? 0.95 : 0,
                       transition: 'opacity 0.2s ease',
                       pointerEvents: 'none',
                     }}
@@ -287,10 +301,10 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
                   key={idx}
                   cx={n.x}
                   cy={n.y}
-                  r={6 / viewportState.k}
+                  r={7 / viewportState.k}
                   fill="#ef4444"
                   stroke="#ffffff"
-                  strokeWidth={2 / viewportState.k}
+                  strokeWidth={2.5 / viewportState.k}
                 />
               ))}
             </g>
@@ -299,8 +313,8 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
           {/* You Are Here Pulsing Dot */}
           {startLocation && startLocation.floorId === currentFloor && (
             <g transform={`translate(${startLocation.x}, ${startLocation.y})`}>
-              <circle className={styles.yahPulse} r={28} />
-              <circle r={14} fill="#ef4444" stroke="#ffffff" strokeWidth={4} />
+              <circle className={styles.yahPulse} r={32} />
+              <circle r={15} fill="#ef4444" stroke="#ffffff" strokeWidth={4} />
               <circle r={5} fill="#ffffff" />
             </g>
           )}

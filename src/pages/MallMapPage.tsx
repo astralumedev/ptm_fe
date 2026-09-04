@@ -9,6 +9,8 @@ import {
 } from '../types/wayfinding';
 import wayfindingService from '../services/wayfindingService';
 import { buildGlobalPathGraph, findRoute, BuiltGraphData } from '../lib/wayfindingGraph';
+import NavigationBar from '../app/components/NavigationBar';
+import Footer from '../app/components/Footer';
 import { WayfindingHeader } from '../app/components/wayfinding/WayfindingHeader';
 import { WayfindingMapStage } from '../app/components/wayfinding/WayfindingMapStage';
 import { FloorSelector } from '../app/components/wayfinding/FloorSelector';
@@ -61,8 +63,7 @@ export const MallMapPage: React.FC = () => {
   const [routeResult, setRouteResult] = useState<PathResult | null>(null);
 
   // Stage Viewport
-  const [viewportState, setViewportState] = useState({ k: 0.2, x: 0, y: 0 });
-  const [showUnderlay, setShowUnderlay] = useState(true);
+  const [viewportState, setViewportState] = useState({ k: 0.25, x: 0, y: 0 });
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
 
   // 1. Initial Load of Stores & Floor Plans
@@ -91,12 +92,22 @@ export const MallMapPage: React.FC = () => {
     loadData();
   }, []);
 
-  // 2. Handle URL parameters (e.g. ?store=zara or ?from=ground_floor:G-01)
+  // 2. Handle URL parameters (e.g. ?store=zara, ?floor=first_floor, ?category=electronics, ?from=ground_floor:G-01)
   useEffect(() => {
     if (isLoading || stores.length === 0) return;
 
     const storeParam = searchParams.get('store');
+    const floorParam = searchParams.get('floor');
+    const categoryParam = searchParams.get('category');
     const fromParam = searchParams.get('from');
+
+    if (floorParam && ALL_FLOORS.includes(floorParam as FloorId)) {
+      setCurrentFloor(floorParam as FloorId);
+    }
+
+    if (categoryParam) {
+      setActiveCategory(categoryParam);
+    }
 
     if (fromParam) {
       const parts = fromParam.split(':');
@@ -136,17 +147,23 @@ export const MallMapPage: React.FC = () => {
   }, [searchParams, stores, floorDataMap, isLoading]);
 
   const handleZoomFit = useCallback(() => {
-    const windowW = window.innerWidth;
-    const windowH = window.innerHeight;
-    const W = 3508;
-    const H = 4962;
-    const padding = 24;
-
-    const k = Math.min((windowW - padding * 2) / W, (windowH - padding * 2) / H);
-    const x = (windowW - W * k) / 2;
-    const y = (windowH - H * k) / 2;
-    setViewportState({ k, x, y });
-  }, []);
+    const curLocations = floorDataMap[currentFloor]?.locations || [];
+    if (curLocations.length > 0) {
+      const minX = Math.min(...curLocations.map((l) => l.x));
+      const minY = Math.min(...curLocations.map((l) => l.y));
+      const maxX = Math.max(...curLocations.map((l) => l.x + l.w));
+      const maxY = Math.max(...curLocations.map((l) => l.y + l.h));
+      const contentW = Math.max(100, maxX - minX);
+      const contentH = Math.max(100, maxY - minY);
+      const windowW = window.innerWidth;
+      const windowH = window.innerHeight * 0.8;
+      const pad = 40;
+      const k = Math.min((windowW - pad * 2) / contentW, (windowH - pad * 2) / contentH);
+      const x = (windowW - contentW * k) / 2 - minX * k;
+      const y = (windowH - contentH * k) / 2 - minY * k;
+      setViewportState({ k, x, y });
+    }
+  }, [currentFloor, floorDataMap]);
 
   const handleZoomIn = () => {
     setViewportState((prev) => ({ ...prev, k: Math.min(6.0, prev.k * 1.35) }));
@@ -215,12 +232,20 @@ export const MallMapPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#0a0b16] text-white">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-[#801424] border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm font-semibold tracking-wider text-gray-300 uppercase">
-            Loading Pokhara Trade Mall Map...
-          </span>
+      <div className="flex items-center justify-center min-h-screen bg-[#070914] text-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#2e3094] border-t-[#801424] rounded-full animate-spin shadow-lg shadow-indigo-950/60" />
+          <div className="text-center">
+            <span
+              className="text-base font-bold tracking-widest text-white uppercase block"
+              style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
+            >
+              Pokhara Trade Mall
+            </span>
+            <span className="text-xs text-indigo-400 uppercase tracking-wider font-semibold">
+              Loading Interactive Floor Plans & Wayfinding...
+            </span>
+          </div>
         </div>
       </div>
     );
@@ -229,68 +254,78 @@ export const MallMapPage: React.FC = () => {
   const currentFloorLocations = floorDataMap[currentFloor]?.locations || [];
 
   return (
-    <div className={styles.container}>
-      <WayfindingHeader
-        stores={stores}
-        activeCategory={activeCategory}
-        onCategoryChange={setActiveCategory}
-        onSelectStore={handleSelectStoreFromSearch}
-      />
+    <div className="flex flex-col min-h-screen bg-[#070914] text-white selection:bg-[#801424] selection:text-white">
+      {/* 1. Official Website Navigation Header */}
+      <NavigationBar />
 
-      <div className={styles.stage}>
-        <FloorSelector
-          currentFloor={currentFloor}
-          onFloorChange={(f) => {
-            setCurrentFloor(f);
-          }}
-        />
+      {/* 2. Wayfinding App Interactive Workspace */}
+      <main className="flex-1 w-full relative flex flex-col">
+        <div className={styles.container}>
+          {/* Top Search & Category Filter Header */}
+          <WayfindingHeader
+            stores={stores}
+            activeCategory={activeCategory}
+            onCategoryChange={setActiveCategory}
+            onSelectStore={handleSelectStoreFromSearch}
+          />
 
-        <MapControls
-          onZoomIn={handleZoomIn}
-          onZoomOut={handleZoomOut}
-          onZoomFit={handleZoomFit}
-          onToggleUnderlay={() => setShowUnderlay((prev) => !prev)}
-          onToggleQrSim={() => setIsQrModalOpen(true)}
-          showUnderlay={showUnderlay}
-        />
+          {/* Interactive Map Stage */}
+          <div className={styles.stage}>
+            <FloorSelector
+              currentFloor={currentFloor}
+              onFloorChange={(f) => {
+                setCurrentFloor(f);
+              }}
+            />
 
-        <WayfindingMapStage
-          currentFloor={currentFloor}
-          floorData={floorDataMap[currentFloor] || null}
-          stores={stores}
-          activeCategory={activeCategory}
-          selectedLocation={selectedLocation}
-          selectedStore={selectedStore}
-          startLocation={startLocation}
-          routeNodePath={routeResult?.nodePath || []}
-          graphNodeInfo={graphData.nodeInfo}
-          showUnderlay={showUnderlay}
-          onSelectLocation={handleSelectLocationOnMap}
-          viewportState={viewportState}
-          setViewportState={setViewportState}
-        />
+            <MapControls
+              onZoomIn={handleZoomIn}
+              onZoomOut={handleZoomOut}
+              onZoomFit={handleZoomFit}
+              onToggleQrSim={() => setIsQrModalOpen(true)}
+            />
 
-        <StoreDetailsDrawer
-          currentFloor={currentFloor}
-          selectedStore={selectedStore}
-          selectedLocation={selectedLocation}
-          startLocation={startLocation}
-          routeResult={routeResult}
-          floorLocations={currentFloorLocations}
-          onGetDirections={handleGetDirections}
-          onCloseDetails={() => {
-            setSelectedLocation(null);
-            setSelectedStore(null);
-          }}
-          onCloseDirections={() => setRouteResult(null)}
-        />
-      </div>
+            <WayfindingMapStage
+              currentFloor={currentFloor}
+              floorData={floorDataMap[currentFloor] || null}
+              stores={stores}
+              activeCategory={activeCategory}
+              selectedLocation={selectedLocation}
+              selectedStore={selectedStore}
+              startLocation={startLocation}
+              routeNodePath={routeResult?.nodePath || []}
+              graphNodeInfo={graphData.nodeInfo}
+              onSelectLocation={handleSelectLocationOnMap}
+              viewportState={viewportState}
+              setViewportState={setViewportState}
+            />
 
-      <QrSimulationModal
-        isOpen={isQrModalOpen}
-        onClose={() => setIsQrModalOpen(false)}
-        onSelectEntrance={handleSelectEntrance}
-      />
+            <StoreDetailsDrawer
+              currentFloor={currentFloor}
+              selectedStore={selectedStore}
+              selectedLocation={selectedLocation}
+              startLocation={startLocation}
+              routeResult={routeResult}
+              floorLocations={currentFloorLocations}
+              onGetDirections={handleGetDirections}
+              onCloseDetails={() => {
+                setSelectedLocation(null);
+                setSelectedStore(null);
+              }}
+              onCloseDirections={() => setRouteResult(null)}
+            />
+          </div>
+
+          <QrSimulationModal
+            isOpen={isQrModalOpen}
+            onClose={() => setIsQrModalOpen(false)}
+            onSelectEntrance={handleSelectEntrance}
+          />
+        </div>
+      </main>
+
+      {/* 3. Official Website Footer */}
+      <Footer />
     </div>
   );
 };

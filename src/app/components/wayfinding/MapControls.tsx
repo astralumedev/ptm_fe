@@ -1,23 +1,19 @@
 import React from 'react';
-import { QrCode, Image as ImageIcon, Plus, Minus, Maximize2 } from 'lucide-react';
+import { QrCode, Plus, Minus, Maximize2 } from 'lucide-react';
 import styles from './Wayfinding.module.css';
 
 interface MapControlsProps {
   onZoomIn: () => void;
   onZoomOut: () => void;
   onZoomFit: () => void;
-  onToggleUnderlay: () => void;
   onToggleQrSim: () => void;
-  showUnderlay: boolean;
 }
 
 export const MapControls: React.FC<MapControlsProps> = ({
   onZoomIn,
   onZoomOut,
   onZoomFit,
-  onToggleUnderlay,
   onToggleQrSim,
-  showUnderlay,
 }) => {
   return (
     <>
@@ -28,15 +24,6 @@ export const MapControls: React.FC<MapControlsProps> = ({
           title="Simulate QR Code Entrance Scan"
         >
           <QrCode size={20} />
-        </button>
-
-        <button
-          className={styles.controlBtn}
-          onClick={onToggleUnderlay}
-          style={{ color: showUnderlay ? '#ff3d71' : undefined }}
-          title="Toggle Underlay Blueprint"
-        >
-          <ImageIcon size={20} />
         </button>
       </div>
 
