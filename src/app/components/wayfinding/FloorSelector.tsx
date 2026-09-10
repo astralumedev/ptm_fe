@@ -21,7 +21,11 @@ export const FloorSelector: React.FC<FloorSelectorProps> = ({
   onFloorChange,
 }) => {
   return (
-    <div className={styles.floorSelectorPills}>
+    <div
+      className={styles.floorSelectorPills}
+      onPointerDown={(e) => e.stopPropagation()}
+      onWheel={(e) => e.stopPropagation()}
+    >
       {FLOOR_ITEMS.map((item) => {
         const isSelected = currentFloor === item.id;
         return (

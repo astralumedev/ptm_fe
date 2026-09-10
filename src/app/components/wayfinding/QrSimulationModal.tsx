@@ -10,11 +10,14 @@ interface QrSimulationModalProps {
 }
 
 const PRESET_ENTRANCES: Array<{ floorId: FloorId; locationId: string; name: string }> = [
-  { floorId: 'ground_floor', locationId: 'G-01', name: 'Ground Floor Main Entrance' },
-  { floorId: 'ground_floor', locationId: 'G-14', name: 'Ground Floor East Wing Entry' },
-  { floorId: 'lower_ground_floor', locationId: 'LG-01', name: 'Lower Ground Atrium Gate' },
-  { floorId: 'first_floor', locationId: 'F-01', name: 'First Floor Escalator Landing' },
-  { floorId: 'second_floor', locationId: 'S-01', name: 'Second Floor Central Hub' },
+  { floorId: 'ground_floor', locationId: 'A101', name: 'Ground Floor Main Entrance (A101)' },
+  { floorId: 'ground_floor', locationId: 'A115', name: 'Ground Floor East Wing Entry (A115)' },
+  { floorId: 'ground_floor', locationId: 'LIFT-U', name: 'Ground Floor North Elevators' },
+  { floorId: 'first_floor', locationId: 'A201', name: 'First Floor North Landing (A201)' },
+  { floorId: 'second_floor', locationId: 'A305', name: 'Second Floor Central Hub (A305)' },
+  { floorId: 'third_floor', locationId: 'A409', name: 'Third Floor Plaza Entrance (A409)' },
+  { floorId: 'fourth_floor', locationId: 'A509', name: 'Fourth Floor Food Court Entry (A509)' },
+  { floorId: 'fifth_floor', locationId: 'L501', name: 'Fifth Floor QFX Cinemas Lobby (L501)' },
 ];
 
 export const QrSimulationModal: React.FC<QrSimulationModalProps> = ({

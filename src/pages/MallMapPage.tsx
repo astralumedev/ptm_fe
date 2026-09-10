@@ -10,7 +10,6 @@ import {
 import wayfindingService from '../services/wayfindingService';
 import { buildGlobalPathGraph, findRoute, BuiltGraphData } from '../lib/wayfindingGraph';
 import NavigationBar from '../app/components/NavigationBar';
-import Footer from '../app/components/Footer';
 import { WayfindingHeader } from '../app/components/wayfinding/WayfindingHeader';
 import { WayfindingMapStage } from '../app/components/wayfinding/WayfindingMapStage';
 import { FloorSelector } from '../app/components/wayfinding/FloorSelector';
@@ -54,13 +53,14 @@ export const MallMapPage: React.FC = () => {
   }>({
     name: 'Ground Floor Main Entrance',
     floorId: 'ground_floor',
-    locationId: 'G-01',
-    x: 1015,
-    y: 955,
+    locationId: 'A101',
+    x: 1232,
+    y: 513,
   });
 
   // Navigation Route
   const [routeResult, setRouteResult] = useState<PathResult | null>(null);
+  const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
 
   // Stage Viewport
   const [viewportState, setViewportState] = useState({ k: 0.25, x: 0, y: 0 });
@@ -82,6 +82,20 @@ export const MallMapPage: React.FC = () => {
         // Build global path graph
         const builtGraph = buildGlobalPathGraph(loadedFloors);
         setGraphData(builtGraph);
+
+        // Set accurate initial start entrance location if available
+        const gLoc =
+          loadedFloors['ground_floor']?.locations.find((l) => l.id === 'A101') ||
+          loadedFloors['ground_floor']?.locations[0];
+        if (gLoc) {
+          setStartLocation({
+            name: 'Ground Floor Main Entrance',
+            floorId: 'ground_floor',
+            locationId: gLoc.id,
+            x: Math.round(gLoc.x + gLoc.w / 2),
+            y: Math.round(gLoc.y + gLoc.h / 2),
+          });
+        }
       } catch (err) {
         console.error('Failed to initialize Mall Map:', err);
       } finally {
@@ -92,7 +106,7 @@ export const MallMapPage: React.FC = () => {
     loadData();
   }, []);
 
-  // 2. Handle URL parameters (e.g. ?store=zara, ?floor=first_floor, ?category=electronics, ?from=ground_floor:G-01)
+  // 2. Handle URL parameters (e.g. ?store=zara, ?floor=first_floor, ?category=electronics, ?from=ground_floor:A101)
   useEffect(() => {
     if (isLoading || stores.length === 0) return;
 
@@ -114,15 +128,17 @@ export const MallMapPage: React.FC = () => {
       if (parts.length === 2 && ALL_FLOORS.includes(parts[0] as FloorId)) {
         const floorId = parts[0] as FloorId;
         const locId = parts[1];
-        const loc = floorDataMap[floorId]?.locations.find((l) => l.id === locId);
+        const loc = floorDataMap[floorId]?.locations.find((l) => l.id.toLowerCase() === locId.toLowerCase());
 
-        setStartLocation({
-          name: loc?.name || `Entrance (${locId})`,
-          floorId,
-          locationId: locId,
-          x: loc ? Math.round(loc.x + loc.w / 2) : 1015,
-          y: loc ? Math.round(loc.y + loc.h / 2) : 955,
-        });
+        if (loc) {
+          setStartLocation({
+            name: loc.name || `Entrance (${locId})`,
+            floorId,
+            locationId: loc.id,
+            x: Math.round(loc.x + loc.w / 2),
+            y: Math.round(loc.y + loc.h / 2),
+          });
+        }
       }
     }
 
@@ -166,11 +182,11 @@ export const MallMapPage: React.FC = () => {
   }, [currentFloor, floorDataMap]);
 
   const handleZoomIn = () => {
-    setViewportState((prev) => ({ ...prev, k: Math.min(6.0, prev.k * 1.35) }));
+    setViewportState((prev) => ({ ...prev, k: Math.min(3.5, prev.k * 1.35) }));
   };
 
   const handleZoomOut = () => {
-    setViewportState((prev) => ({ ...prev, k: Math.max(0.05, prev.k / 1.35) }));
+    setViewportState((prev) => ({ ...prev, k: Math.max(0.16, prev.k / 1.35) }));
   };
 
   // Select store from header search
@@ -199,35 +215,99 @@ export const MallMapPage: React.FC = () => {
     setRouteResult(null);
   };
 
-  // Compute Route Directions
+  // Compute Route Directions with reliable fallback to Ground Floor Main Entrance
   const handleGetDirections = () => {
     if (!selectedLocation) return;
 
-    const startNodeId = `${startLocation.floorId}:${startLocation.locationId}`;
+    let curStart = startLocation;
+    const startLocFound =
+      curStart &&
+      floorDataMap[curStart.floorId]?.locations.some((l) => l.id === curStart.locationId);
+
+    if (!curStart || !startLocFound) {
+      const gFloor = floorDataMap['ground_floor'];
+      const defaultLoc =
+        gFloor?.locations.find((l) => l.id === 'A101') || gFloor?.locations[0];
+      curStart = {
+        name: 'Ground Floor Main Entrance',
+        floorId: 'ground_floor',
+        locationId: defaultLoc ? defaultLoc.id : 'A101',
+        x: defaultLoc ? Math.round(defaultLoc.x + defaultLoc.w / 2) : 1232,
+        y: defaultLoc ? Math.round(defaultLoc.y + defaultLoc.h / 2) : 513,
+      };
+      setStartLocation(curStart);
+    }
+
+    const startNodeId = `${curStart.floorId}:${curStart.locationId}`;
     const endNodeId = `${currentFloor}:${selectedLocation.id}`;
+    const startName = curStart.name || 'Main Entrance';
+    const endName = selectedStore?.name || selectedLocation.name || selectedLocation.id;
 
-    const route = findRoute(graphData, startNodeId, endNodeId);
+    const route = findRoute(graphData, startNodeId, endNodeId, startName, endName);
     setRouteResult(route);
+    setActiveStepIndex(0);
 
-    if (startLocation.floorId !== currentFloor) {
-      setCurrentFloor(startLocation.floorId);
+    if (curStart.floorId !== currentFloor) {
+      setCurrentFloor(curStart.floorId);
+    }
+  };
+
+  // Step-by-step navigation controls
+  const handleStepChange = (index: number) => {
+    if (!routeResult || index < 0 || index >= routeResult.steps.length) return;
+    setActiveStepIndex(index);
+    const targetStep = routeResult.steps[index];
+    if (targetStep && targetStep.floorId !== currentFloor) {
+      setCurrentFloor(targetStep.floorId);
+    }
+  };
+
+  const handleNextStep = () => {
+    if (!routeResult) return;
+    if (activeStepIndex < routeResult.steps.length - 1) {
+      handleStepChange(activeStepIndex + 1);
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (!routeResult) return;
+    if (activeStepIndex > 0) {
+      handleStepChange(activeStepIndex - 1);
     }
   };
 
   // QR Entrance Selection
   const handleSelectEntrance = (floorId: FloorId, locationId: string, name: string) => {
-    const loc = floorDataMap[floorId]?.locations.find((l) => l.id === locationId);
+    const floorLocs = floorDataMap[floorId]?.locations || [];
+    const loc =
+      floorLocs.find((l) => l.id.toLowerCase() === locationId.toLowerCase()) || floorLocs[0];
+
+    const posX = loc ? Math.round(loc.x + loc.w / 2) : 1232;
+    const posY = loc ? Math.round(loc.y + loc.h / 2) : 513;
+    const finalLocId = loc ? loc.id : locationId;
 
     setStartLocation({
       name,
       floorId,
-      locationId,
-      x: loc ? Math.round(loc.x + loc.w / 2) : 1015,
-      y: loc ? Math.round(loc.y + loc.h / 2) : 955,
+      locationId: finalLocId,
+      x: posX,
+      y: posY,
     });
 
     setCurrentFloor(floorId);
     setRouteResult(null);
+
+    // Smoothly focus/center on the newly selected start location on the map
+    setViewportState((prev) => {
+      const k = Math.min(0.9, Math.max(0.38, prev.k));
+      const windowW = window.innerWidth;
+      const windowH = window.innerHeight * 0.75;
+      return {
+        k,
+        x: windowW / 2 - posX * k,
+        y: windowH / 2 - posY * k,
+      };
+    });
   };
 
   if (isLoading) {
@@ -254,12 +334,14 @@ export const MallMapPage: React.FC = () => {
   const currentFloorLocations = floorDataMap[currentFloor]?.locations || [];
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#070914] text-white selection:bg-[#801424] selection:text-white">
+    <div className="flex flex-col h-screen max-h-screen overflow-hidden bg-[#070914] text-white selection:bg-[#801424] selection:text-white">
       {/* 1. Official Website Navigation Header */}
-      <NavigationBar />
+      <div className="flex-shrink-0 z-40">
+        <NavigationBar />
+      </div>
 
       {/* 2. Wayfinding App Interactive Workspace */}
-      <main className="flex-1 w-full relative flex flex-col">
+      <main className="flex-1 min-h-0 w-full relative flex flex-col overflow-hidden">
         <div className={styles.container}>
           {/* Top Search & Category Filter Header */}
           <WayfindingHeader
@@ -269,45 +351,55 @@ export const MallMapPage: React.FC = () => {
             onSelectStore={handleSelectStoreFromSearch}
           />
 
-          {/* Interactive Map Stage */}
-          <div className={styles.stage}>
-            <FloorSelector
-              currentFloor={currentFloor}
-              onFloorChange={(f) => {
-                setCurrentFloor(f);
-              }}
-            />
+          {/* Interactive Workspace (Map Canvas + Desktop Sidebar / Mobile Drawer) */}
+          <div className={styles.workspaceBody}>
+            <div className={styles.stage}>
+              <FloorSelector
+                currentFloor={currentFloor}
+                onFloorChange={(f) => {
+                  setCurrentFloor(f);
+                }}
+              />
 
-            <MapControls
-              onZoomIn={handleZoomIn}
-              onZoomOut={handleZoomOut}
-              onZoomFit={handleZoomFit}
-              onToggleQrSim={() => setIsQrModalOpen(true)}
-            />
+              <MapControls
+                onZoomIn={handleZoomIn}
+                onZoomOut={handleZoomOut}
+                onZoomFit={handleZoomFit}
+                onToggleQrSim={() => setIsQrModalOpen(true)}
+              />
 
-            <WayfindingMapStage
-              currentFloor={currentFloor}
-              floorData={floorDataMap[currentFloor] || null}
-              stores={stores}
-              activeCategory={activeCategory}
-              selectedLocation={selectedLocation}
-              selectedStore={selectedStore}
-              startLocation={startLocation}
-              routeNodePath={routeResult?.nodePath || []}
-              graphNodeInfo={graphData.nodeInfo}
-              onSelectLocation={handleSelectLocationOnMap}
-              viewportState={viewportState}
-              setViewportState={setViewportState}
-            />
+              <WayfindingMapStage
+                currentFloor={currentFloor}
+                floorData={floorDataMap[currentFloor] || null}
+                stores={stores}
+                activeCategory={activeCategory}
+                selectedLocation={selectedLocation}
+                selectedStore={selectedStore}
+                startLocation={startLocation}
+                routeNodePath={routeResult?.nodePath || []}
+                graphNodeInfo={graphData.nodeInfo}
+                onSelectLocation={handleSelectLocationOnMap}
+                viewportState={viewportState}
+                setViewportState={setViewportState}
+              />
+            </div>
 
             <StoreDetailsDrawer
               currentFloor={currentFloor}
+              stores={stores}
+              activeCategory={activeCategory}
               selectedStore={selectedStore}
               selectedLocation={selectedLocation}
               startLocation={startLocation}
               routeResult={routeResult}
+              activeStepIndex={activeStepIndex}
               floorLocations={currentFloorLocations}
+              onCategoryChange={setActiveCategory}
+              onSelectStore={handleSelectStoreFromSearch}
               onGetDirections={handleGetDirections}
+              onStepChange={handleStepChange}
+              onNextStep={handleNextStep}
+              onPrevStep={handlePrevStep}
               onCloseDetails={() => {
                 setSelectedLocation(null);
                 setSelectedStore(null);
@@ -323,9 +415,6 @@ export const MallMapPage: React.FC = () => {
           />
         </div>
       </main>
-
-      {/* 3. Official Website Footer */}
-      <Footer />
     </div>
   );
 };

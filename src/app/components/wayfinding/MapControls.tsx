@@ -17,7 +17,11 @@ export const MapControls: React.FC<MapControlsProps> = ({
 }) => {
   return (
     <>
-      <div className={styles.floatingControlsLeft}>
+      <div
+        className={styles.floatingControlsLeft}
+        onPointerDown={(e) => e.stopPropagation()}
+        onWheel={(e) => e.stopPropagation()}
+      >
         <button
           className={styles.controlBtn}
           onClick={onToggleQrSim}
@@ -27,7 +31,11 @@ export const MapControls: React.FC<MapControlsProps> = ({
         </button>
       </div>
 
-      <div className={styles.floatingControlsRight}>
+      <div
+        className={styles.floatingControlsRight}
+        onPointerDown={(e) => e.stopPropagation()}
+        onWheel={(e) => e.stopPropagation()}
+      >
         <button className={styles.controlBtn} onClick={onZoomIn} title="Zoom In">
           <Plus size={20} />
         </button>
