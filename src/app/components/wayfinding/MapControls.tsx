@@ -16,40 +16,36 @@ export const MapControls: React.FC<MapControlsProps> = ({
   onToggleQrSim,
 }) => {
   return (
-    <>
-      <div
-        className={styles.floatingControlsLeft}
-        onPointerDown={(e) => e.stopPropagation()}
-        onWheel={(e) => e.stopPropagation()}
-      >
-        <button
-          className={styles.controlBtn}
-          onClick={onToggleQrSim}
-          title="Simulate QR Code Entrance Scan"
-        >
-          <QrCode size={20} />
+    <div
+      className={styles.floatingControlsStack}
+      onPointerDown={(e) => e.stopPropagation()}
+      onWheel={(e) => e.stopPropagation()}
+    >
+      <div className={styles.controlBtnGroup}>
+        <button className={styles.controlBtn} onClick={onZoomIn} title="Zoom In" aria-label="Zoom in">
+          <Plus size={18} />
         </button>
-      </div>
-
-      <div
-        className={styles.floatingControlsRight}
-        onPointerDown={(e) => e.stopPropagation()}
-        onWheel={(e) => e.stopPropagation()}
-      >
-        <button className={styles.controlBtn} onClick={onZoomIn} title="Zoom In">
-          <Plus size={20} />
-        </button>
-        <button className={styles.controlBtn} onClick={onZoomOut} title="Zoom Out">
-          <Minus size={20} />
+        <button className={styles.controlBtn} onClick={onZoomOut} title="Zoom Out" aria-label="Zoom out">
+          <Minus size={18} />
         </button>
         <button
           className={`${styles.controlBtn} ${styles.fitBtn}`}
           onClick={onZoomFit}
-          title="Fit Map to Screen"
+          title="Fit Floor to Screen"
+          aria-label="Fit floor to screen"
         >
           <Maximize2 size={16} />
         </button>
       </div>
-    </>
+
+      <button
+        className={styles.controlBtn}
+        onClick={onToggleQrSim}
+        title="Simulate QR Code Entrance / You Are Here"
+        aria-label="Select entrance location"
+      >
+        <QrCode size={18} />
+      </button>
+    </div>
   );
 };

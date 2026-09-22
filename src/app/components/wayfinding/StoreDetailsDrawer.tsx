@@ -15,6 +15,8 @@ import {
   Search,
   Store as StoreIcon,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
   SlidersHorizontal,
 } from 'lucide-react';
 import {
@@ -70,10 +72,46 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
   const isNavigating = Boolean(routeResult);
   const hasSelection = Boolean(selectedStore || selectedLocation);
 
+  // Mobile Bottom Sheet State: 'peek' (minimal ~72px) | 'expanded' (~52vh) | 'full' (~82vh)
+  const [sheetMode, setSheetMode] = useState<'peek' | 'expanded' | 'full'>('peek');
+  const touchStartY = useRef<number | null>(null);
+
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  // Auto-expand when navigating or when store is clicked from search
+  useEffect(() => {
+    if (isNavigating) {
+      setSheetMode('expanded');
+    }
+  }, [isNavigating]);
+
+  // Handle Swipe Gesture on Handle Area
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartY.current === null) return;
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaY = touchEndY - touchStartY.current;
+
+    // Swiped up (deltaY negative) -> Expand
+    if (deltaY < -35) {
+      setSheetMode((prev) => (prev === 'peek' ? 'expanded' : 'full'));
+    }
+    // Swiped down (deltaY positive) -> Minimize / Peek
+    else if (deltaY > 35) {
+      setSheetMode((prev) => (prev === 'full' ? 'expanded' : 'peek'));
+    }
+    touchStartY.current = null;
+  };
+
+  const toggleSheetMode = () => {
+    setSheetMode((prev) => (prev === 'peek' ? 'expanded' : 'peek'));
+  };
 
   // Filter search suggestions
   const suggestions = useMemo(() => {
@@ -139,13 +177,165 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
   const shutterLabel =
     selectedStore?.shutters?.[0]?.split(':')[1] || selectedLocation?.id || 'Main';
 
+  const drawerClass = `${styles.drawer} ${
+    sheetMode === 'peek'
+      ? styles.drawerPeek
+      : sheetMode === 'full'
+      ? styles.drawerFull
+      : styles.drawerExpanded
+  }`;
+
   return (
     <div
-      className={styles.drawer}
+      className={drawerClass}
       onPointerDown={(e) => e.stopPropagation()}
       onWheel={(e) => e.stopPropagation()}
     >
-      <div className={styles.drawerHandle} />
+      {/* Mobile Drag Handle & Swipe Zone */}
+      <div
+        className={styles.drawerHandleArea}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onClick={toggleSheetMode}
+        role="button"
+        tabIndex={0}
+        aria-label={sheetMode === 'peek' ? 'Expand details sheet' : 'Minimize details sheet'}
+      >
+        <div className={styles.drawerHandle} />
+      </div>
+
+      {/* Mobile Peek State Quick Action Bar (Visible only when peeked on mobile) */}
+      {sheetMode === 'peek' && (
+        <div
+          className={styles.drawerPeekBar}
+          onClick={toggleSheetMode}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          {isNavigating && routeResult ? (
+            <>
+              <div className={styles.drawerPeekInfo}>
+                <div className="w-8 h-8 rounded-full bg-red-600/20 text-red-400 flex items-center justify-center flex-shrink-0">
+                  <Navigation size={15} className="animate-pulse" />
+                </div>
+                <div className="min-w-0">
+                  <div className={styles.drawerPeekTitle}>
+                    Step {activeStepIndex + 1}: {routeResult.steps[activeStepIndex]?.text || 'Navigating'}
+                  </div>
+                  <div className={styles.drawerPeekSubtitle}>
+                    <span>{FLOOR_LABELS[routeResult.steps[activeStepIndex]?.floorId || currentFloor]}</span>
+                    <span>&bull;</span>
+                    <span>Est. {routeResult.estTimeMinutes} min walk</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.drawerPeekActions} onClick={(e) => e.stopPropagation()}>
+                {activeStepIndex < routeResult.steps.length - 1 ? (
+                  <button className={styles.drawerPeekBtn} onClick={onNextStep}>
+                    <span>Next</span>
+                    <ArrowRight size={12} />
+                  </button>
+                ) : (
+                  <button className={styles.drawerPeekBtn} onClick={onCloseDirections} style={{ backgroundColor: '#059669' }}>
+                    <span>Finish</span>
+                  </button>
+                )}
+                <button
+                  className={styles.drawerToggleBtn}
+                  onClick={toggleSheetMode}
+                  title="Expand Route Details"
+                >
+                  <ChevronUp size={16} />
+                </button>
+              </div>
+            </>
+          ) : hasSelection ? (
+            <>
+              <div className={styles.drawerPeekInfo}>
+                {selectedStore?.logo ? (
+                  <img
+                    src={selectedStore.logo}
+                    alt={selectedStore.name}
+                    className="w-8 h-8 rounded-lg bg-white p-0.5 object-contain flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-lg bg-[#801424]/20 border border-[#801424]/40 text-red-400 flex items-center justify-center flex-shrink-0">
+                    <CategoryIcon
+                      category={selectedStore?.cat || selectedLocation?.cat || 'shop'}
+                      size={16}
+                      color="#fca5a5"
+                    />
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <div className={styles.drawerPeekTitle}>
+                    {selectedStore?.name || selectedLocation?.name || selectedLocation?.id}
+                  </div>
+                  <div className={styles.drawerPeekSubtitle}>
+                    <span>{FLOOR_LABELS[currentFloor]}</span>
+                    <span>&bull;</span>
+                    <span>Unit {shutterLabel}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.drawerPeekActions} onClick={(e) => e.stopPropagation()}>
+                <button
+                  className={styles.drawerPeekBtn}
+                  onClick={() => {
+                    setSheetMode('expanded');
+                    onGetDirections();
+                  }}
+                >
+                  <Navigation size={12} />
+                  <span>Go</span>
+                </button>
+                <button
+                  className={styles.drawerToggleBtn}
+                  onClick={toggleSheetMode}
+                  title="Expand Details"
+                >
+                  <ChevronUp size={16} />
+                </button>
+                <button
+                  className={styles.drawerToggleBtn}
+                  onClick={onCloseDetails}
+                  title="Close"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className={styles.drawerPeekInfo}>
+                <div className="w-8 h-8 rounded-lg bg-indigo-950/60 border border-indigo-800/40 text-indigo-400 flex items-center justify-center flex-shrink-0">
+                  <Sparkles size={16} />
+                </div>
+                <div className="min-w-0">
+                  <div className={styles.drawerPeekTitle}>{FLOOR_LABELS[currentFloor]}</div>
+                  <div className={styles.drawerPeekSubtitle}>
+                    <span>{currentFloorStores.length} Stores & Outlets</span>
+                    <span>&bull;</span>
+                    <span className="text-indigo-400">Tap to browse list</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.drawerPeekActions} onClick={(e) => e.stopPropagation()}>
+                <button
+                  className={styles.drawerToggleBtn}
+                  onClick={toggleSheetMode}
+                  title="Expand Directory"
+                >
+                  <ChevronUp size={16} />
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Desktop Sticky Header: Search Bar & Category Filter Chips */}
       <div className={styles.sidebarHeaderSection}>
@@ -309,13 +499,22 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
                   </p>
                 </div>
 
-                <button
-                  className={styles.btnSecondary}
-                  onClick={onCloseDirections}
-                  title="Close Navigation"
-                >
-                  <X size={15} />
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    className={styles.btnSecondary}
+                    onClick={() => setSheetMode('peek')}
+                    title="Minimize to Map"
+                  >
+                    <ChevronDown size={15} />
+                  </button>
+                  <button
+                    className={styles.btnSecondary}
+                    onClick={onCloseDirections}
+                    title="Close Navigation"
+                  >
+                    <X size={15} />
+                  </button>
+                </div>
               </div>
 
               {/* Prominent Active Step Banner */}
@@ -406,11 +605,19 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
                 </div>
               </div>
 
-              <div className="pt-2">
+              <div className="pt-2 flex gap-2">
+                <button
+                  className={styles.btnSecondary}
+                  onClick={() => setSheetMode('peek')}
+                  style={{ flex: 1 }}
+                >
+                  <ChevronDown size={14} />
+                  <span>Minimize to Map</span>
+                </button>
                 <button
                   className={styles.btnSecondary}
                   onClick={onCloseDirections}
-                  style={{ width: '100%' }}
+                  style={{ flex: 1 }}
                 >
                   End Navigation
                 </button>
@@ -460,13 +667,22 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
                   </div>
                 </div>
 
-                <button
-                  className={styles.btnSecondary}
-                  onClick={onCloseDetails}
-                  title="Close Details"
-                >
-                  <X size={15} />
-                </button>
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <button
+                    className={styles.btnSecondary}
+                    onClick={() => setSheetMode('peek')}
+                    title="Minimize to Map"
+                  >
+                    <ChevronDown size={15} />
+                  </button>
+                  <button
+                    className={styles.btnSecondary}
+                    onClick={onCloseDetails}
+                    title="Close Details"
+                  >
+                    <X size={15} />
+                  </button>
+                </div>
               </div>
 
               {/* Location & Floor Badges */}
@@ -561,9 +777,19 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
                     {FLOOR_LABELS[currentFloor]} Directory
                   </span>
                 </div>
-                <span className="text-[11px] font-semibold text-indigo-400 bg-indigo-950/60 px-2.5 py-0.5 rounded-full border border-indigo-900/60">
-                  {currentFloorStores.length} Stores
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-semibold text-indigo-400 bg-indigo-950/60 px-2.5 py-0.5 rounded-full border border-indigo-900/60">
+                    {currentFloorStores.length} Stores
+                  </span>
+                  <button
+                    className={styles.btnSecondary}
+                    onClick={() => setSheetMode('peek')}
+                    title="Minimize to Map"
+                    aria-label="Minimize to map"
+                  >
+                    <ChevronDown size={15} />
+                  </button>
+                </div>
               </div>
 
               {/* Quick Directory List for this Floor */}
@@ -656,6 +882,18 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
                   </div>
                   <div className={styles.statLabel}>Lifts & Stairs</div>
                 </div>
+              </div>
+
+              {/* Bottom Minimize Button on Mobile */}
+              <div className="pt-2">
+                <button
+                  className={styles.btnSecondary}
+                  onClick={() => setSheetMode('peek')}
+                  style={{ width: '100%' }}
+                >
+                  <ChevronDown size={14} />
+                  <span>Minimize to Map</span>
+                </button>
               </div>
             </motion.div>
           )}

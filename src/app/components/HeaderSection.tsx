@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import MobileMenuToggle from './MobileMenuToggle';
+import MobileNavigationDrawer from './MobileNavigationDrawer';
 import styles from './HeaderSection.module.css';
 import { menuItems } from './navData';
 
@@ -57,7 +58,6 @@ const latestNewsAndEvents: NewsItem[] = [
 const HeaderSection = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [openMobileSubmenu, setOpenMobileSubmenu] = useState<string | null>(null);
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
 
   // Auto-cycle through news and events items
@@ -365,108 +365,17 @@ const HeaderSection = () => {
 
             {/* Mobile Menu Button */}
             <div className="md:hidden">
-              <MobileMenuToggle onClick={() => setIsMenuOpen(!isMenuOpen)} />
-            </div>
-          </div>
-
-          {/* Mobile Menu */}
-          {isMenuOpen && (
-            <div className={styles.mobileMenuOverlay} onClick={() => setIsMenuOpen(false)} />
-          )}
-          <div className={`${styles.mobileMenu} ${isMenuOpen ? styles.mobileMenuOpen : ''}`}>
-            <div className="flex flex-col h-full bg-mall-accent overflow-y-auto">
-              <div className="flex justify-between items-center p-4 border-b border-white/20 bg-white shadow-2xl sticky top-0 z-20">
-                <button
-                  className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-                <span className="text-gray-900 font-bold tracking-wider">MENU</span>
-                <div className="w-10" /> {/* Spacer to balance the layout */}
-              </div>
-
-              <nav className="flex-1 px-4 py-6 space-y-3">
-                {menuItems.map((item) => {
-                  const hasSub = !!item.subGroups;
-                  const isSubOpen = openMobileSubmenu === item.label;
-
-                  if (!hasSub) {
-                    return (
-                      <Link
-                        key={item.label}
-                        to={item.href || '#'}
-                        className={`block tracking-wider text-mall-brown no-underline hover:no-underline ${styles.navLinkSideBar} transition-colors`}
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <span className="text-sm">{item.label.toUpperCase()}</span>
-                        <svg
-                          className={styles.arrowIcon}
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="3"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M5 12h14M12 5l7 7-7 7" />
-                        </svg>
-                      </Link>
-                    );
-                  }
-
-                  return (
-                    <div key={item.label} className="border-b border-gray-300/40">
-                      <button
-                        onClick={() => setOpenMobileSubmenu(isSubOpen ? null : item.label)}
-                        className="w-full flex items-center justify-between py-3 px-3 text-mall-brown font-bold text-sm tracking-wider cursor-pointer"
-                      >
-                        <span>{item.label.toUpperCase()}</span>
-                        <svg
-                          className={`w-4 h-4 transition-transform duration-200 ${isSubOpen ? 'rotate-180 text-red-600' : 'text-gray-600'}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-
-                      {isSubOpen && (
-                        <div className="bg-white/60 rounded-lg px-3 py-2 my-1 space-y-3">
-                          {item.subGroups?.map((group, gIdx) => (
-                            <div key={gIdx} className="space-y-1">
-                              {group.title && (
-                                <div className="text-xs font-bold tracking-widest text-red-700 uppercase pt-1 pb-1 border-b border-gray-300/50">
-                                  {group.title}
-                                </div>
-                              )}
-                              {group.items.map((subItem) => (
-                                <Link
-                                  key={subItem.label}
-                                  to={subItem.href}
-                                  className="block py-2 px-2 text-sm text-gray-800 hover:text-red-700 font-semibold no-underline hover:no-underline transition-colors"
-                                  onClick={() => setIsMenuOpen(false)}
-                                >
-                                  • {subItem.label}
-                                </Link>
-                              ))}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </nav>
+              <MobileMenuToggle onClick={() => setIsMenuOpen(true)} />
             </div>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Sliding Navigation Drawer */}
+      <MobileNavigationDrawer
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+      />
     </header>
   );
 };

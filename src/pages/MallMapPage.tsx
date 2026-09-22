@@ -208,8 +208,8 @@ export const MallMapPage: React.FC = () => {
     }
   };
 
-  // Select location on map click
-  const handleSelectLocationOnMap = (loc: WayfindingLocation, store: WayfindingStore | null) => {
+  // Select location on map click or deselect on background click
+  const handleSelectLocationOnMap = (loc: WayfindingLocation | null, store: WayfindingStore | null) => {
     setSelectedLocation(loc);
     setSelectedStore(store);
     setRouteResult(null);
