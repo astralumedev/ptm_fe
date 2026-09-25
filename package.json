@@ -6,15 +6,19 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "seed:export": "tsx --tsconfig tsconfig.json scripts/export-seed.ts",
+    "typecheck:api": "tsc -p api/tsconfig.json"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@neondatabase/serverless": "^1.1.0",
     "@reduxjs/toolkit": "^2.8.2",
     "@tailwindcss/line-clamp": "^0.4.4",
+    "@vercel/blob": "^2.8.0",
     "clsx": "^2.1.1",
     "firebase": "^11.7.1",
     "framer-motion": "^12.11.3",
@@ -34,12 +38,14 @@
     "@types/react-dom": "^19",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
+    "@vercel/node": "^15.0.0",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "tailwindcss": "^4.1.4",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vite": "^4.5.0"
   }

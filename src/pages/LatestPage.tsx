@@ -16,11 +16,18 @@ import PageHeader, { PageHeaderTab } from '../app/components/PageHeader';
 import Footer from '../app/components/Footer';
 import api from '../services/api';
 import { Blog } from '../data/models/Blog';
-import { mockEvents, mockOffers, MallEvent } from '../data/latestData';
+import { MallEvent, MallOffer } from '../data/latestData';
 
 export const LatestPage: React.FC = () => {
   const location = useLocation();
   const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [events, setEvents] = useState<MallEvent[]>([]);
+  const [offers, setOffers] = useState<MallOffer[]>([]);
+
+  useEffect(() => {
+    api.getEvents().then(setEvents);
+    api.getOffers().then(setOffers);
+  }, []);
   const [loadingBlogs, setLoadingBlogs] = useState(true);
   const [activeTab, setActiveTab] = useState<'all' | 'blogs' | 'events' | 'offers'>('all');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
@@ -68,10 +75,10 @@ export const LatestPage: React.FC = () => {
   };
 
   const tabs: PageHeaderTab[] = [
-    { id: 'all', label: 'All Updates', count: blogs.length + mockEvents.length + mockOffers.length },
+    { id: 'all', label: 'All Updates', count: blogs.length + events.length + offers.length },
     { id: 'blogs', label: 'Blogs & Stories', count: blogs.length, icon: <FaBookOpen className="w-3.5 h-3.5" /> },
-    { id: 'events', label: 'Events & Happenings', count: mockEvents.length, icon: <FaCalendarAlt className="w-3.5 h-3.5" /> },
-    { id: 'offers', label: 'Latest Offers', count: mockOffers.length, icon: <FaTags className="w-3.5 h-3.5" /> },
+    { id: 'events', label: 'Events & Happenings', count: events.length, icon: <FaCalendarAlt className="w-3.5 h-3.5" /> },
+    { id: 'offers', label: 'Latest Offers', count: offers.length, icon: <FaTags className="w-3.5 h-3.5" /> },
   ];
 
   const featuredBlog = blogs[0];
@@ -289,7 +296,7 @@ export const LatestPage: React.FC = () => {
 
             {/* Events Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-              {mockEvents.map((event, index) => {
+              {events.map((event, index) => {
                 const isRsvpd = rsvpSuccess === event.id;
                 return (
                   <motion.div
@@ -423,7 +430,7 @@ export const LatestPage: React.FC = () => {
 
             {/* Offer Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {mockOffers.map((offer, index) => {
+              {offers.map((offer, index) => {
                 const isCopied = copiedCode === offer.promoCode;
                 return (
                   <motion.div
