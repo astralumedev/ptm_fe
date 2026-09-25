@@ -21,11 +21,11 @@ function AuthFrame({ children, title, lead }: { children: React.ReactNode; title
   );
 }
 
-function PasswordInput({ id, value, onChange, autoComplete, autoFocus }: { id: string; value: string; onChange: (v: string) => void; autoComplete: string; autoFocus?: boolean }) {
+function PasswordInput({ id, value, onChange, autoComplete, autoFocus, required = true }: { id: string; value: string; onChange: (v: string) => void; autoComplete: string; autoFocus?: boolean; required?: boolean }) {
   const [show, setShow] = useState(false);
   return (
     <div className="relative">
-      <input id={id} type={show ? 'text' : 'password'} className="adm-input !pr-10" value={value} onChange={(e) => onChange(e.target.value)} autoComplete={autoComplete} autoFocus={autoFocus} required />
+      <input id={id} type={show ? 'text' : 'password'} className="adm-input !pr-10" value={value} onChange={(e) => onChange(e.target.value)} autoComplete={autoComplete} autoFocus={autoFocus} required={required} />
       <button type="button" onClick={() => setShow((s) => !s)} className="absolute right-1 top-1 grid place-items-center size-7 rounded-md text-[var(--adm-ink-3)] hover:text-[var(--adm-ink)] hover:bg-[var(--adm-panel)] cursor-pointer" aria-label={show ? 'Hide password' : 'Show password'}>
         {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
       </button>
@@ -96,7 +96,8 @@ export function SetupPage({ onDone }: { onDone: () => void }) {
   );
 }
 
-export function PasswordForm({ onDone, forced }: { onDone: (a: AdminUser) => void; forced?: boolean }) {
+export function PasswordForm({ onDone, forced, username: initialUsername }: { onDone: (a: AdminUser) => void; forced?: boolean; username?: string }) {
+  const [username, setUsername] = useState(initialUsername || '');
   const [current, setCurrent] = useState('');
   const [next, setNext] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -105,12 +106,15 @@ export function PasswordForm({ onDone, forced }: { onDone: (a: AdminUser) => voi
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (next !== confirm) return setError('The two new passwords do not match');
-    if (next.length < 8) return setError('Use at least 8 characters');
+    const renameOnly = !!initialUsername && !next && !confirm;
+    if (!renameOnly) {
+      if (next !== confirm) return setError('The two new passwords do not match');
+      if (next.length < 8) return setError('Use at least 8 characters');
+    }
     setBusy(true);
     setError('');
     try {
-      onDone((await adminApi.changePassword(current, next)).admin);
+      onDone((await adminApi.changePassword(current, next, initialUsername ? username : undefined)).admin);
       setCurrent(''); setNext(''); setConfirm('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not change the password');
@@ -122,16 +126,21 @@ export function PasswordForm({ onDone, forced }: { onDone: (a: AdminUser) => voi
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
       {error && <ErrorNote>{error}</ErrorNote>}
+      {initialUsername && (
+        <FieldShell label="Username" htmlFor="un" help="Letters, numbers, dots, dashes or underscores.">
+          <input id="un" className="adm-input" value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" autoCapitalize="none" required />
+        </FieldShell>
+      )}
       <FieldShell label="Current password" htmlFor="pc">
         <PasswordInput id="pc" value={current} onChange={setCurrent} autoComplete="current-password" autoFocus={forced} />
       </FieldShell>
-      <FieldShell label="New password" htmlFor="pn" help="At least 8 characters.">
-        <PasswordInput id="pn" value={next} onChange={setNext} autoComplete="new-password" />
+      <FieldShell label="New password" htmlFor="pn" help={initialUsername ? 'At least 8 characters. Leave empty to keep the current password.' : 'At least 8 characters.'}>
+        <PasswordInput id="pn" value={next} onChange={setNext} autoComplete="new-password" required={!initialUsername} />
       </FieldShell>
       <FieldShell label="Repeat new password" htmlFor="pr">
-        <PasswordInput id="pr" value={confirm} onChange={setConfirm} autoComplete="new-password" />
+        <PasswordInput id="pr" value={confirm} onChange={setConfirm} autoComplete="new-password" required={!initialUsername} />
       </FieldShell>
-      <button className={`adm-btn adm-btn-primary mt-1 ${forced ? 'w-full' : 'self-start'}`} disabled={busy}>{busy && <Spinner />} Change password</button>
+      <button className={`adm-btn adm-btn-primary mt-1 ${forced ? 'w-full' : 'self-start'}`} disabled={busy}>{busy && <Spinner />} {initialUsername ? 'Save changes' : 'Change password'}</button>
     </form>
   );
 }

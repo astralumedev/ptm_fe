@@ -393,7 +393,8 @@ export function findRoute(
   startNodeId: string,
   endNodeId: string,
   customStartLabel?: string,
-  customEndLabel?: string
+  customEndLabel?: string,
+  floorLabels: Record<FloorId, string> = FLOOR_LABELS
 ): PathResult | null {
   const { graph, nodeInfo } = graphData;
 
@@ -454,7 +455,7 @@ export function findRoute(
     const estTimeMinutes = Math.max(1, Math.round((directDistance / 1500) * 10) / 10);
     const steps: RouteStep[] = [
       {
-        text: `Start at ${startNode?.label || 'Main Entrance'} (${FLOOR_LABELS[startNode?.floorId || 'ground_floor']})`,
+        text: `Start at ${startNode?.label || 'Main Entrance'} (${floorLabels[startNode?.floorId || 'ground_floor']})`,
         floorId: startNode?.floorId || 'ground_floor',
         type: 'start',
       },
@@ -462,7 +463,7 @@ export function findRoute(
 
     if (startNode?.floorId !== endNode?.floorId) {
       steps.push({
-        text: `Take Elevators or Stairs from ${FLOOR_LABELS[startNode?.floorId || 'ground_floor']} to ${FLOOR_LABELS[endNode?.floorId || 'first_floor']}`,
+        text: `Take Elevators or Stairs from ${floorLabels[startNode?.floorId || 'ground_floor']} to ${floorLabels[endNode?.floorId || 'first_floor']}`,
         floorId: endNode?.floorId || 'first_floor',
         type: 'floor_change',
         icon: 'elevator',
@@ -470,7 +471,7 @@ export function findRoute(
     }
 
     steps.push({
-      text: `Arrive at destination: ${endNode?.label || 'Target Unit'} (${FLOOR_LABELS[endNode?.floorId || 'ground_floor']})`,
+      text: `Arrive at destination: ${endNode?.label || 'Target Unit'} (${floorLabels[endNode?.floorId || 'ground_floor']})`,
       floorId: endNode?.floorId || 'ground_floor',
       type: 'destination',
     });
@@ -558,7 +559,7 @@ export function findRoute(
       if (index === 0 && leg.nextFloorId && leg.transitType) {
         // First floor leg leading to elevator/stairs
         steps.push({
-          text: `Walk from ${fromLabel} to the ${leg.endNode.label || leg.transitType} on ${FLOOR_LABELS[leg.floorId]}, and take it to ${FLOOR_LABELS[leg.nextFloorId]}`,
+          text: `Walk from ${fromLabel} to the ${leg.endNode.label || leg.transitType} on ${floorLabels[leg.floorId]}, and take it to ${floorLabels[leg.nextFloorId]}`,
           floorId: leg.floorId,
           type: 'floor_change',
           icon: leg.transitType.toLowerCase() === 'elevator' ? 'elevator' : 'stairs',
@@ -566,14 +567,14 @@ export function findRoute(
       } else if (index === legs.length - 1) {
         // Final floor leg reaching destination
         steps.push({
-          text: `On ${FLOOR_LABELS[leg.floorId]}, follow the hallway from the ${leg.startNode.label || 'Lifts/Stairs'} to ${toLabel}`,
+          text: `On ${floorLabels[leg.floorId]}, follow the hallway from the ${leg.startNode.label || 'Lifts/Stairs'} to ${toLabel}`,
           floorId: leg.floorId,
           type: 'destination',
         });
       } else if (leg.nextFloorId && leg.transitType) {
         // Intermediate floor transfer leg (if any)
         steps.push({
-          text: `Transfer on ${FLOOR_LABELS[leg.floorId]} from ${fromLabel} to ${leg.endNode.label}, and take it to ${FLOOR_LABELS[leg.nextFloorId]}`,
+          text: `Transfer on ${floorLabels[leg.floorId]} from ${fromLabel} to ${leg.endNode.label}, and take it to ${floorLabels[leg.nextFloorId]}`,
           floorId: leg.floorId,
           type: 'floor_change',
           icon: leg.transitType.toLowerCase() === 'elevator' ? 'elevator' : 'stairs',

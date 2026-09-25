@@ -17,19 +17,13 @@ import { MapControls } from '../app/components/wayfinding/MapControls';
 import { StoreDetailsDrawer } from '../app/components/wayfinding/StoreDetailsDrawer';
 import { QrSimulationModal } from '../app/components/wayfinding/QrSimulationModal';
 import styles from '../app/components/wayfinding/Wayfinding.module.css';
-
-const ALL_FLOORS: FloorId[] = [
-  'lower_ground_floor',
-  'ground_floor',
-  'first_floor',
-  'second_floor',
-  'third_floor',
-  'fourth_floor',
-  'fifth_floor',
-];
+import { ALL_FLOORS, useFloorTexts, useMapCategories, useMapCopy } from '../app/components/wayfinding/useMapContent';
 
 export const MallMapPage: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const copy = useMapCopy();
+  const { names: floorNames } = useFloorTexts();
+  const { canonical } = useMapCategories();
 
   // Core Data
   const [stores, setStores] = useState<WayfindingStore[]>([]);
@@ -51,7 +45,7 @@ export const MallMapPage: React.FC = () => {
     x: number;
     y: number;
   }>({
-    name: 'Ground Floor Main Entrance',
+    name: copy.defaultStartName,
     floorId: 'ground_floor',
     locationId: 'A101',
     x: 1232,
@@ -66,17 +60,25 @@ export const MallMapPage: React.FC = () => {
   const [viewportState, setViewportState] = useState({ k: 0.25, x: 0, y: 0 });
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
 
-  // 1. Initial Load of Stores & Floor Plans
+  // 1a. Stores (CMS stores + optional demo fillers); reloads if the demo toggle changes
+  const showDemoStores = copy.showDemoStores !== false;
+  useEffect(() => {
+    let cancelled = false;
+    wayfindingService.getStores({ includeDemo: showDemoStores }).then((loaded) => {
+      if (!cancelled) setStores(loaded);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [showDemoStores]);
+
+  // 1b. Initial Load of Floor Plans
   useEffect(() => {
     async function loadData() {
       setIsLoading(true);
       try {
-        const [loadedStores, loadedFloors] = await Promise.all([
-          wayfindingService.getStores(),
-          wayfindingService.getAllFloorsData(ALL_FLOORS),
-        ]);
+        const loadedFloors = await wayfindingService.getAllFloorsData(ALL_FLOORS);
 
-        setStores(loadedStores);
         setFloorDataMap(loadedFloors);
 
         // Build global path graph
@@ -89,7 +91,7 @@ export const MallMapPage: React.FC = () => {
           loadedFloors['ground_floor']?.locations[0];
         if (gLoc) {
           setStartLocation({
-            name: 'Ground Floor Main Entrance',
+            name: copy.defaultStartName,
             floorId: 'ground_floor',
             locationId: gLoc.id,
             x: Math.round(gLoc.x + gLoc.w / 2),
@@ -104,6 +106,7 @@ export const MallMapPage: React.FC = () => {
     }
 
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 2. Handle URL parameters (e.g. ?store=zara, ?floor=first_floor, ?category=electronics, ?from=ground_floor:A101)
@@ -114,13 +117,14 @@ export const MallMapPage: React.FC = () => {
     const floorParam = searchParams.get('floor');
     const categoryParam = searchParams.get('category');
     const fromParam = searchParams.get('from');
+    const searchParam = searchParams.get('search');
 
     if (floorParam && ALL_FLOORS.includes(floorParam as FloorId)) {
       setCurrentFloor(floorParam as FloorId);
     }
 
     if (categoryParam) {
-      setActiveCategory(categoryParam);
+      setActiveCategory(canonical(categoryParam));
     }
 
     if (fromParam) {
@@ -142,10 +146,19 @@ export const MallMapPage: React.FC = () => {
       }
     }
 
-    if (storeParam) {
-      const foundStore = stores.find(
-        (s) => s.slug === storeParam || s.id.toLowerCase() === storeParam.toLowerCase()
-      );
+    if (storeParam || searchParam) {
+      const wanted = (storeParam || '').trim().toLowerCase();
+      const wantedName = (searchParam || '').trim().toLowerCase();
+      const foundStore =
+        (wanted && stores.find((s) => (s.slug || '').toLowerCase() === wanted || s.id.toLowerCase() === wanted)) ||
+        (wantedName && stores.find((s) => s.name.trim().toLowerCase() === wantedName)) ||
+        undefined;
+
+      // Stores not yet placed on the map still open their details panel
+      if (foundStore && !foundStore.shutters?.length) {
+        setSelectedStore(foundStore);
+        setSelectedLocation(null);
+      }
 
       if (foundStore && foundStore.shutters && foundStore.shutters.length > 0) {
         const [targetFloor, shutterId] = foundStore.shutters[0].split(':');
@@ -153,13 +166,14 @@ export const MallMapPage: React.FC = () => {
           setCurrentFloor(targetFloor as FloorId);
           setSelectedStore(foundStore);
 
-          const loc = floorDataMap[targetFloor]?.locations.find((l) => l.id === shutterId);
+          const loc = floorDataMap[targetFloor]?.locations.find((l) => l.id.toLowerCase() === shutterId.toLowerCase());
           if (loc) {
             setSelectedLocation(loc);
           }
         }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, stores, floorDataMap, isLoading]);
 
   const handleZoomFit = useCallback(() => {
@@ -192,6 +206,7 @@ export const MallMapPage: React.FC = () => {
   // Select store from header search
   const handleSelectStoreFromSearch = (store: WayfindingStore) => {
     setSelectedStore(store);
+    setSelectedLocation(null);
     setRouteResult(null);
 
     if (store.shutters && store.shutters.length > 0) {
@@ -200,7 +215,7 @@ export const MallMapPage: React.FC = () => {
         const floor = floorStr as FloorId;
         setCurrentFloor(floor);
 
-        const loc = floorDataMap[floor]?.locations.find((l) => l.id === shutterId);
+        const loc = floorDataMap[floor]?.locations.find((l) => l.id.toLowerCase() === shutterId.toLowerCase());
         if (loc) {
           setSelectedLocation(loc);
         }
@@ -229,7 +244,7 @@ export const MallMapPage: React.FC = () => {
       const defaultLoc =
         gFloor?.locations.find((l) => l.id === 'A101') || gFloor?.locations[0];
       curStart = {
-        name: 'Ground Floor Main Entrance',
+        name: copy.defaultStartName,
         floorId: 'ground_floor',
         locationId: defaultLoc ? defaultLoc.id : 'A101',
         x: defaultLoc ? Math.round(defaultLoc.x + defaultLoc.w / 2) : 1232,
@@ -240,10 +255,10 @@ export const MallMapPage: React.FC = () => {
 
     const startNodeId = `${curStart.floorId}:${curStart.locationId}`;
     const endNodeId = `${currentFloor}:${selectedLocation.id}`;
-    const startName = curStart.name || 'Main Entrance';
+    const startName = curStart.name || copy.mainEntrance;
     const endName = selectedStore?.name || selectedLocation.name || selectedLocation.id;
 
-    const route = findRoute(graphData, startNodeId, endNodeId, startName, endName);
+    const route = findRoute(graphData, startNodeId, endNodeId, startName, endName, floorNames);
     setRouteResult(route);
     setActiveStepIndex(0);
 
@@ -320,10 +335,10 @@ export const MallMapPage: React.FC = () => {
               className="text-base font-bold tracking-widest text-white uppercase block"
               style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
             >
-              Pokhara Trade Mall
+              {copy.loadingTitle}
             </span>
             <span className="text-xs text-indigo-400 uppercase tracking-wider font-semibold">
-              Loading Interactive Floor Plans & Wayfinding...
+              {copy.loadingText}
             </span>
           </div>
         </div>
@@ -349,6 +364,7 @@ export const MallMapPage: React.FC = () => {
             activeCategory={activeCategory}
             onCategoryChange={setActiveCategory}
             onSelectStore={handleSelectStoreFromSearch}
+            initialQuery={searchParams.get('search') || ''}
           />
 
           {/* Interactive Workspace (Map Canvas + Desktop Sidebar / Mobile Drawer) */}

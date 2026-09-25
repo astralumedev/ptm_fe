@@ -4,14 +4,13 @@ import {
   FloorData,
   WayfindingLocation,
   WayfindingStore,
-  CATEGORIES,
   GraphNode,
   CORRIDOR_SEGMENTS,
-  FLOOR_LABELS,
 } from '../../../types/wayfinding';
 import { hexToRgb, getSilhouettePoints } from '../../../lib/wayfindingGraph';
 import { CategoryIcon } from './CategoryIcon';
 import styles from './Wayfinding.module.css';
+import { fill, useFloorTexts, useMapCategories, useMapCopy } from './useMapContent';
 
 interface WayfindingMapStageProps {
   currentFloor: FloorId;
@@ -42,6 +41,9 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
   viewportState,
   setViewportState,
 }) => {
+  const copy = useMapCopy();
+  const { names: FLOOR_LABELS } = useFloorTexts();
+  const categories = useMapCategories();
   const stageRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -126,8 +128,8 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
   // Find store associated with a shutter ID
   const getStoreByShutter = useCallback(
     (shutterId: string): WayfindingStore | null => {
-      const key = `${currentFloor}:${shutterId}`;
-      return stores.find((s) => s.shutters?.includes(key)) || null;
+      const key = `${currentFloor}:${shutterId}`.toLowerCase();
+      return stores.find((s) => s.shutters?.some((k) => k.toLowerCase() === key)) || null;
     },
     [currentFloor, stores]
   );
@@ -167,7 +169,7 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
         }>,
         startPoint:
           startLocation && startLocation.floorId === currentFloor
-            ? { x: startLocation.x, y: startLocation.y, label: startLocation.name || 'You Are Here' }
+            ? { x: startLocation.x, y: startLocation.y, label: startLocation.name || copy.youAreHere }
             : null,
         destinationPoint:
           selectedLocation
@@ -241,7 +243,7 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
           transitNodes.push({
             id: u.id,
             location: loc,
-            targetFloorLabel: `To ${targetFloorLabel}`,
+            targetFloorLabel: fill(copy.transitTo, { floor: targetFloorLabel }),
             isExit: true,
             isElevator,
             x: cx,
@@ -265,7 +267,7 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
           transitNodes.push({
             id: v.id,
             location: loc,
-            targetFloorLabel: `From ${fromFloorLabel}`,
+            targetFloorLabel: fill(copy.transitFrom, { floor: fromFloorLabel }),
             isExit: false,
             isElevator,
             x: cx,
@@ -280,9 +282,9 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
     let startPoint: { x: number; y: number; label: string } | null = null;
     if (isStartFloor) {
       if (startLocation && startLocation.floorId === currentFloor) {
-        startPoint = { x: startLocation.x, y: startLocation.y, label: startLocation.name || 'You Are Here' };
+        startPoint = { x: startLocation.x, y: startLocation.y, label: startLocation.name || copy.youAreHere };
       } else if (firstNode) {
-        startPoint = { x: firstNode.x, y: firstNode.y, label: firstNode.label || 'Start Point' };
+        startPoint = { x: firstNode.x, y: firstNode.y, label: firstNode.label || copy.startPoint };
       }
     }
 
@@ -318,7 +320,7 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
       destinationPoint,
       routeLocationIds,
     };
-  }, [routeNodePath, graphNodeInfo, currentFloor, floorData, startLocation, selectedLocation, selectedStore]);
+  }, [routeNodePath, graphNodeInfo, currentFloor, floorData, startLocation, selectedLocation, selectedStore, FLOOR_LABELS, copy]);
 
   // Auto-focus smoothly onto active navigation route OR newly selected location (only once per selection change)
   const prevSelectedIdRef = useRef<string | null>(null);
@@ -707,7 +709,7 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
               let pointerEnabled = true;
 
               if (activeCategory !== null) {
-                const matchesCat = (store && store.cat === activeCategory) || loc.cat === activeCategory;
+                const matchesCat = (store && categories.matches(store.cat, activeCategory)) || categories.matches(loc.cat, activeCategory);
                 opacity = matchesCat ? 1 : 0.12;
                 pointerEnabled = matchesCat;
               } else if (isRouteActive) {
@@ -722,7 +724,7 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
                 pointerEnabled = true;
               }
 
-              const catInfo = CATEGORIES[catKey] || CATEGORIES.service;
+              const catInfo = categories.info(catKey);
               const rgb = hexToRgb(catInfo.color);
 
               let fillColor = isSelected
@@ -953,8 +955,8 @@ export const WayfindingMapStage: React.FC<WayfindingMapStageProps> = ({
                   >
                     {transit.isExit
                       ? transit.isElevator
-                        ? `Elevator ${transit.targetFloorLabel}`
-                        : `Stairs ${transit.targetFloorLabel}`
+                        ? fill(copy.elevatorTo, { floor: transit.targetFloorLabel })
+                        : fill(copy.stairsTo, { floor: transit.targetFloorLabel })
                       : transit.targetFloorLabel}
                   </text>
                 </g>

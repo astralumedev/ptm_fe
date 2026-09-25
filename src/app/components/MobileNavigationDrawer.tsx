@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-import { menuItems } from './navData';
+import { useMenuItems } from './navData';
+import { useSiteNav, useMallHours } from '@/content/blocks/site';
+import { CmsLink } from '@/content/CmsLink';
 
 interface MobileNavigationDrawerProps {
   isOpen: boolean;
@@ -9,6 +11,9 @@ interface MobileNavigationDrawerProps {
 }
 
 const MobileNavigationDrawer: React.FC<MobileNavigationDrawerProps> = ({ isOpen, onClose }) => {
+  const menuItems = useMenuItems();
+  const nav = useSiteNav();
+  const hours = useMallHours();
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const location = useLocation();
 
@@ -72,8 +77,8 @@ const MobileNavigationDrawer: React.FC<MobileNavigationDrawerProps> = ({ isOpen,
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 bg-gray-50/90 flex-shrink-0">
               <Link to="/" onClick={onClose} className="flex items-center no-underline">
                 <img
-                  src="/tm_logo_nobg.png"
-                  alt="Pokhara Trade Mall"
+                  src={nav.logoUrl}
+                  alt={nav.logoAlt}
                   className="h-10 sm:h-12 w-auto object-contain"
                 />
               </Link>
@@ -98,11 +103,13 @@ const MobileNavigationDrawer: React.FC<MobileNavigationDrawerProps> = ({ isOpen,
                 <svg className="w-3.5 h-3.5 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>10:00 AM - 8:00 PM</span>
+                <span>{hours.todayHours}</span>
               </div>
+              {hours.badge && (
               <span className="text-[11px] font-bold text-red-700 uppercase tracking-wider bg-red-100/80 px-2 py-0.5 rounded-full">
-                Open Daily
+                {hours.badge}
               </span>
+              )}
             </div>
 
             {/* Navigation List (Scrollable) */}
@@ -114,9 +121,9 @@ const MobileNavigationDrawer: React.FC<MobileNavigationDrawerProps> = ({ isOpen,
 
                 if (!hasSub) {
                   return (
-                    <Link
+                    <CmsLink
                       key={item.label}
-                      to={item.href || '#'}
+                      href={item.href || '#'}
                       onClick={onClose}
                       className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm tracking-wider transition-all no-underline ${
                         isCurrent
@@ -133,7 +140,7 @@ const MobileNavigationDrawer: React.FC<MobileNavigationDrawerProps> = ({ isOpen,
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                       </svg>
-                    </Link>
+                    </CmsLink>
                   );
                 }
 
@@ -179,15 +186,15 @@ const MobileNavigationDrawer: React.FC<MobileNavigationDrawerProps> = ({ isOpen,
                               )}
                               <div className="space-y-0.5 pt-1">
                                 {group.items.map((subItem) => (
-                                  <Link
+                                  <CmsLink
                                     key={subItem.label}
-                                    to={subItem.href}
+                                    href={subItem.href}
                                     onClick={onClose}
                                     className="flex items-center px-3 py-2 text-xs sm:text-sm text-gray-700 hover:text-red-700 hover:bg-red-50/60 rounded-lg font-medium transition-colors no-underline"
                                   >
                                     <span className="w-1.5 h-1.5 rounded-full bg-red-600 mr-2 flex-shrink-0" />
                                     <span>{subItem.label}</span>
-                                  </Link>
+                                  </CmsLink>
                                 ))}
                               </div>
                             </div>
@@ -205,8 +212,8 @@ const MobileNavigationDrawer: React.FC<MobileNavigationDrawerProps> = ({ isOpen,
               className="p-4 border-t border-gray-200 bg-gray-50 flex flex-col gap-2 flex-shrink-0"
               style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
-              <Link
-                to="/mall-map"
+              <CmsLink
+                href={nav.mapLink}
                 onClick={onClose}
                 className="btn-primary w-full text-center py-2.5 justify-center flex items-center gap-2"
               >
@@ -214,13 +221,13 @@ const MobileNavigationDrawer: React.FC<MobileNavigationDrawerProps> = ({ isOpen,
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span>Interactive Mall Map</span>
-              </Link>
+                <span>{nav.drawerMapLabel}</span>
+              </CmsLink>
               <div className="flex items-center justify-between text-xs text-gray-600 px-1 pt-1">
-                <span>Chipledhunga, Pokhara</span>
-                <Link to="/contact" onClick={onClose} className="text-red-700 font-bold hover:underline">
-                  Contact Us
-                </Link>
+                <span>{nav.drawerLocation}</span>
+                <CmsLink href={nav.drawerContactLink} onClick={onClose} className="text-red-700 font-bold hover:underline">
+                  {nav.drawerContactLabel}
+                </CmsLink>
               </div>
             </div>
           </motion.div>

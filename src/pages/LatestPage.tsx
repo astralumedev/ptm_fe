@@ -17,9 +17,21 @@ import Footer from '../app/components/Footer';
 import api from '../services/api';
 import { Blog } from '../data/models/Blog';
 import { MallEvent, MallOffer } from '../data/latestData';
+import { useBlock } from '../content/block';
+import { latestPageBlock } from '../content/blocks/latest';
+import { submitForm } from '../content/forms';
+
+const emptyRsvp = { name: '', email: '', phone: '', guests: '1', note: '', website: '' };
+
+const EmptyState: React.FC<{ text: string }> = ({ text }) => (
+  <div className="py-14 px-6 text-center bg-white rounded-2xl border border-dashed border-gray-300 text-sm text-gray-500">
+    {text}
+  </div>
+);
 
 export const LatestPage: React.FC = () => {
   const location = useLocation();
+  const c = useBlock(latestPageBlock);
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [events, setEvents] = useState<MallEvent[]>([]);
   const [offers, setOffers] = useState<MallOffer[]>([]);
@@ -32,7 +44,11 @@ export const LatestPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'blogs' | 'events' | 'offers'>('all');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<MallEvent | null>(null);
-  const [rsvpSuccess, setRsvpSuccess] = useState<string | null>(null);
+  const [rsvpDone, setRsvpDone] = useState<Set<string>>(() => new Set());
+  const [rsvpOpen, setRsvpOpen] = useState(false);
+  const [rsvpForm, setRsvpForm] = useState(emptyRsvp);
+  const [rsvpStatus, setRsvpStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [rsvpError, setRsvpError] = useState('');
 
   // Parse hash on initial load or change (e.g. /latest#events, /latest#offers, /latest#blogs)
   useEffect(() => {
@@ -64,21 +80,64 @@ export const LatestPage: React.FC = () => {
   }, []);
 
   const handleCopyCode = (code: string) => {
-    navigator.clipboard.writeText(code);
+    navigator.clipboard?.writeText(code).catch(() => undefined);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2500);
   };
 
-  const handleRsvp = (eventId: string) => {
-    setRsvpSuccess(eventId);
-    setTimeout(() => setRsvpSuccess(null), 3000);
+  const openEvent = (event: MallEvent, withRsvp: boolean) => {
+    setSelectedEvent(event);
+    setRsvpOpen(withRsvp && c.rsvpEnabled && !rsvpDone.has(event.id));
+    setRsvpStatus(rsvpDone.has(event.id) ? 'success' : 'idle');
+    setRsvpError('');
+  };
+
+  const closeEvent = () => {
+    setSelectedEvent(null);
+    setRsvpOpen(false);
+  };
+
+  const setField = (key: keyof typeof emptyRsvp) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setRsvpForm((f) => ({ ...f, [key]: e.target.value }));
+
+  const handleRsvpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedEvent || rsvpStatus === 'sending') return;
+    if (!rsvpForm.email.trim() && !rsvpForm.phone.trim()) {
+      setRsvpStatus('error');
+      setRsvpError(c.rsvpContactError);
+      return;
+    }
+    setRsvpStatus('sending');
+    setRsvpError('');
+    try {
+      await submitForm(
+        'rsvp',
+        {
+          name: rsvpForm.name.trim(),
+          email: rsvpForm.email.trim(),
+          phone: rsvpForm.phone.trim(),
+          guests: rsvpForm.guests.trim().slice(0, 4),
+          note: rsvpForm.note.trim(),
+          eventId: selectedEvent.id,
+          eventTitle: selectedEvent.title,
+        },
+        rsvpForm.website,
+      );
+      setRsvpDone((prev) => new Set(prev).add(selectedEvent.id));
+      setRsvpStatus('success');
+      setRsvpForm((f) => ({ ...emptyRsvp, name: f.name, email: f.email, phone: f.phone }));
+    } catch (err) {
+      setRsvpStatus('error');
+      setRsvpError(err instanceof Error ? err.message : String(err));
+    }
   };
 
   const tabs: PageHeaderTab[] = [
-    { id: 'all', label: 'All Updates', count: blogs.length + events.length + offers.length },
-    { id: 'blogs', label: 'Blogs & Stories', count: blogs.length, icon: <FaBookOpen className="w-3.5 h-3.5" /> },
-    { id: 'events', label: 'Events & Happenings', count: events.length, icon: <FaCalendarAlt className="w-3.5 h-3.5" /> },
-    { id: 'offers', label: 'Latest Offers', count: offers.length, icon: <FaTags className="w-3.5 h-3.5" /> },
+    { id: 'all', label: c.tabAll, count: blogs.length + events.length + offers.length },
+    { id: 'blogs', label: c.tabBlogs, count: blogs.length, icon: <FaBookOpen className="w-3.5 h-3.5" /> },
+    { id: 'events', label: c.tabEvents, count: events.length, icon: <FaCalendarAlt className="w-3.5 h-3.5" /> },
+    { id: 'offers', label: c.tabOffers, count: offers.length, icon: <FaTags className="w-3.5 h-3.5" /> },
   ];
 
   const featuredBlog = blogs[0];
@@ -91,12 +150,12 @@ export const LatestPage: React.FC = () => {
 
       {/* Reusable Page Header */}
       <PageHeader
-        title="Latest"
-        subtitle="Stay updated with our newest editorial stories, vibrant mall events, and exclusive seasonal discounts at Pokhara Trade Mall."
-        badge="WHAT'S ON"
+        title={c.title}
+        subtitle={c.subtitle}
+        badge={c.badge}
         breadcrumbs={[
-          { label: "What's On", href: '/latest' },
-          { label: 'Latest' },
+          { label: c.breadcrumbParent, href: '/latest' },
+          { label: c.breadcrumbCurrent },
         ]}
         tabs={tabs}
         activeTab={activeTab}
@@ -116,17 +175,17 @@ export const LatestPage: React.FC = () => {
               <div>
                 <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-[#801424] uppercase mb-1">
                   <FaBookOpen className="w-3.5 h-3.5" />
-                  <span>Stories & Articles</span>
+                  <span>{c.blogsEyebrow}</span>
                 </div>
                 <h2
                   className="text-2xl sm:text-3xl font-bold text-gray-900 uppercase tracking-wide"
                   style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                 >
-                  Latest Blogs & Insights
+                  {c.blogsHeading}
                 </h2>
               </div>
               <p className="text-xs sm:text-sm text-gray-500 max-w-md">
-                Discover lifestyle tips, dining recommendations, and insider shopping guides curated by our editorial team.
+                {c.blogsIntro}
               </p>
             </div>
 
@@ -136,6 +195,8 @@ export const LatestPage: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-8">
+                {blogs.length === 0 && <EmptyState text={c.blogsEmpty} />}
+
                 {/* Featured Blog Highlight Card */}
                 {featuredBlog && (
                   <motion.div
@@ -153,7 +214,7 @@ export const LatestPage: React.FC = () => {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                       <div className="absolute top-4 left-4 bg-[#801424] text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
-                        Featured Story
+                        {c.blogsFeaturedBadge}
                       </div>
                     </div>
 
@@ -171,10 +232,14 @@ export const LatestPage: React.FC = () => {
                               year: 'numeric',
                             })}
                           </span>
-                          <span>•</span>
-                          <span className="flex items-center gap-1 text-[#801424]">
-                            <FaClock className="w-3 h-3" /> 4 min read
-                          </span>
+                          {c.blogsReadTime && (
+                            <>
+                              <span>•</span>
+                              <span className="flex items-center gap-1 text-[#801424]">
+                                <FaClock className="w-3 h-3" /> {c.blogsReadTime}
+                              </span>
+                            </>
+                          )}
                         </div>
 
                         <Link to={`/blogs/${featuredBlog.slug}`} className="block group-hover:text-[#801424] transition-colors">
@@ -196,7 +261,7 @@ export const LatestPage: React.FC = () => {
                           to={`/blogs/${featuredBlog.slug}`}
                           className="btn-link"
                         >
-                          <span>Read Full Story</span>
+                          <span>{c.blogsReadFull}</span>
                           <FaArrowRight className="w-3.5 h-3.5" />
                         </Link>
                       </div>
@@ -205,7 +270,7 @@ export const LatestPage: React.FC = () => {
                 )}
 
                 {/* Additional Blog Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                {gridBlogs.length > 0 && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                   {gridBlogs.map((blog, index) => (
                     <motion.article
                       key={blog.id}
@@ -231,7 +296,7 @@ export const LatestPage: React.FC = () => {
                         {/* Content */}
                         <div className="p-5 sm:p-6 space-y-3">
                           <div className="text-[11px] font-bold uppercase tracking-wider text-[#801424]">
-                            Editorial
+                            {c.blogsCardLabel}
                           </div>
 
                           <Link to={`/blogs/${blog.slug}`} className="block group-hover:text-[#801424] transition-colors">
@@ -252,19 +317,19 @@ export const LatestPage: React.FC = () => {
                       {/* Footer */}
                       <div className="px-5 sm:px-6 pb-5 pt-2 border-t border-gray-100 flex items-center justify-between text-xs">
                         <span className="text-gray-500 font-medium">
-                          By {blog.owner?.first_name} {blog.owner?.last_name}
+                          {c.blogsByPrefix} {blog.owner?.first_name} {blog.owner?.last_name}
                         </span>
                         <Link
                           to={`/blogs/${blog.slug}`}
                           className="font-bold text-[#801424] hover:underline flex items-center gap-1"
                         >
-                          Read More
+                          {c.blogsReadMore}
                           <FaArrowRight className="w-2.5 h-2.5" />
                         </Link>
                       </div>
                     </motion.article>
                   ))}
-                </div>
+                </div>}
               </div>
             )}
           </section>
@@ -280,24 +345,25 @@ export const LatestPage: React.FC = () => {
               <div>
                 <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-blue-700 uppercase mb-1">
                   <FaCalendarAlt className="w-3.5 h-3.5" />
-                  <span>Calendar of Events</span>
+                  <span>{c.eventsEyebrow}</span>
                 </div>
                 <h2
                   className="text-2xl sm:text-3xl font-bold text-gray-900 uppercase tracking-wide"
                   style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                 >
-                  Upcoming Events & Happenings
+                  {c.eventsHeading}
                 </h2>
               </div>
               <p className="text-xs sm:text-sm text-gray-500 max-w-md">
-                Live concerts, cultural food fests, movie premiere nights, and family gaming tournaments at Pokhara Trade Mall.
+                {c.eventsIntro}
               </p>
             </div>
 
             {/* Events Grid */}
+            {events.length === 0 && <EmptyState text={c.eventsEmpty} />}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
               {events.map((event, index) => {
-                const isRsvpd = rsvpSuccess === event.id;
+                const isRsvpd = rsvpDone.has(event.id);
                 return (
                   <motion.div
                     key={event.id}
@@ -319,10 +385,10 @@ export const LatestPage: React.FC = () => {
                       {/* Date Badge */}
                       <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md text-gray-900 rounded-xl p-2 text-center shadow-lg border border-white/40 min-w-[62px]">
                         <span className="block text-[10px] font-black text-[#801424] uppercase tracking-wider">
-                          {event.dateBadge.month}
+                          {event.dateBadge?.month}
                         </span>
                         <span className="block text-lg font-extrabold leading-none">
-                          {event.dateBadge.day}
+                          {event.dateBadge?.day}
                         </span>
                       </div>
 
@@ -372,14 +438,14 @@ export const LatestPage: React.FC = () => {
                       {/* Action Bar */}
                       <div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
                         <button
-                          onClick={() => setSelectedEvent(event)}
+                          onClick={() => openEvent(event, false)}
                           className="text-xs font-bold text-gray-700 hover:text-[#801424] transition-colors underline cursor-pointer"
                         >
-                          View Details
+                          {c.eventsDetails}
                         </button>
 
-                        <button
-                          onClick={() => handleRsvp(event.id)}
+                        {c.rsvpEnabled && <button
+                          onClick={() => openEvent(event, true)}
                           className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${isRsvpd
                               ? 'bg-emerald-600 text-white'
                               : 'bg-gray-900 text-white hover:bg-[#801424] shadow-sm'
@@ -387,14 +453,14 @@ export const LatestPage: React.FC = () => {
                         >
                           {isRsvpd ? (
                             <>
-                              <FaCheck className="w-3 h-3" /> Added Reminder!
+                              <FaCheck className="w-3 h-3" /> {c.rsvpDoneButton}
                             </>
                           ) : (
                             <>
-                              <FaCalendarAlt className="w-3 h-3" /> Save Event
+                              <FaCalendarAlt className="w-3 h-3" /> {c.rsvpButton}
                             </>
                           )}
-                        </button>
+                        </button>}
                       </div>
                     </div>
                   </motion.div>
@@ -414,21 +480,22 @@ export const LatestPage: React.FC = () => {
               <div>
                 <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-emerald-700 uppercase mb-1">
                   <FaTags className="w-3.5 h-3.5" />
-                  <span>Deals & Vouchers</span>
+                  <span>{c.offersEyebrow}</span>
                 </div>
                 <h2
                   className="text-2xl sm:text-3xl font-bold text-gray-900 uppercase tracking-wide"
                   style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                 >
-                  Latest Offers & Promotions
+                  {c.offersHeading}
                 </h2>
               </div>
               <p className="text-xs sm:text-sm text-gray-500 max-w-md">
-                Claim exclusive coupon codes and special store discounts across retail, dining, and cinema at Pokhara Trade Mall.
+                {c.offersIntro}
               </p>
             </div>
 
             {/* Offer Cards Grid */}
+            {offers.length === 0 && <EmptyState text={c.offersEmpty} />}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {offers.map((offer, index) => {
                 const isCopied = copiedCode === offer.promoCode;
@@ -482,7 +549,7 @@ export const LatestPage: React.FC = () => {
                           <div className="flex items-center justify-between bg-gray-50 border border-dashed border-gray-300 rounded-xl p-2.5">
                             <div className="flex flex-col">
                               <span className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">
-                                Promo Code
+                                {c.offersPromoLabel}
                               </span>
                               <span className="font-mono text-xs sm:text-sm font-bold text-gray-900 tracking-wider">
                                 {offer.promoCode}
@@ -498,11 +565,11 @@ export const LatestPage: React.FC = () => {
                             >
                               {isCopied ? (
                                 <>
-                                  <FaCheck className="w-3 h-3" /> Copied!
+                                  <FaCheck className="w-3 h-3" /> {c.offersCopied}
                                 </>
                               ) : (
                                 <>
-                                  <FaCopy className="w-3 h-3 text-gray-500" /> Copy
+                                  <FaCopy className="w-3 h-3 text-gray-500" /> {c.offersCopy}
                                 </>
                               )}
                             </button>
@@ -515,7 +582,7 @@ export const LatestPage: React.FC = () => {
                             to={offer.storeLink}
                             className="font-bold text-gray-800 hover:text-[#801424] flex items-center gap-1 transition-colors"
                           >
-                            Explore Store
+                            {c.offersStoreLink}
                             <FaArrowRight className="w-2.5 h-2.5" />
                           </Link>
                         </div>
@@ -538,7 +605,7 @@ export const LatestPage: React.FC = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl border border-gray-200"
+              className="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200"
             >
               <div className="relative aspect-16/9 bg-gray-900">
                 <img
@@ -547,7 +614,7 @@ export const LatestPage: React.FC = () => {
                   className="w-full h-full object-cover"
                 />
                 <button
-                  onClick={() => setSelectedEvent(null)}
+                  onClick={closeEvent}
                   aria-label="Close modal"
                   className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white p-2 rounded-full transition-colors cursor-pointer"
                 >
@@ -571,12 +638,12 @@ export const LatestPage: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4 py-3 border-y border-gray-100 text-xs text-gray-700">
                   <div>
-                    <span className="block text-gray-400 font-medium">Date & Time</span>
+                    <span className="block text-gray-400 font-medium">{c.modalDateLabel}</span>
                     <span className="font-semibold">{selectedEvent.date}</span>
                     <div className="text-gray-500">{selectedEvent.time}</div>
                   </div>
                   <div>
-                    <span className="block text-gray-400 font-medium">Venue Location</span>
+                    <span className="block text-gray-400 font-medium">{c.modalVenueLabel}</span>
                     <span className="font-semibold">{selectedEvent.location}</span>
                   </div>
                 </div>
@@ -585,22 +652,93 @@ export const LatestPage: React.FC = () => {
                   {selectedEvent.fullDescription || selectedEvent.description}
                 </p>
 
+                <AnimatePresence initial={false}>
+                  {c.rsvpEnabled && (rsvpOpen || rsvpStatus === 'success') && (
+                    <motion.div
+                      key="rsvp"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden"
+                    >
+                      {rsvpStatus === 'success' ? (
+                        <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 flex items-start gap-3" role="status">
+                          <FaCheck className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <div className="text-sm font-bold text-emerald-800">{c.rsvpSuccessTitle}</div>
+                            <p className="text-xs text-emerald-700 mt-0.5">{c.rsvpSuccessText}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <form onSubmit={handleRsvpSubmit} className="relative rounded-2xl bg-gray-50 border border-gray-200 p-4 space-y-3" noValidate>
+                          <div>
+                            <div className="text-sm font-bold text-gray-900">{c.rsvpFormTitle}</div>
+                            {c.rsvpFormIntro && <p className="text-xs text-gray-500 mt-0.5">{c.rsvpFormIntro}</p>}
+                          </div>
+                          <div
+                            aria-hidden="true"
+                            style={{ position: 'absolute', left: '-10000px', width: 1, height: 1, overflow: 'hidden' }}
+                          >
+                            <input type="text" name="website" tabIndex={-1} autoComplete="off" value={rsvpForm.website} onChange={setField('website')} />
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label className="block sm:col-span-2 text-xs font-semibold text-gray-600">
+                              {c.rsvpNameLabel}
+                              <input required maxLength={120} autoComplete="name" value={rsvpForm.name} onChange={setField('name')}
+                                className="mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#801424]" />
+                            </label>
+                            <label className="block text-xs font-semibold text-gray-600">
+                              {c.rsvpEmailLabel}
+                              <input type="email" maxLength={200} autoComplete="email" value={rsvpForm.email} onChange={setField('email')}
+                                className="mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#801424]" />
+                            </label>
+                            <label className="block text-xs font-semibold text-gray-600">
+                              {c.rsvpPhoneLabel}
+                              <input type="tel" maxLength={40} autoComplete="tel" value={rsvpForm.phone} onChange={setField('phone')}
+                                className="mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#801424]" />
+                            </label>
+                            <label className="block text-xs font-semibold text-gray-600">
+                              {c.rsvpGuestsLabel}
+                              <input type="number" min={1} max={99} inputMode="numeric" value={rsvpForm.guests} onChange={setField('guests')}
+                                className="mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#801424]" />
+                            </label>
+                            <label className="block sm:col-span-2 text-xs font-semibold text-gray-600">
+                              {c.rsvpNoteLabel}
+                              <textarea rows={2} maxLength={1000} value={rsvpForm.note} onChange={setField('note')}
+                                className="mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#801424] resize-none" />
+                            </label>
+                          </div>
+                          {rsvpStatus === 'error' && rsvpError && (
+                            <p className="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2" role="alert">
+                              {rsvpError}
+                            </p>
+                          )}
+                          <div className="flex justify-end">
+                            <button type="submit" disabled={rsvpStatus === 'sending' || !rsvpForm.name.trim()} className="btn-primary text-xs disabled:opacity-60 disabled:cursor-not-allowed">
+                              {rsvpStatus === 'sending' ? c.rsvpSending : c.rsvpSubmit}
+                            </button>
+                          </div>
+                        </form>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <div className="pt-4 flex items-center justify-end gap-3">
                   <button
-                    onClick={() => setSelectedEvent(null)}
+                    onClick={closeEvent}
                     className="btn-secondary text-xs"
                   >
-                    Close
+                    {c.modalClose}
                   </button>
-                  <button
-                    onClick={() => {
-                      handleRsvp(selectedEvent.id);
-                      setSelectedEvent(null);
-                    }}
-                    className="btn-primary text-xs"
-                  >
-                    Save to My Schedule
-                  </button>
+                  {c.rsvpEnabled && !rsvpOpen && rsvpStatus !== 'success' && (
+                    <button
+                      onClick={() => setRsvpOpen(true)}
+                      className="btn-primary text-xs"
+                    >
+                      {c.rsvpModalButton}
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>

@@ -30,7 +30,12 @@ export function useCollection(key: string) {
     setItems(next);
   };
 
-  return { items, error, reload, upsert, remove };
+  const replaceAll = (rows: ItemRow[]) => {
+    cache.set(key, rows);
+    setItems(rows);
+  };
+
+  return { items, error, reload, upsert, remove, replaceAll };
 }
 
 export const clearCollectionCache = () => cache.clear();

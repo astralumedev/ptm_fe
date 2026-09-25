@@ -1,12 +1,16 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { FaFacebook, FaInstagram, FaTiktok, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
 import { SiteSettings } from '@/data/models/SiteSettings';
 import api from '@/services/api';
+import { useBlock } from '@/content/block';
+import { siteFooterBlock, useMallHours } from '@/content/blocks/site';
+import { CmsLink } from '@/content/CmsLink';
 
 const Footer: React.FC = () => {
+  const footer = useBlock(siteFooterBlock);
+  const hours = useMallHours();
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -26,8 +30,6 @@ const Footer: React.FC = () => {
     fetchSiteSettings();
   }, []);
 
-  const googleMapsUrl = "https://www.google.com/maps?ll=28.223844,83.986463&z=18&t=m&hl=en&gl=NP&mapclient=embed&cid=13569072981790925385";
-
   const rawPhones = siteSettings?.phone 
     ? siteSettings.phone.split('/').map(p => p.trim()) 
     : ['+977 61-520000', '+977 9856012345'];
@@ -38,7 +40,7 @@ const Footer: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col items-start">
             <img
-              src="/tm_logo_nobg.png"
+              src={footer.logoUrl}
               alt="Pokhara Trade Mall Logo"
               className='w-60 md:w-72 h-auto object-contain drop-shadow-sm'
             />
@@ -55,48 +57,35 @@ const Footer: React.FC = () => {
         {/* Column 1: Logo & Overview */}
         <div className="lg:col-span-1 flex flex-col items-start">
           <img
-            src="/tm_logo_nobg.png"
+            src={footer.logoUrl}
             alt="Pokhara Trade Mall Logo"
             className='w-60 md:w-72 h-auto object-contain drop-shadow-sm transition-transform hover:scale-105'
           />
           <p className="text-xs text-gray-600 mt-4 leading-relaxed">
-            Pokhara's premier destination for shopping, dining, services, and entertainment.
+            {footer.tagline}
           </p>
         </div>
 
         {/* Column 2: EXPLORE */}
         <div>
           <h4 className="font-semibold text-base mb-5 text-gray-900 tracking-wider uppercase" style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}>
-            EXPLORE
+            {footer.exploreTitle}
           </h4>
           <ul className="space-y-3 text-sm">
-            <li>
-              <Link to="/page/about_us" className="text-gray-700 hover:text-[#801424] transition-colors">
-                Our Story
-              </Link>
-            </li>
-            <li>
-              <Link to="/latest" className="text-gray-700 hover:text-[#801424] transition-colors">
-                Latest & Events
-              </Link>
-            </li>
-            <li>
-              <Link to="/page/privacy_policy" className="text-gray-700 hover:text-[#801424] transition-colors">
-                Privacy Policy
-              </Link>
-            </li>
-            <li>
-              <Link to="/contact" className="text-gray-700 hover:text-[#801424] transition-colors">
-                Contact Us
-              </Link>
-            </li>
+            {(footer.exploreLinks || []).filter((l) => l && l.label).map((l, i) => (
+              <li key={i}>
+                <CmsLink href={l.href} className="text-gray-700 hover:text-[#801424] transition-colors">
+                  {l.label}
+                </CmsLink>
+              </li>
+            ))}
           </ul>
         </div>
 
         {/* Column 3: Connect With Us */}
         <div>
           <h4 className="font-semibold text-base mb-5 text-gray-900 tracking-wider uppercase" style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}>
-            Connect With Us
+            {footer.connectTitle}
           </h4>
           <ul className="space-y-3 text-sm mb-5">
             {rawPhones.map((phone, idx) => (
@@ -143,53 +132,47 @@ const Footer: React.FC = () => {
         {/* Column 4: Mall Timings */}
         <div>
           <h4 className="font-semibold text-base mb-5 text-gray-900 tracking-wider uppercase" style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}>
-            Mall Timings
+            {footer.timingsTitle}
           </h4>
           <div className="space-y-3.5 text-sm">
-            <div>
-              <span className="text-xs text-gray-500 uppercase tracking-wider block mb-0.5">Weekdays</span>
-              <span className="text-gray-700">10:00 AM - 8:00 PM</span>
-            </div>
-            <div>
-              <span className="text-xs text-gray-500 uppercase tracking-wider block mb-0.5">Weekends</span>
-              <span className="text-gray-700">10:00 AM - 10:00 PM</span>
-            </div>
-            <div>
-              <span className="text-xs text-gray-500 uppercase tracking-wider block mb-0.5">QFX Cinemas</span>
-              <span className="text-gray-700">07:00 AM - 12:00 AM</span>
-            </div>
+            {(hours.rows || []).filter((r) => r && r.label).map((r, i) => (
+              <div key={i}>
+                <span className="text-xs text-gray-500 uppercase tracking-wider block mb-0.5">{r.label}</span>
+                <span className="text-gray-700">{r.hours}</span>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Column 5: Find Us */}
         <div>
           <h4 className="font-semibold text-base mb-5 text-gray-900 tracking-wider uppercase" style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}>
-            Find Us
+            {footer.findUsTitle}
           </h4>
           <div className="text-sm text-gray-700 space-y-1.5 mb-5">
-            <p className="font-medium text-gray-900">Pokhara Trade Mall</p>
-            <p className="text-xs leading-relaxed text-gray-600">Chiple Dhunga Road, पोखरा 33700, Nepal</p>
+            <p className="font-medium text-gray-900">{footer.mallName}</p>
+            <p className="text-xs leading-relaxed text-gray-600">{footer.address || siteSettings?.address}</p>
           </div>
           
           <a 
-            href={googleMapsUrl}
+            href={footer.mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="group inline-flex items-center text-xs font-medium text-gray-800 hover:text-[#801424] transition-colors bg-white px-3.5 py-2.5 rounded-md border border-gray-300 shadow-xs"
           >
             <FaMapMarkerAlt className="w-3.5 h-3.5 mr-2 text-gray-800 group-hover:text-[#801424] transition-colors" />
-            View on Google Maps
+            {footer.mapsLabel}
           </a>
         </div>
 
       </div>
 
       <div className="max-w-7xl mx-auto border-t border-gray-300 mt-12 pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-gray-600">
-        <p>© {new Date().getFullYear()} Pokhara Trade Mall. All rights reserved.</p>
+        <p>{(footer.copyright || '').split('{year}').join(String(new Date().getFullYear()))}</p>
         <div className="flex space-x-6 mt-3 md:mt-0">
-          <Link to="/page/privacy_policy" className="hover:text-[#801424] transition-colors">Privacy Policy</Link>
-          <Link to="/page/about_us" className="hover:text-[#801424] transition-colors">About Us</Link>
-          <Link to="/contact" className="hover:text-[#801424] transition-colors">Contact</Link>
+          {(footer.bottomLinks || []).filter((l) => l && l.label).map((l, i) => (
+            <CmsLink key={i} href={l.href} className="hover:text-[#801424] transition-colors">{l.label}</CmsLink>
+          ))}
         </div>
       </div>
     </footer>

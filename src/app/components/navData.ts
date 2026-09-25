@@ -1,3 +1,6 @@
+import { useMemo } from 'react';
+import { useSiteNav } from '@/content/blocks/site';
+
 export interface SubMenuItem {
   label: string;
   href: string;
@@ -14,50 +17,19 @@ export interface MenuItem {
   subGroups?: SubMenuGroup[];
 }
 
-export const menuItems: MenuItem[] = [
-  {
-    label: "What's On",
-    href: "/latest",
-  },
-  {
-    label: "Shop",
-    href: "/shop",
-  },
-  {
-    label: "Dine",
-    href: "/dine",
-  },
-  {
-    label: "Entertain",
-    href: "/entertain",
-  },
-  {
-    label: "Services",
-    subGroups: [
-      {
-        title: "Business Directory",
-        items: [
-          { label: "Beauty & Wellness", href: "/services#beauty" },
-          { label: "Banks & Financial Services", href: "/services#finance" },
-          { label: "Abroad Study & Education", href: "/services#education" },
-          { label: "IT & Software Studios", href: "/services#it-tech" },
-          { label: "Health & Fitness", href: "/services#health-fitness" },
-          { label: "Engineering & Consultancies", href: "/services#consultancy" },
-          { label: "All Services Directory", href: "/services" },
-        ],
-      },
-      {
-        title: "Mall Services",
-        items: [
-          { label: "Mall Map & Wayfinding", href: "/mall-map" },
-          { label: "Parking Information", href: "/services#parking" },
-          { label: "Contact & Inquiries", href: "/contact" },
-        ],
-      },
-    ],
-  },
-  {
-    label: "About",
-    href: "/page/about_us",
-  },
-];
+/** Main menu from the "Main menu & logo" CMS block (site-nav). */
+export function useMenuItems(): MenuItem[] {
+  const { items } = useSiteNav();
+  return useMemo(
+    () =>
+      (items || [])
+        .filter((i) => i && i.label && !i.hidden)
+        .map((i) => {
+          const groups = (i.groups || [])
+            .map((g) => ({ title: g.title || undefined, items: (g.links || []).filter((l) => l && l.label) }))
+            .filter((g) => g.items.length > 0);
+          return groups.length ? { label: i.label, subGroups: groups } : { label: i.label, href: i.href };
+        }),
+    [items],
+  );
+}

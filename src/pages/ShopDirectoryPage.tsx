@@ -13,96 +13,29 @@ import {
   FaSlidersH,
   FaStore,
   FaCheckCircle,
-  FaFemale,
-  FaTshirt,
-  FaChild,
-  FaHeart,
-  FaShoppingBag,
-  FaGem,
-  FaSpa,
-  FaLaptop,
-  FaCouch,
-  FaGift,
-  FaUtensils,
-  FaPizzaSlice,
-  FaCoffee,
-  FaHamburger,
-  FaFilm,
-  FaGamepad,
-  FaUniversity,
-  FaGraduationCap,
-  FaLaptopCode,
-  FaDumbbell,
-  FaDraftingCompass,
 } from 'react-icons/fa';
 import NavigationBar from '../app/components/NavigationBar';
 import PageHeader, { BreadcrumbItem } from '../app/components/PageHeader';
 import Footer from '../app/components/Footer';
 import api from '../services/api';
 import { Store } from '../data/models/Store';
-
-interface CategoryOption {
-  id: string;
-  name: string;
-  sector: 'retail' | 'dine' | 'entertain' | 'service' | 'all';
-  slugs: string[];
-  icon: React.ReactNode;
-}
-
-const CATEGORY_OPTIONS: CategoryOption[] = [
-  { id: 'all', name: 'All Categories (Complete Directory)', sector: 'all', slugs: ['all'], icon: <FaStore className="w-3.5 h-3.5" /> },
-  
-  // RETAIL / SHOP
-  { id: 'womens-fashion', name: "Women's Fashion & Couture", sector: 'retail', slugs: ['womens-fashion', 'fashion'], icon: <FaFemale className="w-3.5 h-3.5" /> },
-  { id: 'mens-fashion', name: "Men's Fashion & Denim", sector: 'retail', slugs: ['mens-fashion'], icon: <FaTshirt className="w-3.5 h-3.5" /> },
-  { id: 'kids', name: 'Kids & Baby Wear', sector: 'retail', slugs: ['kids'], icon: <FaChild className="w-3.5 h-3.5" /> },
-  { id: 'lingerie', name: 'Lingerie & Nightwear', sector: 'retail', slugs: ['lingerie'], icon: <FaHeart className="w-3.5 h-3.5" /> },
-  { id: 'footwear-bags', name: 'Footwear, Bags & Luggage', sector: 'retail', slugs: ['footwear-bags', 'footwear', 'bags'], icon: <FaShoppingBag className="w-3.5 h-3.5" /> },
-  { id: 'jewelry-watches', name: 'Fine Jewelry & Luxury Watches', sector: 'retail', slugs: ['jewelry-watches', 'jewelry', 'womens-accessories', 'watches'], icon: <FaGem className="w-3.5 h-3.5" /> },
-  { id: 'beauty-fragrance', name: 'Beauty, Skincare & Fragrance', sector: 'retail', slugs: ['beauty-fragrance', 'beauty', 'cosmetics'], icon: <FaSpa className="w-3.5 h-3.5" /> },
-  { id: 'electronics', name: 'Tech, Mobiles & Electronics', sector: 'retail', slugs: ['electronics', 'tech', 'mobiles'], icon: <FaLaptop className="w-3.5 h-3.5" /> },
-  { id: 'home-living', name: 'Home, Living & Decor', sector: 'retail', slugs: ['home-living', 'lifestyle'], icon: <FaCouch className="w-3.5 h-3.5" /> },
-  { id: 'handicrafts', name: 'Himalayan Handicrafts & Souvenirs', sector: 'retail', slugs: ['handicrafts', 'gifts', 'souvenirs'], icon: <FaGift className="w-3.5 h-3.5" /> },
-
-  // DINE
-  { id: 'thakali', name: 'Authentic Nepali & Thakali', sector: 'dine', slugs: ['thakali'], icon: <FaUtensils className="w-3.5 h-3.5" /> },
-  { id: 'restaurant', name: 'Restaurants & Multi-Cuisine', sector: 'dine', slugs: ['restaurant', 'eatery'], icon: <FaPizzaSlice className="w-3.5 h-3.5" /> },
-  { id: 'cafe', name: 'Artisan Cafés & Bakeries', sector: 'dine', slugs: ['cafe', 'bakery'], icon: <FaCoffee className="w-3.5 h-3.5" /> },
-  { id: 'fast-food', name: 'Fast Food & Quick Bites', sector: 'dine', slugs: ['fast-food'], icon: <FaHamburger className="w-3.5 h-3.5" /> },
-
-  // ENTERTAIN
-  { id: 'cinema', name: 'Movies & Multiplex (QFX Cinemas)', sector: 'entertain', slugs: ['cinema', 'entertainment'], icon: <FaFilm className="w-3.5 h-3.5" /> },
-  { id: 'gaming', name: '4D VR Gaming & Arcade', sector: 'entertain', slugs: ['gaming'], icon: <FaGamepad className="w-3.5 h-3.5" /> },
-
-  // SERVICES
-  { id: 'beauty-wellness', name: 'Beauty, Spas & Salons', sector: 'service', slugs: ['beauty-wellness'], icon: <FaSpa className="w-3.5 h-3.5" /> },
-  { id: 'finance', name: 'Financial Services & Banking', sector: 'service', slugs: ['finance'], icon: <FaUniversity className="w-3.5 h-3.5" /> },
-  { id: 'education', name: 'Educational Institutes & Abroad Study', sector: 'service', slugs: ['education'], icon: <FaGraduationCap className="w-3.5 h-3.5" /> },
-  { id: 'it-tech', name: 'IT, Software & Digital Solutions', sector: 'service', slugs: ['it-tech'], icon: <FaLaptopCode className="w-3.5 h-3.5" /> },
-  { id: 'health-fitness', name: 'Health, Fitness & Gym', sector: 'service', slugs: ['health-fitness'], icon: <FaDumbbell className="w-3.5 h-3.5" /> },
-  { id: 'professional', name: 'Engineering & Consultancies', sector: 'service', slugs: ['professional', 'consultancy'], icon: <FaDraftingCompass className="w-3.5 h-3.5" /> },
-];
-
-const SECTOR_PILLS = [
-  { id: 'all', label: 'All Sectors' },
-  { id: 'retail', label: 'Shop & Boutiques' },
-  { id: 'dine', label: 'Dine & Cafes' },
-  { id: 'entertain', label: 'Entertainment' },
-  { id: 'service', label: 'Services & Offices' },
-];
-
-const FLOOR_OPTIONS = [
-  'All Floors',
-  'Ground Floor',
-  '1st Floor',
-  '2nd Floor',
-  '3rd Floor',
-  '4th Floor',
-  '5th Floor',
-];
+import { useBlock } from '../content/block';
+import { useCategories, type Sector } from '../content/blocks/categories';
+import {
+  directoryPageBlock,
+  inCategory,
+  storeSector,
+  floorsOf,
+  floorKey,
+  compareFloors,
+  isPublished,
+  fillParts,
+} from '../content/blocks/directory';
 
 export default function ShopDirectoryPage() {
   const [searchParams] = useSearchParams();
+  const t = useBlock(directoryPageBlock);
+  const { visible: categories, find } = useCategories();
   const [allStores, setAllStores] = useState<Store[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -110,19 +43,17 @@ export default function ShopDirectoryPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSector, setSelectedSector] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedFloor, setSelectedFloor] = useState<string>('All Floors');
+  const [selectedFloor, setSelectedFloor] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'featured' | 'name-asc' | 'name-desc' | 'floor'>('featured');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   useEffect(() => {
     const categoryParam = searchParams.get('category');
     if (categoryParam) {
-      const found = CATEGORY_OPTIONS.find((c) => c.slugs.includes(categoryParam.toLowerCase()) || c.id === categoryParam.toLowerCase());
+      const found = find(categoryParam.toLowerCase());
       if (found) {
-        setSelectedCategory(found.id);
-        if (found.sector !== 'all') {
-          setSelectedSector(found.sector);
-        }
+        setSelectedCategory(found.slug);
+        setSelectedSector(found.sector);
       }
     }
 
@@ -132,16 +63,11 @@ export default function ShopDirectoryPage() {
     }
 
     const floorParam = searchParams.get('floor');
-    if (floorParam) {
-      const matchFloor = FLOOR_OPTIONS.find(
-        (f) => f.toLowerCase().replace(/\s+/g, '-') === floorParam.toLowerCase()
-      );
-      if (matchFloor) setSelectedFloor(matchFloor);
-    }
+    if (floorParam) setSelectedFloor(floorKey(floorParam));
 
     const searchParam = searchParams.get('search');
     if (searchParam) setSearchQuery(searchParam);
-  }, [searchParams]);
+  }, [searchParams, find]);
 
   useEffect(() => {
     const fetchStores = async () => {
@@ -150,7 +76,7 @@ export default function ShopDirectoryPage() {
         const response = await api.getStores({
           fields: '*,logo.data.full_url,cover.data.full_url,store_gallery.directus_files_id.*',
         });
-        setAllStores(response.data || []);
+        setAllStores((response.data || []).filter(isPublished));
       } catch (err) {
         console.error('Error fetching directory stores:', err);
       } finally {
@@ -164,8 +90,8 @@ export default function ShopDirectoryPage() {
   const handleSectorChange = (sectorId: string) => {
     setSelectedSector(sectorId);
     if (selectedCategory !== 'all') {
-      const cat = CATEGORY_OPTIONS.find((c) => c.id === selectedCategory);
-      if (cat && cat.sector !== 'all' && cat.sector !== sectorId && sectorId !== 'all') {
+      const cat = find(selectedCategory);
+      if (cat && cat.sector !== sectorId && sectorId !== 'all') {
         setSelectedCategory('all');
       }
     }
@@ -176,30 +102,20 @@ export default function ShopDirectoryPage() {
 
     // 1. Sector filter
     if (selectedSector !== 'all') {
-      result = result.filter((s) => {
-        if (selectedSector === 'retail') return s.type === 'retail';
-        if (selectedSector === 'dine') return s.type === 'eatery';
-        if (selectedSector === 'entertain') return s.categorySlug === 'cinema' || s.categorySlug === 'gaming' || s.categorySlug === 'entertainment';
-        if (selectedSector === 'service') return s.type === 'service' && s.categorySlug !== 'cinema' && s.categorySlug !== 'gaming' && s.categorySlug !== 'entertainment';
-        return true;
-      });
+      result = result.filter((s) => storeSector(s, find) === selectedSector);
     }
 
     // 2. Category filter
     if (selectedCategory !== 'all') {
-      const targetCat = CATEGORY_OPTIONS.find((c) => c.id === selectedCategory);
+      const targetCat = find(selectedCategory);
       if (targetCat) {
-        result = result.filter((s) => {
-          if (s.categorySlug && targetCat.slugs.includes(s.categorySlug)) return true;
-          if (s.category && targetCat.name.toLowerCase().includes(s.category.toLowerCase())) return true;
-          return false;
-        });
+        result = result.filter((s) => inCategory(s, targetCat, find));
       }
     }
 
     // 3. Floor filter
-    if (selectedFloor !== 'All Floors') {
-      result = result.filter((s) => s.floor?.toLowerCase().includes(selectedFloor.toLowerCase()));
+    if (selectedFloor !== 'all') {
+      result = result.filter((s) => floorKey(s.floor) === selectedFloor);
     }
 
     // 4. Search keyword
@@ -224,32 +140,53 @@ export default function ShopDirectoryPage() {
       }
       if (sortBy === 'name-asc') return a.name.localeCompare(b.name);
       if (sortBy === 'name-desc') return b.name.localeCompare(a.name);
-      if (sortBy === 'floor') return (a.floor || '').localeCompare(b.floor || '');
+      if (sortBy === 'floor') return compareFloors(a.floor, b.floor);
       return 0;
     });
 
     return result;
-  }, [allStores, selectedSector, selectedCategory, selectedFloor, searchQuery, sortBy]);
+  }, [allStores, selectedSector, selectedCategory, selectedFloor, searchQuery, sortBy, find]);
 
   const handleResetFilters = () => {
     setSearchQuery('');
     setSelectedSector('all');
     setSelectedCategory('all');
-    setSelectedFloor('All Floors');
+    setSelectedFloor('all');
     setSortBy('featured');
   };
 
   const breadcrumbs: BreadcrumbItem[] = [
-    { label: 'Shop', href: '/shop' },
-    { label: 'Store Directory' },
+    { label: t.breadcrumbParent, href: t.breadcrumbParentUrl },
+    { label: t.breadcrumb },
   ];
 
-  const hasActiveFilters = searchQuery !== '' || selectedSector !== 'all' || selectedCategory !== 'all' || selectedFloor !== 'All Floors';
+  const hasActiveFilters = searchQuery !== '' || selectedSector !== 'all' || selectedCategory !== 'all' || selectedFloor !== 'all';
 
+  const sectorPills: { id: 'all' | Sector; label: string }[] = [
+    { id: 'all', label: t.allSectorsLabel },
+    { id: 'retail', label: t.retailLabel },
+    { id: 'dine', label: t.dineLabel },
+    { id: 'entertain', label: t.entertainLabel },
+    { id: 'service', label: t.serviceLabel },
+  ];
+
+  // Categories from the CMS that have at least one store (the selected one always stays listed).
   const visibleCategoryOptions = useMemo(() => {
-    if (selectedSector === 'all') return CATEGORY_OPTIONS;
-    return CATEGORY_OPTIONS.filter((c) => c.sector === 'all' || c.sector === selectedSector);
-  }, [selectedSector]);
+    const options = categories
+      .filter((c) => selectedSector === 'all' || c.sector === selectedSector)
+      .filter((c) => c.slug === selectedCategory || allStores.some((s) => inCategory(s, c, find)))
+      .map((c) => ({ id: c.slug, name: c.name }));
+    return [{ id: 'all', name: t.allCategoriesLabel }, ...options];
+  }, [categories, selectedSector, selectedCategory, allStores, find, t.allCategoriesLabel]);
+
+  // Floors that stores are actually on, in building order.
+  const floorOptions = useMemo(() => {
+    const floors = floorsOf(allStores).map((f) => ({ id: floorKey(f), name: f }));
+    if (selectedFloor !== 'all' && !floors.some((f) => f.id === selectedFloor)) {
+      floors.push({ id: selectedFloor, name: selectedFloor.replace(/-/g, ' ') });
+    }
+    return [{ id: 'all', name: t.allFloorsLabel }, ...floors];
+  }, [allStores, selectedFloor, t.allFloorsLabel]);
 
   return (
     <div className="min-h-screen bg-gray-50/50 flex flex-col" style={{ fontFamily: "'Montserrat', sans-serif" }}>
@@ -258,9 +195,9 @@ export default function ShopDirectoryPage() {
 
       {/* Header */}
       <PageHeader
-        title="Mall Store Directory"
-        subtitle="Search and filter through all retail outlets, boutiques, dining spots, entertainment venues, and professional service suites at Pokhara Trade Mall."
-        badge="OMNICHANNEL DIRECTORY"
+        title={t.title}
+        subtitle={t.subtitle}
+        badge={t.badge}
         breadcrumbs={breadcrumbs}
       />
 
@@ -271,7 +208,7 @@ export default function ShopDirectoryPage() {
         <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm p-4 sm:p-6 space-y-4">
           {/* Sector Switcher Pills */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-gray-100">
-            {SECTOR_PILLS.map((pill) => {
+            {sectorPills.map((pill) => {
               const isSelected = selectedSector === pill.id;
               return (
                 <button
@@ -298,7 +235,7 @@ export default function ShopDirectoryPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search store name, brand, keyword, unit..."
+                placeholder={t.searchPlaceholder}
                 className="w-full pl-10 pr-10 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#801424]/20 focus:border-[#801424] transition-all"
               />
               {searchQuery && (
@@ -333,9 +270,9 @@ export default function ShopDirectoryPage() {
                 onChange={(e) => setSelectedFloor(e.target.value)}
                 className="w-full py-2.5 px-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#801424]/20 focus:border-[#801424] text-gray-800 font-medium cursor-pointer"
               >
-                {FLOOR_OPTIONS.map((floor) => (
-                  <option key={floor} value={floor}>
-                    {floor}
+                {floorOptions.map((floor) => (
+                  <option key={floor.id} value={floor.id}>
+                    {floor.name}
                   </option>
                 ))}
               </select>
@@ -348,10 +285,10 @@ export default function ShopDirectoryPage() {
                 onChange={(e) => setSortBy(e.target.value as any)}
                 className="w-full py-2.5 px-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#801424]/20 focus:border-[#801424] text-gray-800 font-medium cursor-pointer"
               >
-                <option value="featured">Sort: Featured First</option>
-                <option value="name-asc">Name (A-Z)</option>
-                <option value="name-desc">Name (Z-A)</option>
-                <option value="floor">By Floor Level</option>
+                <option value="featured">{t.sortFeatured}</option>
+                <option value="name-asc">{t.sortNameAsc}</option>
+                <option value="name-desc">{t.sortNameDesc}</option>
+                <option value="floor">{t.sortFloor}</option>
               </select>
             </div>
           </div>
@@ -361,12 +298,12 @@ export default function ShopDirectoryPage() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-gray-500 font-medium flex items-center gap-1">
                 <FaSlidersH className="w-3 h-3 text-gray-400" />
-                Active Filters:
+                {t.activeFiltersLabel}
               </span>
 
               {selectedSector !== 'all' && (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 text-[#801424] font-semibold border border-red-200">
-                  <span>Sector: {SECTOR_PILLS.find((p) => p.id === selectedSector)?.label}</span>
+                  <span>Sector: {sectorPills.find((p) => p.id === selectedSector)?.label}</span>
                   <button onClick={() => setSelectedSector('all')} className="hover:text-red-900 cursor-pointer">
                     <FaTimes className="w-2.5 h-2.5" />
                   </button>
@@ -384,17 +321,17 @@ export default function ShopDirectoryPage() {
 
               {selectedCategory !== 'all' && (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 text-[#801424] font-semibold border border-red-200">
-                  <span>Category: {CATEGORY_OPTIONS.find((c) => c.id === selectedCategory)?.name}</span>
+                  <span>Category: {find(selectedCategory)?.name || selectedCategory}</span>
                   <button onClick={() => setSelectedCategory('all')} className="hover:text-red-900 cursor-pointer">
                     <FaTimes className="w-2.5 h-2.5" />
                   </button>
                 </span>
               )}
 
-              {selectedFloor !== 'All Floors' && (
+              {selectedFloor !== 'all' && (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 text-[#801424] font-semibold border border-red-200">
-                  <span>Floor: {selectedFloor}</span>
-                  <button onClick={() => setSelectedFloor('All Floors')} className="hover:text-red-900 cursor-pointer">
+                  <span>Floor: {floorOptions.find((f) => f.id === selectedFloor)?.name}</span>
+                  <button onClick={() => setSelectedFloor('all')} className="hover:text-red-900 cursor-pointer">
                     <FaTimes className="w-2.5 h-2.5" />
                   </button>
                 </span>
@@ -405,18 +342,21 @@ export default function ShopDirectoryPage() {
                   onClick={handleResetFilters}
                   className="text-[#801424] hover:underline font-bold ml-1 cursor-pointer"
                 >
-                  Clear All
+                  {t.clearAllLabel}
                 </button>
               )}
 
               {!hasActiveFilters && (
-                <span className="text-gray-400 italic">Showing all outlets</span>
+                <span className="text-gray-400 italic">{t.noFiltersText}</span>
               )}
             </div>
 
             <div className="flex items-center gap-4">
               <span className="text-gray-600 font-semibold text-xs">
-                Showing <strong className="text-[#801424]">{filteredStores.length}</strong> of {allStores.length} Outlets
+                {fillParts(t.showingText, {
+                  shown: <strong key="shown" className="text-[#801424]">{filteredStores.length}</strong>,
+                  total: allStores.length,
+                })}
               </span>
               <div className="flex items-center space-x-1 bg-gray-100 p-1 rounded-xl">
                 <button
@@ -446,7 +386,7 @@ export default function ShopDirectoryPage() {
         {loading ? (
           <div className="py-20 flex flex-col justify-center items-center space-y-4">
             <div className="w-10 h-10 border-4 border-[#801424] border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm text-gray-500">Loading store directory...</p>
+            <p className="text-sm text-gray-500">{t.loadingText}</p>
           </div>
         ) : filteredStores.length === 0 ? (
           <div className="bg-white rounded-3xl border border-gray-200/80 p-12 text-center space-y-4 max-w-md mx-auto shadow-sm">
@@ -454,16 +394,16 @@ export default function ShopDirectoryPage() {
               <FaStore />
             </div>
             <h3 className="text-xl font-bold text-gray-900" style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}>
-              No Outlets Found
+              {t.emptyTitle}
             </h3>
             <p className="text-sm text-gray-500 leading-relaxed">
-              We couldn't find any stores matching your current search or filter combination.
+              {t.emptyText}
             </p>
             <button
               onClick={handleResetFilters}
               className="btn-primary text-xs"
             >
-              Reset All Filters
+              {t.emptyButton}
             </button>
           </div>
         ) : viewMode === 'grid' ? (
@@ -484,7 +424,7 @@ export default function ShopDirectoryPage() {
                   {/* Cover Header */}
                   <div className="relative h-48 w-full overflow-hidden bg-gray-100">
                     <img
-                      src={store.cover.data.full_url}
+                      src={store.cover?.data?.full_url}
                       alt={store.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
@@ -492,17 +432,17 @@ export default function ShopDirectoryPage() {
 
                     <span className="absolute top-3 right-3 text-[11px] font-semibold text-gray-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/80 flex items-center gap-1">
                       <FaMapMarkerAlt className="w-2.5 h-2.5 text-[#801424]" />
-                      {store.floor || 'Main Mall'}
+                      {store.floor || t.fallbackFloor}
                     </span>
 
                     <span className="absolute bottom-3 left-3 text-[10px] font-bold uppercase tracking-widest text-white bg-[#801424]/90 backdrop-blur-xs px-2.5 py-0.5 rounded-full shadow-xs">
-                      {store.category || store.type.toUpperCase()}
+                      {store.category || store.type?.toUpperCase()}
                     </span>
 
                     {store.featured && (
                       <span className="absolute top-3 left-3 text-[10px] font-bold text-amber-900 bg-amber-100/95 backdrop-blur-md px-2 py-0.5 rounded-full shadow-xs border border-amber-300 flex items-center gap-1">
                         <FaCheckCircle className="w-2.5 h-2.5 text-amber-700" />
-                        Featured
+                        {t.featuredBadge}
                       </span>
                     )}
                   </div>
@@ -513,7 +453,7 @@ export default function ShopDirectoryPage() {
                       <div className="flex items-start gap-3 mb-2">
                         <div className="w-11 h-11 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
                           <img
-                            src={store.logo.data.full_url}
+                            src={store.logo?.data?.full_url}
                             alt={`${store.name} logo`}
                             className="w-full h-full object-cover"
                           />
@@ -556,7 +496,7 @@ export default function ShopDirectoryPage() {
                       ) : (
                         <div className="flex items-center text-[11px] text-gray-500 gap-1">
                           <FaMapMarkerAlt className="w-3 h-3 text-[#801424]" />
-                          <span>Pokhara Trade Mall</span>
+                          <span>{t.fallbackLocation}</span>
                         </div>
                       )}
 
@@ -574,7 +514,7 @@ export default function ShopDirectoryPage() {
                         <span
                           className="inline-flex items-center gap-1.5 text-xs font-bold text-[#801424] group-hover:translate-x-0.5 transition-all"
                         >
-                          <span>Explore</span>
+                          <span>{t.exploreLabel}</span>
                           <FaArrowRight className="w-3 h-3" />
                         </span>
                       </div>
@@ -594,7 +534,7 @@ export default function ShopDirectoryPage() {
               >
                 <div className="flex items-start sm:items-center gap-4">
                   <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
-                    <img src={store.logo.data.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
+                    <img src={store.logo?.data?.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
                   </div>
                   <div className="space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
@@ -606,7 +546,7 @@ export default function ShopDirectoryPage() {
                       </span>
                       {store.featured && (
                         <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
-                          Featured
+                          {t.featuredBadge}
                         </span>
                       )}
                       <span className="text-[10px] font-bold uppercase tracking-wider text-[#801424] bg-red-50 px-2 py-0.5 rounded-md border border-red-200">
@@ -643,7 +583,7 @@ export default function ShopDirectoryPage() {
                   <span
                     className="btn-primary-sm"
                   >
-                    <span>Details</span>
+                    <span>{t.detailsLabel}</span>
                     <FaArrowRight className="w-2.5 h-2.5" />
                   </span>
                 </div>

@@ -1,21 +1,50 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { FaArrowLeft, FaCalendarAlt, FaUser, FaTag, FaShareAlt } from 'react-icons/fa';
+import { FaArrowLeft, FaCalendarAlt, FaUser, FaTag, FaShareAlt, FaCheck } from 'react-icons/fa';
 import NavigationBar from '../app/components/NavigationBar';
 import Footer from '../app/components/Footer';
 import PageHeader from '../app/components/PageHeader';
 import api from '../services/api';
 import { Blog } from '../data/models/Blog';
+import { useBlock } from '../content/block';
+import { blogPageBlock } from '../content/blocks/latest';
 
 export default function BlogDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
+  const c = useBlock(blogPageBlock);
+
+  useEffect(() => {
+    if (!copied) return;
+    const t = setTimeout(() => setCopied(false), 2500);
+    return () => clearTimeout(t);
+  }, [copied]);
+
+  const handleShare = async (title: string) => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, url });
+        return;
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+    } catch {
+      window.prompt(c.shareCopied, url);
+    }
+  };
 
   useEffect(() => {
     const fetchBlog = async () => {
       if (!slug) return;
-      
+      setLoading(true);
+
       try {
         const response = await api.getBlogs({
           fields: '*,cover_image.data.full_url,owner.*',
@@ -44,7 +73,7 @@ export default function BlogDetailPage() {
         <NavigationBar />
         <div className="flex flex-col items-center justify-center py-32 space-y-4">
           <div className="w-10 h-10 border-4 border-[#801424] border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm font-semibold text-gray-500">Loading article...</p>
+          <p className="text-sm font-semibold text-gray-500">{c.loading}</p>
         </div>
         <Footer />
       </div>
@@ -56,13 +85,13 @@ export default function BlogDetailPage() {
       <div className="min-h-screen bg-white font-montserrat flex flex-col justify-between">
         <NavigationBar />
         <div className="max-w-md mx-auto my-32 p-8 bg-white border border-gray-200 rounded-3xl text-center space-y-4 shadow-sm">
-          <h2 className="text-2xl font-bold text-gray-900 font-arizona-flare">Article Not Found</h2>
+          <h2 className="text-2xl font-bold text-gray-900 font-arizona-flare">{c.notFoundTitle}</h2>
           <p className="text-xs text-gray-500">
-            The article or story you are looking for is unavailable or has been moved.
+            {c.notFoundText}
           </p>
           <div className="pt-2">
             <Link to="/latest#blogs" className="btn-primary text-xs">
-              Back to Latest Stories
+              {c.notFoundButton}
             </Link>
           </div>
         </div>
@@ -77,10 +106,10 @@ export default function BlogDetailPage() {
 
       <PageHeader
         title={blog.title}
-        subtitle="Editorial features, events, lifestyle news, and shopping guides from Pokhara Trade Mall."
-        badge="Editorial Article"
+        subtitle={c.subtitle}
+        badge={c.badge}
         breadcrumbs={[
-          { label: 'Latest & Stories', href: '/latest#blogs' },
+          { label: c.breadcrumbParent, href: '/latest#blogs' },
           { label: blog.title }
         ]}
       />
@@ -95,11 +124,11 @@ export default function BlogDetailPage() {
               className="btn-link"
             >
               <FaArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to All Stories</span>
+              <span>{c.backLink}</span>
             </Link>
 
             <span className="text-xs font-semibold text-gray-400">
-              Pokhara Trade Mall Editorial
+              {c.sideLabel}
             </span>
           </div>
 
@@ -110,7 +139,7 @@ export default function BlogDetailPage() {
             <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-gray-500 pb-4 border-b border-gray-100">
               <span className="inline-flex items-center gap-1.5 text-[#801424] font-bold">
                 <FaTag className="w-3 h-3" />
-                <span>Featured Story</span>
+                <span>{c.tagLabel}</span>
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <FaCalendarAlt className="w-3 h-3 text-gray-400" />
@@ -118,7 +147,7 @@ export default function BlogDetailPage() {
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <FaUser className="w-3 h-3 text-gray-400" />
-                <span>PTM Editorial Desk</span>
+                <span>{c.authorLabel}</span>
               </span>
             </div>
 
@@ -141,28 +170,33 @@ export default function BlogDetailPage() {
             {/* Article Footer */}
             <div className="pt-8 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Share:</span>
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{c.shareLabel}</span>
                 <button
-                  onClick={() => {
-                    if (navigator.share) {
-                      navigator.share({ title: blog.title, url: window.location.href });
-                    } else {
-                      navigator.clipboard.writeText(window.location.href);
-                      alert('Link copied to clipboard!');
-                    }
-                  }}
+                  onClick={() => handleShare(blog.title)}
                   className="btn-secondary text-xs py-2 px-4"
                 >
                   <FaShareAlt className="w-3 h-3" />
-                  <span>Share Story</span>
+                  <span>{c.shareButton}</span>
                 </button>
+                <span
+                  role="status"
+                  aria-live="polite"
+                  className={`inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 transition-opacity duration-300 ${copied ? 'opacity-100' : 'opacity-0'}`}
+                >
+                  {copied && (
+                    <>
+                      <FaCheck className="w-3 h-3" />
+                      {c.shareCopied}
+                    </>
+                  )}
+                </span>
               </div>
 
               <Link
                 to="/latest"
                 className="btn-primary text-xs"
               >
-                <span>Browse What's On</span>
+                <span>{c.browseButton}</span>
               </Link>
             </div>
 

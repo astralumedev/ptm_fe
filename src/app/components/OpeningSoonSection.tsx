@@ -1,61 +1,15 @@
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useBlock } from '@/content/block';
+import { CmsLink } from '@/content/CmsLink';
+import { liveOnly } from '@/content/visibility';
+import { homeOpeningSoonBlock } from '@/content/blocks/home';
 import { FaClock, FaMapMarkerAlt } from 'react-icons/fa';
 
-interface UpcomingStore {
-  id: string;
-  name: string;
-  category: string;
-  floor: string;
-  expectedDate: string;
-  teaser: string;
-  imageUrl: string;
-  logoUrl: string;
-}
-
-const upcomingStoresData: UpcomingStore[] = [
-  {
-    id: 'adidas',
-    name: 'Adidas Flagship Store',
-    category: 'Sportswear & Sneakers',
-    floor: 'Ground Floor - Main Plaza',
-    expectedDate: 'Opening Spring 2026',
-    teaser: "World's iconic three-stripes performance activewear, Originals footwear, and athleisure gear arriving soon in Pokhara.",
-    imageUrl: 'https://images.unsplash.com/photo-1518002171953-a080ee817e1f?auto=format&fit=crop&w=800&q=80',
-    logoUrl: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=200&q=80',
-  },
-  {
-    id: 'starbucks',
-    name: 'Starbucks Coffee',
-    category: 'Global Cafe & Espresso',
-    floor: '1st Floor - Outdoor Terrace',
-    expectedDate: 'Opening Summer 2026',
-    teaser: "Handcrafted espresso beverages, Frappuccinos, fresh artisan food & cozy lounge seating overlooking Pokhara city view.",
-    imageUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
-    logoUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=200&q=80',
-  },
-  {
-    id: 'miniso',
-    name: 'Miniso Lifestyle',
-    category: 'Japanese Lifestyle & Gifts',
-    floor: '2nd Floor - Retail Atrium',
-    expectedDate: 'Opening Mid 2026',
-    teaser: "Affordable plushies, digital gadgets, home organizing aesthetic, travel items, and viral pop-culture merchandise.",
-    imageUrl: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=80',
-    logoUrl: 'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?auto=format&fit=crop&w=200&q=80',
-  },
-  {
-    id: 'sephora',
-    name: 'Sephora Beauty Lounge',
-    category: 'Cosmetics & Skincare',
-    floor: '1st Floor - Fashion Wing',
-    expectedDate: 'Opening Fall 2026',
-    teaser: "Premium global beauty brands, luxury fragrances, skincare consultations, and interactive makeup bars.",
-    imageUrl: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80',
-    logoUrl: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=200&q=80',
-  },
-];
-
 export default function OpeningSoonSection() {
+  const content = useBlock(homeOpeningSoonBlock);
+  const upcoming = useMemo(() => liveOnly(content.items), [content.items]);
+  if (content.show === false || upcoming.length === 0) return null;
 
   return (
     <section className="w-full py-12 md:py-20 bg-gray-900 text-white relative overflow-hidden border-t border-gray-800">
@@ -70,7 +24,7 @@ export default function OpeningSoonSection() {
             className="text-3xl md:text-4xl lg:text-5xl font-medium text-white tracking-wider mb-2 uppercase"
             style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
           >
-            OPENING SOON
+            {content.title}
           </h2>
           <div className="flex items-center justify-center md:justify-start gap-2 my-3">
             <div className="w-8 h-0.5 bg-[#801424] rounded-full" />
@@ -82,16 +36,16 @@ export default function OpeningSoonSection() {
             className="text-gray-300 text-sm md:text-base leading-relaxed"
             style={{ fontFamily: "'Montserrat', sans-serif" }}
           >
-            Get ready for exciting new arrivals! Iconic global brands, luxury lifestyle lounges, and flagship outlets are bringing their signature experiences to Pokhara Trade Mall.
+            {content.intro}
           </p>
         </div>
 
         {/* Upcoming Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          {upcomingStoresData.map((store, index) => {
+          {upcoming.map((store, index) => {
             return (
               <motion.div
-                key={store.id}
+                key={`${store.name}-${index}`}
                 initial={{ opacity: 0, y: 25 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -109,7 +63,7 @@ export default function OpeningSoonSection() {
                   
                   {/* Badge Ribbon */}
                   <span className="absolute top-3 left-3 bg-[#801424] text-white text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full shadow-md">
-                    COMING SOON
+                    {content.badge}
                   </span>
                 </div>
 
@@ -130,7 +84,7 @@ export default function OpeningSoonSection() {
                       className="text-lg md:text-xl font-semibold text-white mb-2 tracking-wide uppercase !no-underline"
                       style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif", textDecoration: 'none' }}
                     >
-                      {store.name}
+                      {store.href ? <CmsLink href={store.href} className="text-white hover:text-rose-200 transition-colors !no-underline">{store.name}</CmsLink> : store.name}
                     </h3>
 
                     <p className="text-xs text-gray-300 leading-relaxed mb-4 font-light">

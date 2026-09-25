@@ -3,6 +3,7 @@ import { Store, StoreResponse } from '@/data/models/Store';
 import { SiteSettings, SiteSettingsResponse } from '@/data/models/SiteSettings';
 import type { PageData } from '@/data/mockMallData';
 import type { MallEvent, MallOffer } from '@/data/latestData';
+import { liveOnly } from '@/content/visibility';
 
 interface BlogFilter {
   status?: 'published' | 'draft';
@@ -54,6 +55,8 @@ interface ContentBundle {
   events: MallEvent[];
   offers: MallOffer[];
   settings: SiteSettings[];
+  /** Saved site sections, keyed by slug. Missing ones fall back to their defaults. */
+  blocks: Array<Record<string, any> & { slug: string }>;
 }
 
 /** Bundled content used when the API is unreachable (e.g. plain `vite` dev without `vercel dev`). */
@@ -66,16 +69,26 @@ async function fallbackBundle(): Promise<ContentBundle> {
     settings: mall.mockSiteSettings,
     events: latest.mockEvents,
     offers: latest.mockOffers,
+    blocks: [],
   };
 }
 
 let bundlePromise: Promise<ContentBundle> | null = null;
+let snapshot: ContentBundle | null = null;
+const listeners = new Set<() => void>();
+
+/** Synchronous view of the loaded content (null until the first load finishes). */
+export const getBundleSnapshot = () => snapshot;
+export function subscribeBundle(fn: () => void) {
+  listeners.add(fn);
+  return () => { listeners.delete(fn); };
+}
 
 /**
  * The whole published site is one small, edge-cached JSON document. It is fetched once per
  * page load and every getter filters it in memory, so navigation costs no further requests.
  */
-function loadBundle(): Promise<ContentBundle> {
+export function loadBundle(): Promise<ContentBundle> {
   if (!bundlePromise) {
     bundlePromise = fetch('/api/content', { headers: { Accept: 'application/json' } })
       .then(async (res) => {
@@ -87,6 +100,11 @@ function loadBundle(): Promise<ContentBundle> {
       .catch((err) => {
         console.warn('Using bundled content:', err);
         return fallbackBundle();
+      })
+      .then((data) => {
+        snapshot = { ...data, blocks: data.blocks || [] };
+        listeners.forEach((l) => l());
+        return snapshot;
       });
   }
   return bundlePromise;
@@ -135,11 +153,11 @@ class ApiService {
   }
 
   async getEvents(): Promise<MallEvent[]> {
-    return (await loadBundle()).events;
+    return liveOnly((await loadBundle()).events as (MallEvent & { hidden?: boolean })[]);
   }
 
   async getOffers(): Promise<MallOffer[]> {
-    return (await loadBundle()).offers;
+    return liveOnly((await loadBundle()).offers as (MallOffer & { hidden?: boolean })[]);
   }
 }
 

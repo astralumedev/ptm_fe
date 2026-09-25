@@ -12,12 +12,15 @@ export function sql() {
   return client;
 }
 
-export const COLLECTIONS = ['stores', 'blogs', 'pages', 'events', 'offers', 'settings'] as const;
+// 'blocks' holds one document per editable site section (hero, menus, page copy…), keyed by slug.
+export const COLLECTIONS = ['stores', 'blogs', 'pages', 'events', 'offers', 'settings', 'blocks'] as const;
 export type Collection = (typeof COLLECTIONS)[number];
 
 export function isCollection(v: unknown): v is Collection {
   return typeof v === 'string' && (COLLECTIONS as readonly string[]).includes(v);
 }
+
+export const SUBMISSION_KINDS = ['contact', 'rsvp', 'leasing'] as const;
 
 export const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS content (
@@ -53,4 +56,19 @@ export const SCHEMA = [
     pw_version INTEGER NOT NULL DEFAULT 1,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   )`,
+  `CREATE TABLE IF NOT EXISTS submissions (
+    id SERIAL PRIMARY KEY,
+    kind TEXT NOT NULL,
+    data JSONB NOT NULL,
+    ip_hash TEXT,
+    read BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`,
+  `CREATE INDEX IF NOT EXISTS submissions_recent_idx ON submissions (created_at DESC)`,
 ];
+
+/** Runs the idempotent schema. Cheap: every statement is IF NOT EXISTS. */
+export async function ensureSchema() {
+  const db = sql();
+  for (const stmt of SCHEMA) await db.query(stmt);
+}

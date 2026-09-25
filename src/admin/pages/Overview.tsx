@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, ChevronRight } from 'lucide-react';
+import { Plus, ChevronRight, Inbox, PanelsTopLeft } from 'lucide-react';
 import { COLLECTIONS } from '../schema';
 import { adminApi } from '../lib/http';
 import { ErrorNote } from '../components/ui';
@@ -9,9 +9,11 @@ import { PageHead } from './Layout';
 export default function Overview({ username }: { username: string }) {
   const [counts, setCounts] = useState<Record<string, { live: number; draft: number }> | null>(null);
   const [error, setError] = useState('');
+  const [unread, setUnread] = useState(0);
 
   useEffect(() => {
-    adminApi.counts().then(({ counts }) => {
+    adminApi.counts().then(({ counts, unread }) => {
+      setUnread(unread || 0);
       const map: Record<string, { live: number; draft: number }> = {};
       for (const c of counts) {
         map[c.collection] ??= { live: 0, draft: 0 };
@@ -28,6 +30,19 @@ export default function Overview({ username }: { username: string }) {
     <>
       <PageHead title={`${greeting}, ${username}`} lead="Everything you publish here shows on the website within about a minute." />
       {error && <div className="mb-4"><ErrorNote>{error}</ErrorNote></div>}
+      {unread > 0 && (
+        <Link to="/admin/inbox" className="flex items-center gap-3 mb-4 px-4 h-12 rounded-xl bg-[var(--adm-accent-soft)] text-[var(--adm-accent)] font-medium hover:underline">
+          <Inbox className="size-4" /> {unread} new {unread === 1 ? 'message' : 'messages'} from the website <ChevronRight className="size-4 ml-auto" />
+        </Link>
+      )}
+      <Link to="/admin/content" className="flex items-center gap-3 mb-4 px-4 py-3 rounded-xl border border-[var(--adm-line)] hover:bg-[var(--adm-panel)] transition-colors group">
+        <PanelsTopLeft className="size-4 text-[var(--adm-ink-3)] group-hover:text-[var(--adm-accent)]" />
+        <span className="flex-1">
+          <span className="block font-medium group-hover:text-[var(--adm-accent)]">Site content</span>
+          <span className="block text-[12.5px] text-[var(--adm-ink-3)]">Home page banners, menus, opening hours, categories, page text and more</span>
+        </span>
+        <ChevronRight className="size-4 text-[var(--adm-ink-3)]" />
+      </Link>
 
       <div className="rounded-xl border border-[var(--adm-line)] bg-white overflow-hidden">
         <div className="grid grid-cols-[minmax(0,1fr)_64px_64px_auto] items-center gap-3 px-4 h-10 text-[12px] font-medium text-[var(--adm-ink-3)] bg-[var(--adm-panel)] border-b border-[var(--adm-line)]">

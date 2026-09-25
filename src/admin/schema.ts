@@ -1,24 +1,8 @@
 import type { LucideIcon } from 'lucide-react';
 import { Store, Newspaper, FileText, CalendarDays, BadgePercent } from 'lucide-react';
-import type { ImagePreset } from './lib/images';
+import { Field, SCHEDULE_FIELDS } from '@/content/fields';
 
-export type FieldType =
-  | 'text' | 'textarea' | 'richtext' | 'url' | 'select' | 'toggle' | 'tags' | 'datetime'
-  | 'asset'    // { data: { full_url, ... } } image object used by stores, blogs, pages
-  | 'imageUrl' // plain image URL string used by events & offers
-  | 'gallery'; // store_gallery list
-
-export interface Field {
-  key: string; // dot path into the record
-  label: string;
-  type: FieldType;
-  help?: string;
-  placeholder?: string;
-  required?: boolean;
-  options?: { value: string; label: string }[];
-  preset?: ImagePreset;
-  half?: boolean;
-}
+export type { Field, FieldType } from '@/content/fields';
 
 export interface CollectionDef {
   key: 'stores' | 'blogs' | 'pages' | 'events' | 'offers';
@@ -35,16 +19,19 @@ export interface CollectionDef {
   blank: () => Record<string, unknown>;
 }
 
-const STORE_TYPES = [
-  { value: 'retail', label: 'Shop' },
-  { value: 'eatery', label: 'Dining' },
-  { value: 'service', label: 'Service' },
-  { value: 'wellness', label: 'Wellness' },
-  { value: 'hotel', label: 'Hotel' },
-];
-
 const FLOORS = ['Lower Ground Floor', 'Ground Floor', '1st Floor', '2nd Floor', '3rd Floor', '4th Floor', '5th Floor']
   .map((f) => ({ value: f, label: f }));
+
+export const MAP_FLOORS = [
+  { value: '', label: 'Not on the map' },
+  { value: 'lower_ground_floor', label: 'Lower Ground Floor' },
+  { value: 'ground_floor', label: 'Ground Floor' },
+  { value: 'first_floor', label: '1st Floor' },
+  { value: 'second_floor', label: '2nd Floor' },
+  { value: 'third_floor', label: '3rd Floor' },
+  { value: 'fourth_floor', label: '4th Floor' },
+  { value: 'fifth_floor', label: '5th Floor' },
+];
 
 const emptyAsset = () => ({ data: { full_url: '', url: '', asset_url: '', thumbnails: [], embed: null } });
 
@@ -61,7 +48,7 @@ export const COLLECTIONS: CollectionDef[] = [
     publicUrl: (s) => `/stores/${s}`,
     blank: () => ({
       name: '', subtitle: '', type: 'retail', featured: false, logo: emptyAsset(), cover: emptyAsset(),
-      store_description: '', tags: [], store_gallery: [], website: null, instagram: null, facebook: null, tiktok: null,
+      store_description: '', tags: [], store_gallery: [], mapFloor: '', mapUnits: [], website: null, instagram: null, facebook: null, tiktok: null,
       contact_number: null, operation_hours: '10:00 AM - 8:00 PM', owner: { id: 1 }, created_on: new Date().toISOString(),
     }),
     sections: [
@@ -70,10 +57,8 @@ export const COLLECTIONS: CollectionDef[] = [
         fields: [
           { key: 'name', label: 'Store name', type: 'text', required: true },
           { key: 'subtitle', label: 'Tagline', type: 'text', placeholder: 'e.g. Iconic denim & casual wear' },
-          { key: 'type', label: 'Section of the site', type: 'select', options: STORE_TYPES, half: true },
-          { key: 'featured', label: 'Feature on the homepage', type: 'toggle', half: true },
-          { key: 'category', label: 'Category', type: 'text', half: true, placeholder: "e.g. Men's Fashion" },
-          { key: 'categorySlug', label: 'Category code', type: 'text', half: true, placeholder: 'e.g. mens-fashion', help: 'Groups stores in the directory filters.' },
+          { key: 'featured', label: 'Featured store', type: 'toggle', help: 'Featured stores are highlighted in the directory and can be picked for the home page.' },
+          { key: 'categorySlug', label: 'Category', type: 'category', help: 'Files the store under a directory filter. Edit the list under Site content → Store categories.' },
           { key: 'store_description', label: 'Description', type: 'textarea' },
           { key: 'tags', label: 'Tags', type: 'tags', help: 'Press Enter after each tag. Used by search.' },
         ],
@@ -89,8 +74,10 @@ export const COLLECTIONS: CollectionDef[] = [
       {
         title: 'Location & hours',
         fields: [
-          { key: 'floor', label: 'Floor', type: 'select', options: FLOORS, half: true },
-          { key: 'unitNumber', label: 'Unit', type: 'text', half: true, placeholder: 'e.g. Unit 108, Wing A' },
+          { key: 'floor', label: 'Floor (as shown on the store page)', type: 'select', options: FLOORS, half: true },
+          { key: 'unitNumber', label: 'Unit label', type: 'text', half: true, placeholder: 'e.g. Unit 108, Wing A' },
+          { key: 'mapFloor', label: 'Mall map floor', type: 'select', options: MAP_FLOORS, half: true, help: 'Where the store is highlighted on the mall map.' },
+          { key: 'mapUnits', label: 'Mall map units', type: 'mapUnits', floorKey: 'mapFloor', help: 'Pick every unit the store occupies. Visitors get directions to it.' },
           { key: 'operation_hours', label: 'Opening hours', type: 'text', half: true },
           { key: 'contact_number', label: 'Phone', type: 'text', half: true },
         ],
@@ -164,6 +151,7 @@ export const COLLECTIONS: CollectionDef[] = [
           { key: 'featured', label: 'Feature this event', type: 'toggle' },
         ],
       },
+      { title: 'Schedule', fields: SCHEDULE_FIELDS },
       {
         title: 'When & where',
         fields: [
@@ -221,6 +209,7 @@ export const COLLECTIONS: CollectionDef[] = [
           { key: 'storeLogo', label: 'Store logo', type: 'imageUrl', preset: 'logo' },
         ],
       },
+      { title: 'Schedule', fields: SCHEDULE_FIELDS },
     ],
   },
   {

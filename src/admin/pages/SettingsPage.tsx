@@ -51,8 +51,8 @@ export function AccountPage({ admin, onChange }: { admin: AdminUser; onChange: (
   const toast = useToast();
   return (
     <div className="max-w-md">
-      <PageHead title="Account" lead={`Signed in as ${admin.username}. Changing the password signs out every other device.`} />
-      <PasswordForm onDone={(a) => { onChange(a); toast('ok', 'Password changed'); }} />
+      <PageHead title="Account" lead="Change the username or password used to sign in. Saving signs out every other device." />
+      <PasswordForm username={admin.username} onDone={(a) => { onChange(a); toast('ok', 'Account updated'); }} />
     </div>
   );
 }

@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Plus, Search, ImageOff, RotateCw } from 'lucide-react';
+import { Plus, Search, ImageOff, RotateCw, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { collectionByKey, getPath, imageUrlOf } from '../schema';
 import { useCollection } from '../lib/useCollection';
-import { ErrorNote, StatusPill, relativeTime } from '../components/ui';
+import { adminApi, ItemRow } from '../lib/http';
+import { ErrorNote, Spinner, StatusPill, relativeTime, useToast } from '../components/ui';
 import { PageHead } from './Layout';
 
 type Filter = 'all' | 'published' | 'draft';
@@ -12,9 +13,35 @@ export default function CollectionList() {
   const { collection } = useParams();
   const def = collectionByKey(collection);
   const navigate = useNavigate();
-  const { items, error, reload } = useCollection(def?.key || '');
+  const { items, error, reload, replaceAll } = useCollection(def?.key || '');
   const [q, setQ] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
+  const [ordering, setOrdering] = useState<ItemRow[] | null>(null);
+  const [savingOrder, setSavingOrder] = useState(false);
+  const toast = useToast();
+  // Blog posts are always listed newest first on the site, so manual order would do nothing.
+  const canReorder = def?.key !== 'blogs';
+
+  const moveRow = (i: number, d: number) => setOrdering((list) => {
+    if (!list) return list;
+    const next = [...list];
+    [next[i], next[i + d]] = [next[i + d], next[i]];
+    return next;
+  });
+  const saveOrder = async () => {
+    if (!ordering || !def) return;
+    setSavingOrder(true);
+    try {
+      await adminApi.reorder(def.key, ordering.map((r) => r.id));
+      replaceAll(ordering.map((r, i) => ({ ...r, sort: i })));
+      setOrdering(null);
+      toast('ok', 'New order saved. Live within a minute.');
+    } catch (e) {
+      toast('error', e instanceof Error ? e.message : 'Could not save the order');
+    } finally {
+      setSavingOrder(false);
+    }
+  };
 
   const rows = useMemo(() => {
     if (!items || !def) return [];
@@ -32,9 +59,35 @@ export default function CollectionList() {
 
   return (
     <>
-      <PageHead title={def.label} actions={
-        <Link to={`/admin/${def.key}/new`} className="adm-btn adm-btn-primary"><Plus className="size-4" /> New {def.singular}</Link>
+      <PageHead title={def.label} lead={ordering ? 'Move items up or down to set the order they appear on the website.' : undefined} actions={
+        ordering ? (
+          <>
+            <button className="adm-btn" onClick={() => setOrdering(null)} disabled={savingOrder}>Cancel</button>
+            <button className="adm-btn adm-btn-primary" onClick={saveOrder} disabled={savingOrder}>{savingOrder && <Spinner />} Save order</button>
+          </>
+        ) : (
+          <>
+            {canReorder && items && items.length > 1 && (
+              <button className="adm-btn" onClick={() => { setQ(''); setFilter('all'); setOrdering(items); }}><ArrowUpDown className="size-4" /> Reorder</button>
+            )}
+            <Link to={`/admin/${def.key}/new`} className="adm-btn adm-btn-primary"><Plus className="size-4" /> New {def.singular}</Link>
+          </>
+        )
       } />
+
+      {ordering ? (
+        <ul className="rounded-xl border border-[var(--adm-line)] overflow-hidden bg-white">
+          {ordering.map((r, i) => (
+            <li key={r.id} className="flex items-center gap-3 px-4 h-14 border-b last:border-0 border-[var(--adm-line)]">
+              <span className="w-6 text-right text-[12.5px] text-[var(--adm-ink-3)]">{i + 1}</span>
+              <span className="flex-1 min-w-0 truncate font-medium text-[14px]">{getPath(r.data, def.titleKey) || 'Untitled'}</span>
+              <StatusPill status={r.status} />
+              <button className="adm-btn adm-btn-sm adm-btn-ghost !px-1.5" disabled={i === 0} onClick={() => moveRow(i, -1)} aria-label="Move up"><ArrowUp className="size-4" /></button>
+              <button className="adm-btn adm-btn-sm adm-btn-ghost !px-1.5" disabled={i === ordering.length - 1} onClick={() => moveRow(i, 1)} aria-label="Move down"><ArrowDown className="size-4" /></button>
+            </li>
+          ))}
+        </ul>
+      ) : (<>
 
       <div className="flex flex-col sm:flex-row gap-2.5 sm:items-center mb-4">
         <div className="relative sm:w-72">
@@ -93,7 +146,8 @@ export default function CollectionList() {
           </ul>
         )}
       </div>
-      {items && (
+      </>)}
+      {items && !ordering && (
         <button onClick={reload} className="mt-3 inline-flex items-center gap-1.5 text-[12.5px] text-[var(--adm-ink-3)] hover:text-[var(--adm-ink)] cursor-pointer">
           <RotateCw className="size-3.5" /> Refresh
         </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -12,11 +12,8 @@ import {
   FaList,
   FaSlidersH,
   FaTshirt,
-  FaLaptop,
-  FaSpa,
   FaUtensils,
   FaGem,
-  FaGift,
   FaGamepad,
   FaCompass,
   FaStore,
@@ -27,88 +24,26 @@ import PageHeader, { PageHeaderTab, BreadcrumbItem } from '../app/components/Pag
 import Footer from '../app/components/Footer';
 import api from '../services/api';
 import { Store } from '../data/models/Store';
-
-// Category Definitions with Icons and Color Accents
-interface CategoryOption {
-  id: string;
-  name: string;
-  slugs: string[];
-  icon: React.ReactNode;
-  description: string;
-}
-
-const CATEGORY_OPTIONS: CategoryOption[] = [
-  {
-    id: 'all',
-    name: 'All Categories',
-    slugs: ['all'],
-    icon: <FaStore className="w-3.5 h-3.5" />,
-    description: 'Explore all retail, dining, beauty, and entertainment outlets at Pokhara Trade Mall.',
-  },
-  {
-    id: 'fashion',
-    name: 'Fashion & Apparel',
-    slugs: ['womens-fashion', 'mens-fashion', 'fashion', 'kids-fashion'],
-    icon: <FaTshirt className="w-3.5 h-3.5" />,
-    description: 'International brands, designer wear, traditional Nepali ethnic apparel, and everyday denim.',
-  },
-  {
-    id: 'tech',
-    name: 'Tech & Electronics',
-    slugs: ['electronics', 'tech', 'mobiles', 'gadgets'],
-    icon: <FaLaptop className="w-3.5 h-3.5" />,
-    description: 'Smartphones, high-performance gaming hardware, accessories, and certified repair hubs.',
-  },
-  {
-    id: 'beauty',
-    name: 'Beauty & Wellness',
-    slugs: ['beauty', 'wellness', 'cosmetics', 'spa'],
-    icon: <FaSpa className="w-3.5 h-3.5" />,
-    description: 'International cosmetics, skincare, Ayurvedic spas, hair salons, and organic body therapies.',
-  },
-  {
-    id: 'jewelry',
-    name: 'Jewelry & Watches',
-    slugs: ['jewelry', 'womens-accessories', 'mens-accessories', 'watches'],
-    icon: <FaGem className="w-3.5 h-3.5" />,
-    description: 'Certified Hallmark 24K gold, diamond jewelry, designer accessories, and luxury timepieces.',
-  },
-  {
-    id: 'dining',
-    name: 'Dining & Cafes',
-    slugs: ['eatery', 'cafe', 'restaurant', 'fast-food'],
-    icon: <FaUtensils className="w-3.5 h-3.5" />,
-    description: 'Artisanal espresso cafes, authentic Himalayan Thakali, wood-fired pizza, and gourmet food courts.',
-  },
-  {
-    id: 'crafts',
-    name: 'Crafts & Souvenirs',
-    slugs: ['handicrafts', 'lifestyle', 'gifts', 'souvenirs'],
-    icon: <FaGift className="w-3.5 h-3.5" />,
-    description: 'Handcrafted cashmere pashminas, organic wild hemp, handmade carpets, and Nepali heritage gifts.',
-  },
-  {
-    id: 'entertainment',
-    name: 'Entertainment & Leisure',
-    slugs: ['entertainment', 'qfx', 'games'],
-    icon: <FaGamepad className="w-3.5 h-3.5" />,
-    description: '4K laser QFX cinema, 4D VR game simulator zone, and interactive family recreation.',
-  },
-];
-
-const FLOOR_OPTIONS = [
-  'All Floors',
-  'Ground Floor',
-  '1st Floor',
-  '2nd Floor',
-  '3rd Floor',
-  '4th Floor',
-  '5th Floor',
-];
+import { useBlock } from '../content/block';
+import { useCategories } from '../content/blocks/categories';
+import {
+  shopTypePageBlock,
+  type StoreGroup,
+  floorsOf,
+  floorKey,
+  compareFloors,
+  isPublished,
+  fill,
+  fillParts,
+} from '../content/blocks/directory';
+import { CmsIcon } from '../content/icons';
+import { CmsLink } from '../content/CmsLink';
 
 export default function ShopTypePage() {
   const { type } = useParams<{ type?: string }>();
   const [searchParams] = useSearchParams();
+  const t = useBlock(shopTypePageBlock);
+  const { find } = useCategories();
 
   // Stores State
   const [allStores, setAllStores] = useState<Store[]>([]);
@@ -118,12 +53,28 @@ export default function ShopTypePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTypeTab, setActiveTypeTab] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedFloor, setSelectedFloor] = useState<string>('All Floors');
+  const [selectedFloor, setSelectedFloor] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'featured' | 'name-asc' | 'name-desc' | 'floor'>('featured');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // Featured Spotlight Category Switcher
   const [featuredSpotlightCategory, setFeaturedSpotlightCategory] = useState<string>('all');
+
+  // Broad groups (fashion, tech...) from the CMS; each covers several store categories.
+  const groups = useMemo(() => {
+    const list = ((t.groups as StoreGroup[]) || []).filter((grp) => !grp.hidden && grp.id);
+    return list.map((grp) => ({
+      ...grp,
+      slugs: new Set((grp.categories || []).map((c) => find(c)?.slug || c)),
+    }));
+  }, [t.groups, find]);
+
+  const inGroup = (s: Store, groupId: string) => {
+    const grp = groups.find((x) => x.id === groupId);
+    if (!grp) return false;
+    const slug = find(s.categorySlug)?.slug || s.categorySlug;
+    return Boolean(slug && grp.slugs.has(slug));
+  };
 
   // Sync URL parameters on initial mount / change
   useEffect(() => {
@@ -141,23 +92,18 @@ export default function ShopTypePage() {
     // 2. Sync category query param (e.g. ?category=womens-fashion)
     const categoryParam = searchParams.get('category');
     if (categoryParam) {
-      const foundCategory = CATEGORY_OPTIONS.find((c) =>
-        c.slugs.includes(categoryParam.toLowerCase())
-      );
-      if (foundCategory) {
-        setSelectedCategory(foundCategory.id);
+      const param = categoryParam.toLowerCase();
+      const slug = find(param)?.slug || param;
+      const foundGroup = groups.find((grp) => grp.id === param) || groups.find((grp) => grp.slugs.has(slug));
+      if (foundGroup) {
+        setSelectedCategory(foundGroup.id);
       }
     }
 
     // 3. Sync floor query param (e.g. ?floor=1st-floor)
     const floorParam = searchParams.get('floor');
     if (floorParam) {
-      const matchFloor = FLOOR_OPTIONS.find(
-        (f) => f.toLowerCase().replace(/\s+/g, '-') === floorParam.toLowerCase()
-      );
-      if (matchFloor) {
-        setSelectedFloor(matchFloor);
-      }
+      setSelectedFloor(floorKey(floorParam));
     }
 
     // 4. Sync search query param
@@ -165,7 +111,7 @@ export default function ShopTypePage() {
     if (searchParam) {
       setSearchQuery(searchParam);
     }
-  }, [type, searchParams]);
+  }, [type, searchParams, groups, find]);
 
   // Fetch stores from API
   useEffect(() => {
@@ -175,7 +121,7 @@ export default function ShopTypePage() {
         const response = await api.getStores({
           fields: '*,logo.data.full_url,cover.data.full_url,store_gallery.directus_files_id.*',
         });
-        setAllStores(response.data || []);
+        setAllStores((response.data || []).filter(isPublished));
       } catch (err) {
         console.error('Error loading stores directory:', err);
       } finally {
@@ -191,18 +137,12 @@ export default function ShopTypePage() {
     let stores = allStores.filter((s) => Boolean(s.featured));
 
     if (featuredSpotlightCategory !== 'all') {
-      const targetCat = CATEGORY_OPTIONS.find((c) => c.id === featuredSpotlightCategory);
-      if (targetCat) {
-        stores = stores.filter((s) => {
-          if (s.categorySlug && targetCat.slugs.includes(s.categorySlug)) return true;
-          if (s.category && targetCat.name.toLowerCase().includes(s.category.toLowerCase())) return true;
-          return false;
-        });
-      }
+      stores = stores.filter((s) => inGroup(s, featuredSpotlightCategory));
     }
 
     return stores;
-  }, [allStores, featuredSpotlightCategory]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allStores, featuredSpotlightCategory, groups]);
 
   // Filtered & Sorted Stores for Directory
   const filteredDirectoryStores = useMemo(() => {
@@ -214,20 +154,13 @@ export default function ShopTypePage() {
     }
 
     // 2. Filter by Category Option
-    if (selectedCategory !== 'all') {
-      const targetCat = CATEGORY_OPTIONS.find((c) => c.id === selectedCategory);
-      if (targetCat) {
-        result = result.filter((s) => {
-          if (s.categorySlug && targetCat.slugs.includes(s.categorySlug)) return true;
-          if (s.category && targetCat.name.toLowerCase().includes(s.category.toLowerCase())) return true;
-          return false;
-        });
-      }
+    if (selectedCategory !== 'all' && groups.some((grp) => grp.id === selectedCategory)) {
+      result = result.filter((s) => inGroup(s, selectedCategory));
     }
 
     // 3. Filter by Floor
-    if (selectedFloor !== 'All Floors') {
-      result = result.filter((s) => s.floor?.toLowerCase().includes(selectedFloor.toLowerCase()));
+    if (selectedFloor !== 'all') {
+      result = result.filter((s) => floorKey(s.floor) === selectedFloor);
     }
 
     // 4. Filter by Search Query
@@ -258,13 +191,34 @@ export default function ShopTypePage() {
         return b.name.localeCompare(a.name);
       }
       if (sortBy === 'floor') {
-        return (a.floor || '').localeCompare(b.floor || '');
+        return compareFloors(a.floor, b.floor);
       }
       return 0;
     });
 
     return result;
-  }, [allStores, activeTypeTab, selectedCategory, selectedFloor, searchQuery, sortBy]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allStores, activeTypeTab, selectedCategory, selectedFloor, searchQuery, sortBy, groups]);
+
+  // Group tiles/options with a live store count; empty groups are hidden (selected one stays).
+  const categoryOptions = useMemo(() => {
+    const counted = groups
+      .map((grp) => ({ ...grp, storeCount: allStores.filter((s) => inGroup(s, grp.id)).length }))
+      .filter((grp) => grp.storeCount > 0 || grp.id === selectedCategory);
+    return [
+      { id: 'all', name: t.allGroupName, shortName: t.featuredAllLabel, icon: 'store', description: t.allGroupDescription, spotlight: true, storeCount: allStores.length },
+      ...counted,
+    ];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groups, allStores, selectedCategory, t.allGroupName, t.featuredAllLabel, t.allGroupDescription]);
+
+  const floorOptions = useMemo(() => {
+    const floors = floorsOf(allStores).map((f) => ({ id: floorKey(f), name: f }));
+    if (selectedFloor !== 'all' && !floors.some((f) => f.id === selectedFloor)) {
+      floors.push({ id: selectedFloor, name: selectedFloor.replace(/-/g, ' ') });
+    }
+    return [{ id: 'all', name: t.allFloorsLabel }, ...floors];
+  }, [allStores, selectedFloor, t.allFloorsLabel]);
 
   // Handle Tab Switch
   const handleTypeTabChange = (tabId: string) => {
@@ -276,28 +230,28 @@ export default function ShopTypePage() {
   const handleResetFilters = () => {
     setSearchQuery('');
     setSelectedCategory('all');
-    setSelectedFloor('All Floors');
+    setSelectedFloor('all');
     setSortBy('featured');
   };
 
   // Header Tabs Configuration
   const tabs: PageHeaderTab[] = [
-    { id: 'all', label: 'All Outlets', count: allStores.length, icon: <FaStore className="w-3.5 h-3.5" /> },
+    { id: 'all', label: t.tabAll, count: allStores.length, icon: <FaStore className="w-3.5 h-3.5" /> },
     {
       id: 'retail',
-      label: 'Shop & Boutiques',
+      label: t.tabRetail,
       count: allStores.filter((s) => s.type === 'retail').length,
       icon: <FaTshirt className="w-3.5 h-3.5" />,
     },
     {
       id: 'eatery',
-      label: 'Dining & Cafes',
+      label: t.tabEatery,
       count: allStores.filter((s) => s.type === 'eatery').length,
       icon: <FaUtensils className="w-3.5 h-3.5" />,
     },
     {
       id: 'service',
-      label: 'Services & Fun',
+      label: t.tabService,
       count: allStores.filter((s) => s.type === 'service').length,
       icon: <FaGamepad className="w-3.5 h-3.5" />,
     },
@@ -306,41 +260,25 @@ export default function ShopTypePage() {
   // Dynamic Header Title & Subtitle
   const getHeaderInfo = () => {
     if (activeTypeTab === 'retail') {
-      return {
-        title: 'Shop & Boutiques',
-        subtitle: 'Explore an expansive collection of leading apparel, electronics, beauty, fine jewelry, and artisanal crafts across Pokhara Trade Mall.',
-        badge: 'EXCLUSIVE RETAIL',
-      };
+      return { title: t.retailTitle, subtitle: t.retailSubtitle, badge: t.retailBadge };
     }
     if (activeTypeTab === 'eatery') {
-      return {
-        title: 'Dining & Cafes',
-        subtitle: 'From authentic Mustang Thakali and stone-oven pizzas to single-origin Himalayan coffee, delight your palate.',
-        badge: 'GOURMET & CASUAL',
-      };
+      return { title: t.eateryTitle, subtitle: t.eaterySubtitle, badge: t.eateryBadge };
     }
     if (activeTypeTab === 'service') {
-      return {
-        title: 'Services & Leisure',
-        subtitle: 'Luxury Ayurvedic spa treatments, state-of-the-art 4K QFX cinema, 4D VR games, and essential mall conveniences.',
-        badge: 'WELLNESS & CINEMA',
-      };
+      return { title: t.serviceTitle, subtitle: t.serviceSubtitle, badge: t.serviceBadge };
     }
-    return {
-      title: 'Shop Directory',
-      subtitle: 'Discover premier brands, specialty boutiques, gourmet eateries, and entertainment hubs in the heart of Chipledhunga, Pokhara.',
-      badge: 'EXPLORE OUTLETS',
-    };
+    return { title: t.allTitle, subtitle: t.allSubtitle, badge: t.allBadge };
   };
 
   const headerInfo = getHeaderInfo();
 
   const breadcrumbs: BreadcrumbItem[] = [
-    { label: 'Shop', href: '/shops/retail' },
+    { label: t.breadcrumb, href: t.breadcrumbUrl },
     { label: headerInfo.title },
   ];
 
-  const hasActiveFilters = searchQuery !== '' || selectedCategory !== 'all' || selectedFloor !== 'All Floors';
+  const hasActiveFilters = searchQuery !== '' || selectedCategory !== 'all' || selectedFloor !== 'all';
 
   return (
     <div className="min-h-screen bg-gray-50/50 flex flex-col" style={{ fontFamily: "'Montserrat', sans-serif" }}>
@@ -370,31 +308,26 @@ export default function ShopTypePage() {
             <div>
               <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-[#801424] uppercase mb-1">
                 <FaGem className="w-3.5 h-3.5" />
-                <span>Featured Brands</span>
+                <span>{t.featuredEyebrow}</span>
               </div>
               <h2
                 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 uppercase tracking-wide"
                 style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
               >
-                Featured Outlets
+                {t.featuredHeading}
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-gray-500 max-w-md">
-              Handpicked standout boutiques, authorized tech centers, and signature destinations at Pokhara Trade Mall.
+              {t.featuredIntro}
             </p>
           </div>
 
           {/* Featured Category Spotlight Pills */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-            {[
-              { id: 'all', label: 'All Featured' },
-              { id: 'fashion', label: 'Fashion & Denim' },
-              { id: 'tech', label: 'Tech & Mobiles' },
-              { id: 'beauty', label: 'Beauty & Spa' },
-              { id: 'jewelry', label: 'Fine Jewelry' },
-              { id: 'dining', label: 'Cafes & Dining' },
-              { id: 'crafts', label: 'Handicrafts' },
-            ].map((cat) => (
+            {categoryOptions
+              .filter((cat) => cat.spotlight)
+              .map((cat) => ({ id: cat.id, label: cat.shortName || cat.name }))
+              .map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setFeaturedSpotlightCategory(cat.id)}
@@ -427,7 +360,7 @@ export default function ShopTypePage() {
                   {/* Store Cover Image */}
                   <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-gray-100">
                     <img
-                      src={store.cover.data.full_url}
+                      src={store.cover?.data?.full_url}
                       alt={store.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
@@ -436,12 +369,12 @@ export default function ShopTypePage() {
                     {/* Floor Location Badge */}
                     <span className="absolute top-3 right-3 text-[11px] font-semibold text-gray-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/80 flex items-center gap-1">
                       <FaMapMarkerAlt className="w-2.5 h-2.5 text-[#801424]" />
-                      {store.floor || 'Pokhara Trade Mall'}
+                      {store.floor || t.featuredFallbackFloor}
                     </span>
 
                     {/* Category Pill on Image */}
                     <span className="absolute bottom-3 left-3 text-[10px] font-bold uppercase tracking-widest text-white bg-[#801424]/90 backdrop-blur-xs px-2.5 py-0.5 rounded-full shadow-xs">
-                      {store.category || store.type.toUpperCase()}
+                      {store.category || store.type?.toUpperCase()}
                     </span>
                   </div>
 
@@ -452,7 +385,7 @@ export default function ShopTypePage() {
                       <div className="flex items-start gap-3 mb-2">
                         <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
                           <img
-                            src={store.logo.data.full_url}
+                            src={store.logo?.data?.full_url}
                             alt={`${store.name} logo`}
                             className="w-full h-full object-cover"
                           />
@@ -505,7 +438,7 @@ export default function ShopTypePage() {
                       <span
                         className="inline-flex items-center gap-1.5 text-xs font-bold text-[#801424] group-hover:translate-x-0.5 transition-all ml-auto"
                       >
-                        <span>Explore</span>
+                        <span>{t.exploreLabel}</span>
                         <FaArrowRight className="w-3 h-3" />
                       </span>
                     </div>
@@ -525,22 +458,15 @@ export default function ShopTypePage() {
               className="text-lg sm:text-xl font-bold text-gray-900 tracking-wide uppercase"
               style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
             >
-              Browse By Category
+              {t.browseHeading}
             </h3>
-            <span className="text-xs text-gray-500 font-medium">Click to filter directory</span>
+            <span className="text-xs text-gray-500 font-medium">{t.browseHint}</span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-            {CATEGORY_OPTIONS.map((cat) => {
+            {categoryOptions.map((cat) => {
               const isSelected = selectedCategory === cat.id;
-              const storeCount =
-                cat.id === 'all'
-                  ? allStores.length
-                  : allStores.filter((s) => {
-                      if (s.categorySlug && cat.slugs.includes(s.categorySlug)) return true;
-                      if (s.category && cat.name.toLowerCase().includes(s.category.toLowerCase())) return true;
-                      return false;
-                    }).length;
+              const storeCount = cat.storeCount;
 
               return (
                 <button
@@ -563,7 +489,7 @@ export default function ShopTypePage() {
                         : 'bg-red-50 text-[#801424] group-hover:bg-white group-hover:text-[#801424]'
                     }`}
                   >
-                    {cat.icon}
+                    <CmsIcon name={cat.icon} className="w-3.5 h-3.5" />
                   </div>
                   <div>
                     <span className="block text-xs font-bold leading-snug line-clamp-1">
@@ -574,7 +500,7 @@ export default function ShopTypePage() {
                         isSelected ? 'text-white/80' : 'text-gray-400'
                       }`}
                     >
-                      {storeCount} Outlets
+                      {fill(t.outletsLabel, { count: storeCount })}
                     </span>
                   </div>
                 </button>
@@ -592,18 +518,21 @@ export default function ShopTypePage() {
             <div>
               <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-[#801424] uppercase mb-1">
                 <FaCompass className="w-3.5 h-3.5" />
-                <span>Mall Directory</span>
+                <span>{t.directoryEyebrow}</span>
               </div>
               <h2
                 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 uppercase tracking-wide"
                 style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
               >
-                Store Directory
+                {t.directoryHeading}
               </h2>
             </div>
             <div className="flex items-center gap-3">
               <span className="text-xs sm:text-sm font-semibold text-gray-600">
-                Showing <span className="text-[#801424] font-bold">{filteredDirectoryStores.length}</span> of {allStores.length} Stores
+                {fillParts(t.showingText, {
+                  shown: <span key="shown" className="text-[#801424] font-bold">{filteredDirectoryStores.length}</span>,
+                  total: allStores.length,
+                })}
               </span>
             </div>
           </div>
@@ -618,7 +547,7 @@ export default function ShopTypePage() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search by store name, brand, category, floor, or tag..."
+                  placeholder={t.searchPlaceholder}
                   className="w-full pl-10 pr-10 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#801424]/20 focus:border-[#801424] transition-all"
                 />
                 {searchQuery && (
@@ -638,7 +567,7 @@ export default function ShopTypePage() {
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="w-full py-2.5 px-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#801424]/20 focus:border-[#801424] text-gray-800 font-medium cursor-pointer"
                 >
-                  {CATEGORY_OPTIONS.map((c) => (
+                  {categoryOptions.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
                     </option>
@@ -653,9 +582,9 @@ export default function ShopTypePage() {
                   onChange={(e) => setSelectedFloor(e.target.value)}
                   className="w-full py-2.5 px-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#801424]/20 focus:border-[#801424] text-gray-800 font-medium cursor-pointer"
                 >
-                  {FLOOR_OPTIONS.map((floor) => (
-                    <option key={floor} value={floor}>
-                      {floor}
+                  {floorOptions.map((floor) => (
+                    <option key={floor.id} value={floor.id}>
+                      {floor.name}
                     </option>
                   ))}
                 </select>
@@ -668,10 +597,10 @@ export default function ShopTypePage() {
                   onChange={(e) => setSortBy(e.target.value as any)}
                   className="w-full py-2.5 px-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#801424]/20 focus:border-[#801424] text-gray-800 font-medium cursor-pointer"
                 >
-                  <option value="featured">Sort: Featured</option>
-                  <option value="name-asc">Name (A-Z)</option>
-                  <option value="name-desc">Name (Z-A)</option>
-                  <option value="floor">By Floor Level</option>
+                  <option value="featured">{t.sortFeatured}</option>
+                  <option value="name-asc">{t.sortNameAsc}</option>
+                  <option value="name-desc">{t.sortNameDesc}</option>
+                  <option value="floor">{t.sortFloor}</option>
                 </select>
               </div>
             </div>
@@ -682,7 +611,7 @@ export default function ShopTypePage() {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-gray-500 font-medium flex items-center gap-1">
                   <FaSlidersH className="w-3 h-3 text-gray-400" />
-                  Filters:
+                  {t.filtersLabel}
                 </span>
 
                 {searchQuery && (
@@ -696,17 +625,17 @@ export default function ShopTypePage() {
 
                 {selectedCategory !== 'all' && (
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 text-[#801424] font-semibold border border-red-200">
-                    <span>Category: {CATEGORY_OPTIONS.find((c) => c.id === selectedCategory)?.name}</span>
+                    <span>Category: {categoryOptions.find((c) => c.id === selectedCategory)?.name || selectedCategory}</span>
                     <button onClick={() => setSelectedCategory('all')} className="hover:text-red-900 cursor-pointer">
                       <FaTimes className="w-2.5 h-2.5" />
                     </button>
                   </span>
                 )}
 
-                {selectedFloor !== 'All Floors' && (
+                {selectedFloor !== 'all' && (
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 text-[#801424] font-semibold border border-red-200">
-                    <span>Floor: {selectedFloor}</span>
-                    <button onClick={() => setSelectedFloor('All Floors')} className="hover:text-red-900 cursor-pointer">
+                    <span>Floor: {floorOptions.find((f) => f.id === selectedFloor)?.name}</span>
+                    <button onClick={() => setSelectedFloor('all')} className="hover:text-red-900 cursor-pointer">
                       <FaTimes className="w-2.5 h-2.5" />
                     </button>
                   </span>
@@ -717,12 +646,12 @@ export default function ShopTypePage() {
                     onClick={handleResetFilters}
                     className="text-[#801424] hover:underline font-bold ml-1 cursor-pointer"
                   >
-                    Clear All
+                    {t.clearAllLabel}
                   </button>
                 )}
 
                 {!hasActiveFilters && (
-                  <span className="text-gray-400 italic">Showing all stores</span>
+                  <span className="text-gray-400 italic">{t.noFiltersText}</span>
                 )}
               </div>
 
@@ -758,7 +687,7 @@ export default function ShopTypePage() {
           {loading ? (
             <div className="py-20 flex flex-col justify-center items-center space-y-4">
               <div className="w-10 h-10 border-4 border-[#801424] border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-gray-500">Loading store directory...</p>
+              <p className="text-sm text-gray-500">{t.loadingText}</p>
             </div>
           ) : filteredDirectoryStores.length === 0 ? (
             /* Empty State */
@@ -770,16 +699,16 @@ export default function ShopTypePage() {
                 className="text-xl font-bold text-gray-900"
                 style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
               >
-                No Outlets Found
+                {t.emptyTitle}
               </h3>
               <p className="text-sm text-gray-500 leading-relaxed">
-                We couldn't find any stores matching your current search or filter combination.
+                {t.emptyText}
               </p>
               <button
                 onClick={handleResetFilters}
                 className="btn-primary text-xs"
               >
-                Reset All Filters
+                {t.emptyButton}
               </button>
             </div>
           ) : viewMode === 'grid' ? (
@@ -800,7 +729,7 @@ export default function ShopTypePage() {
                     {/* Cover Header */}
                     <div className="relative h-48 w-full overflow-hidden bg-gray-100">
                       <img
-                        src={store.cover.data.full_url}
+                        src={store.cover?.data?.full_url}
                         alt={store.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
@@ -809,19 +738,19 @@ export default function ShopTypePage() {
                       {/* Floor Badge */}
                       <span className="absolute top-3 right-3 text-[11px] font-semibold text-gray-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/80 flex items-center gap-1">
                         <FaMapMarkerAlt className="w-2.5 h-2.5 text-[#801424]" />
-                        {store.floor || 'Main Mall'}
+                        {store.floor || t.fallbackFloor}
                       </span>
 
                       {/* Category Pill */}
                       <span className="absolute bottom-3 left-3 text-[10px] font-bold uppercase tracking-widest text-white bg-[#801424]/90 backdrop-blur-xs px-2.5 py-0.5 rounded-full shadow-xs">
-                        {store.category || store.type.toUpperCase()}
+                        {store.category || store.type?.toUpperCase()}
                       </span>
 
                       {/* Featured Checkmark */}
                       {store.featured && (
                         <span className="absolute top-3 left-3 text-[10px] font-bold text-amber-900 bg-amber-100/95 backdrop-blur-md px-2 py-0.5 rounded-full shadow-xs border border-amber-300 flex items-center gap-1">
                           <FaCheckCircle className="w-2.5 h-2.5 text-amber-700" />
-                          Featured
+                          {t.featuredBadge}
                         </span>
                       )}
                     </div>
@@ -833,7 +762,7 @@ export default function ShopTypePage() {
                         <div className="flex items-start gap-3 mb-2">
                           <div className="w-11 h-11 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
                             <img
-                              src={store.logo.data.full_url}
+                              src={store.logo?.data?.full_url}
                               alt={`${store.name} logo`}
                               className="w-full h-full object-cover"
                             />
@@ -885,7 +814,7 @@ export default function ShopTypePage() {
                         ) : (
                           <div className="flex items-center text-[11px] text-gray-500 gap-1">
                             <FaMapMarkerAlt className="w-3 h-3 text-[#801424]" />
-                            <span>Pokhara Trade Mall</span>
+                            <span>{t.fallbackLocation}</span>
                           </div>
                         )}
 
@@ -903,7 +832,7 @@ export default function ShopTypePage() {
                           <span
                             className="inline-flex items-center gap-1.5 text-xs font-bold text-[#801424] group-hover:translate-x-0.5 transition-all"
                           >
-                            <span>Explore</span>
+                            <span>{t.exploreLabel}</span>
                             <FaArrowRight className="w-3 h-3" />
                           </span>
                         </div>
@@ -926,7 +855,7 @@ export default function ShopTypePage() {
                     {/* Logo */}
                     <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
                       <img
-                        src={store.logo.data.full_url}
+                        src={store.logo?.data?.full_url}
                         alt={`${store.name} logo`}
                         className="w-full h-full object-cover"
                       />
@@ -943,7 +872,7 @@ export default function ShopTypePage() {
                         </span>
                         {store.featured && (
                           <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
-                            Featured
+                            {t.featuredBadge}
                           </span>
                         )}
                         <span className="text-[10px] font-bold uppercase tracking-wider text-[#801424] bg-red-50 px-2 py-0.5 rounded-md border border-red-200">
@@ -983,7 +912,7 @@ export default function ShopTypePage() {
                     <span
                       className="btn-primary-sm"
                     >
-                      <span>Details</span>
+                      <span>{t.detailsLabel}</span>
                       <FaArrowRight className="w-2.5 h-2.5" />
                     </span>
                   </div>
@@ -1004,31 +933,29 @@ export default function ShopTypePage() {
           <div className="relative z-10 max-w-3xl space-y-4">
             <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-red-400 uppercase">
               <FaCompass className="w-3.5 h-3.5" />
-              <span>Interactive Navigation</span>
+              <span>{t.mapEyebrow}</span>
             </div>
             <h2
               className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-wide"
               style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
             >
-              Find Any Store in Seconds with Mall Map
+              {t.mapHeading}
             </h2>
             <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-light">
-              Looking for a specific boutique, lift, escalator, or dining terrace? Use our step-by-step interactive floor directory to navigate Pokhara Trade Mall seamlessly across all 6 levels.
+              {t.mapText}
             </p>
             <div className="pt-4 flex flex-wrap items-center gap-4">
-              <Link
-                to="/mall-map"
-                className="btn-primary"
-              >
-                <FaCompass className="w-3.5 h-3.5" />
-                <span>Open Mall Map</span>
-              </Link>
-              <Link
-                to="/contact"
-                className="btn-dark"
-              >
-                <span>Guest Services & Info</span>
-              </Link>
+              {t.mapPrimaryLabel && (
+                <CmsLink href={t.mapPrimaryUrl} className="btn-primary">
+                  <FaCompass className="w-3.5 h-3.5" />
+                  <span>{t.mapPrimaryLabel}</span>
+                </CmsLink>
+              )}
+              {t.mapSecondaryLabel && (
+                <CmsLink href={t.mapSecondaryUrl} className="btn-dark">
+                  <span>{t.mapSecondaryLabel}</span>
+                </CmsLink>
+              )}
             </div>
           </div>
         </section>

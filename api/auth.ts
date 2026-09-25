@@ -39,13 +39,16 @@ export default route(async (req, res) => {
       return res.status(400).json({ error: 'Current password is incorrect' });
     }
     const next = String(b.next || '');
-    if (next.length < 8) return res.status(400).json({ error: 'New password must be at least 8 characters' });
-    if (next === b.current) return res.status(400).json({ error: 'New password must be different from the current one' });
+    const renameOnly = !next && b.username !== undefined && !admin.must_change;
+    if (!renameOnly) {
+      if (next.length < 8) return res.status(400).json({ error: 'New password must be at least 8 characters' });
+      if (next === b.current) return res.status(400).json({ error: 'New password must be different from the current one' });
+    }
     const username = b.username === undefined ? admin.username : String(b.username).trim().toLowerCase();
     if (!/^[a-z0-9._-]{3,32}$/.test(username)) return res.status(400).json({ error: 'Username must be 3–32 characters: letters, numbers, dots, dashes or underscores' });
     const taken = (await sql()`SELECT id FROM admins WHERE username = ${username} AND id <> ${admin.id}`) as { id: number }[];
     if (taken.length) return res.status(400).json({ error: 'That username is already taken' });
-    const hash = await hashPassword(next);
+    const hash = renameOnly ? admin.password_hash : await hashPassword(next);
     const rows = (await sql()`UPDATE admins SET username = ${username}, password_hash = ${hash}, must_change = false, pw_version = pw_version + 1
       WHERE id = ${admin.id} RETURNING pw_version`) as { pw_version: number }[];
     setSession(res, admin.id, rows[0].pw_version);

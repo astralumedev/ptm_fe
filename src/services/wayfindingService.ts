@@ -1,42 +1,49 @@
-import { FloorId, FloorData, WayfindingStore } from '../types/wayfinding';
-import { mockStores } from '../data/mockMallData';
+import { FloorId, FloorData, WayfindingStore, FLOOR_LABELS } from '../types/wayfinding';
+import api from './api';
+import type { Store } from '../data/models/Store';
+import legacyUnits from '../data/storeMapUnits.json';
 
 export interface WayfindingStoresResponse {
   stores: WayfindingStore[];
 }
 
-const STORE_SHUTTER_MAP: Record<string, { floor: FloorId; shutter: string }> = {
-  'levis-store': { floor: 'first_floor', shutter: 'A201' },
-  'fone-decor-tech': { floor: 'ground_floor', shutter: 'A104' },
-  'obsession-cosmetics': { floor: 'first_floor', shutter: 'A212' },
-  'woven-nepali-handicrafts': { floor: 'ground_floor', shutter: 'A115' },
-  'dadybird-fashion': { floor: 'second_floor', shutter: 'A305' },
-  'cube-gaming-tech': { floor: 'ground_floor', shutter: 'A108' },
-  'malabar-gold-diamonds': { floor: 'ground_floor', shutter: 'A101' },
-  'himalayan-outfitters': { floor: 'first_floor', shutter: 'A202' },
-  'himalayan-java-coffee': { floor: 'second_floor', shutter: 'A310' },
-  'mantra-thakali-kitchen': { floor: 'fourth_floor', shutter: 'A501' },
-  'aura-luxury-spa': { floor: 'third_floor', shutter: 'A404' },
-  'machhapuchhre-fashion': { floor: 'second_floor', shutter: 'A308' },
-  'fewa-lakeside-bistro': { floor: 'ground_floor', shutter: 'A118' },
-  'qfx-cinemas': { floor: 'fifth_floor', shutter: 'L501' },
-  '4d-game-zone': { floor: 'fifth_floor', shutter: 'L502' },
-  'miniso-lifestyle': { floor: 'first_floor', shutter: 'A215' },
-  'nabil-bank-ptm': { floor: 'ground_floor', shutter: 'A102' },
-  'global-ime-bank': { floor: 'first_floor', shutter: 'A220' },
-  'kangaroo-education-foundation': { floor: 'third_floor', shutter: 'A402' },
-  'edwise-overseas-education': { floor: 'third_floor', shutter: 'A406' },
-  'apex-architectural-studio': { floor: 'fourth_floor', shutter: 'A508' },
-  'annapurna-survey-consultants': { floor: 'fourth_floor', shutter: 'A510' },
-  'sweet-treats-gelato': { floor: 'ground_floor', shutter: 'A112' },
-  'crispy-crunch-burgers': { floor: 'fourth_floor', shutter: 'A503' },
-  'everest-momo-house': { floor: 'fourth_floor', shutter: 'A506' },
-  'enamor-lingerie-boutique': { floor: 'second_floor', shutter: 'A309' },
-  'solemate-footwear-bags': { floor: 'first_floor', shutter: 'A210' },
-  'home-haven-decor': { floor: 'second_floor', shutter: 'A314' },
-  'vertex-it-solutions': { floor: 'fourth_floor', shutter: 'A512' },
-  'pulse-fitness-gym': { floor: 'fifth_floor', shutter: 'L506' },
-};
+export interface GetStoresOptions {
+  /** Fill units no real store has claimed with the sample stores from stores.json. */
+  includeDemo?: boolean;
+}
+
+type CmsStore = Store & { mapFloor?: string | null; mapUnits?: string[] | string | null };
+
+const LEGACY_UNITS = legacyUnits as Record<string, { floor: string; shutter: string }>;
+const isFloor = (f: unknown): f is FloorId => typeof f === 'string' && f in FLOOR_LABELS;
+
+/** Map placement of a CMS store: its own map fields, else the pre-CMS table, else unplaced. */
+function placement(store: CmsStore): { floor?: FloorId; units: string[] } {
+  const units = (Array.isArray(store.mapUnits) ? store.mapUnits : String(store.mapUnits || '').split(','))
+    .map((u) => String(u).trim())
+    .filter(Boolean);
+  if (isFloor(store.mapFloor)) return { floor: store.mapFloor, units };
+  const legacy = LEGACY_UNITS[store.slug];
+  if (legacy && isFloor(legacy.floor)) return { floor: legacy.floor, units: [legacy.shutter] };
+  return { units: [] };
+}
+
+function toMapStore(store: CmsStore): WayfindingStore {
+  const { floor, units } = placement(store);
+  return {
+    id: store.slug || String(store.id),
+    name: store.name,
+    slug: store.slug,
+    cat: store.categorySlug || store.category || 'shop',
+    desc: store.store_description?.replace(/<[^>]*>/g, '').trim() || store.subtitle || undefined,
+    hours: store.operation_hours || undefined,
+    phone: store.contact_number || undefined,
+    floor,
+    shutters: floor ? units.map((u) => `${floor}:${u}`) : [],
+    logo: store.logo?.data?.full_url,
+    image: store.cover?.data?.full_url,
+  };
+}
 
 class WayfindingService {
   private baseUrl: string;
@@ -46,54 +53,40 @@ class WayfindingService {
     this.baseUrl = envApiUrl ? envApiUrl.replace(/\/$/, '') : '';
   }
 
-  /**
-   * Fetches full store directory combined with rich mockStores data.
-   */
-  async getStores(): Promise<WayfindingStore[]> {
+  private async getDemoStores(): Promise<WayfindingStore[]> {
     try {
-      const endpoint = this.baseUrl
-        ? `${this.baseUrl}/api/stores`
-        : '/wayfinding/data/stores.json';
-      
+      const endpoint = this.baseUrl ? `${this.baseUrl}/api/stores` : '/wayfinding/data/stores.json';
       const response = await fetch(endpoint);
-      let jsonStores: WayfindingStore[] = [];
-      if (response.ok) {
-        const data = await response.json();
-        jsonStores = data.stores || (Array.isArray(data) ? data : []);
-      }
-
-      // Convert mockStores to WayfindingStore format with taxonomy categories
-      const officialStores: WayfindingStore[] = mockStores.map((ms) => {
-        const mapping = STORE_SHUTTER_MAP[ms.slug] || { floor: 'ground_floor', shutter: 'A101' };
-        return {
-          id: ms.slug,
-          name: ms.name,
-          slug: ms.slug,
-          cat: ms.categorySlug || 'shop',
-          desc: (ms.store_description || ms.subtitle) || undefined,
-          hours: ms.operation_hours || '10:00 AM - 8:30 PM',
-          phone: ms.contact_number || '+977 61-520000',
-          floor: mapping.floor,
-          shutters: [`${mapping.floor}:${mapping.shutter}`],
-          logo: ms.logo?.data?.full_url,
-          image: ms.cover?.data?.full_url,
-        };
-      });
-
-      // Filter out duplicate ids from jsonStores and merge
-      const officialIds = new Set(officialStores.map((s) => s.id));
-      const officialSlugs = new Set(officialStores.map((s) => s.slug));
-
-      const merged = [
-        ...officialStores,
-        ...jsonStores.filter((s) => !officialIds.has(s.id) && !officialSlugs.has(s.slug)),
-      ];
-
-      return merged;
+      if (!response.ok) return [];
+      const data = await response.json();
+      const list: WayfindingStore[] = data.stores || (Array.isArray(data) ? data : []);
+      return list.map((s) => ({ ...s, slug: '', floor: s.floor || s.shutters?.[0]?.split(':')[0] })); // demo stores have no store page
     } catch (error) {
-      console.error('WayfindingService: Error loading store directory', error);
+      console.error('WayfindingService: Error loading demo stores', error);
       return [];
     }
+  }
+
+  /**
+   * Map stores: published CMS stores placed by their Map floor/Units. Stores without units are
+   * returned too (searchable, not drawn). Optional demo stores only fill unclaimed units.
+   */
+  async getStores({ includeDemo = true }: GetStoresOptions = {}): Promise<WayfindingStore[]> {
+    let official: WayfindingStore[] = [];
+    try {
+      const res = await api.getStores({ filter: { status: 'published' } });
+      official = (res.data as CmsStore[]).filter((s) => s && s.name).map(toMapStore);
+    } catch (error) {
+      console.error('WayfindingService: Error loading stores', error);
+    }
+    if (!includeDemo) return official;
+
+    const claimed = new Set(official.flatMap((s) => s.shutters || []).map((k) => k.toLowerCase()));
+    const ids = new Set(official.map((s) => s.id));
+    const demo = (await this.getDemoStores()).filter(
+      (s) => !ids.has(s.id) && s.shutters?.length && !s.shutters.some((k) => claimed.has(k.toLowerCase())),
+    );
+    return [...official, ...demo];
   }
 
   /**

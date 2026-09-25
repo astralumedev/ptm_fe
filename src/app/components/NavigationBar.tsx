@@ -4,9 +4,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import styles from './HeaderSection.module.css';
 import MobileMenuToggle from './MobileMenuToggle';
 import MobileNavigationDrawer from './MobileNavigationDrawer';
-import { menuItems } from './navData';
+import { useMenuItems } from './navData';
+import { useSiteNav, useMallHours } from '@/content/blocks/site';
+import { CmsLink } from '@/content/CmsLink';
 
 const NavigationBar: React.FC = () => {
+  const menuItems = useMenuItems();
+  const nav = useSiteNav();
+  const hours = useMallHours();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
@@ -19,8 +24,8 @@ const NavigationBar: React.FC = () => {
             <div className="relative z-20 flex items-center flex-shrink-0">
               <Link to="/" className="flex items-center no-underline hover:no-underline">
                 <img
-                  src="/tm_logo_nobg.png"
-                  alt="Pokhara Trade Mall Logo"
+                  src={nav.logoUrl}
+                  alt={nav.logoAlt}
                   className="w-36 sm:w-40 md:w-44 lg:w-48 h-auto max-h-14 sm:max-h-16 md:max-h-20 object-contain transition-transform hover:scale-105"
                 />
               </Link>
@@ -35,14 +40,14 @@ const NavigationBar: React.FC = () => {
 
                 if (!hasSub) {
                   return (
-                    <Link
+                    <CmsLink
                       key={item.label}
-                      to={item.href || '#'}
+                      href={item.href || '#'}
                       className={`text-gray-800 font-semibold text-sm tracking-widest no-underline hover:no-underline hover:text-red-700 ${styles.navLink} transition-colors whitespace-nowrap`}
                       style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                     >
                       {item.label.toUpperCase()}
-                    </Link>
+                    </CmsLink>
                   );
                 }
 
@@ -90,15 +95,15 @@ const NavigationBar: React.FC = () => {
                               )}
                               <div className="space-y-1 pt-1">
                                 {group.items.map((subItem) => (
-                                  <Link
+                                  <CmsLink
                                     key={subItem.label}
-                                    to={subItem.href}
+                                    href={subItem.href}
                                     onClick={() => setActiveDropdown(null)}
                                     className="block px-3 py-2 text-sm tracking-wider text-gray-700 hover:text-red-700 hover:bg-red-50/80 no-underline hover:no-underline rounded-lg font-medium transition-all"
                                     style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                                   >
                                     {subItem.label}
-                                  </Link>
+                                  </CmsLink>
                                 ))}
                               </div>
                             </div>
@@ -118,15 +123,16 @@ const NavigationBar: React.FC = () => {
                 <svg className="w-3.5 h-3.5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-gray-500 uppercase tracking-widest text-[10px]">TIMINGS:</span>
-                <span className="text-gray-900 font-bold text-xs whitespace-nowrap">10 AM - 8 PM</span>
+                <span className="text-gray-500 uppercase tracking-widest text-[10px]">{hours.pillLabel}</span>
+                <span className="text-gray-900 font-bold text-xs whitespace-nowrap">{hours.shortHours}</span>
 
                 {/* Hover Schedule Popup */}
                 <div className="absolute top-full right-0 mt-2.5 hidden group-hover:block bg-white border border-gray-200 rounded-xl p-3 shadow-2xl text-xs text-gray-800 min-w-[210px] z-50">
-                  <div className="text-[10px] font-bold text-red-700 uppercase tracking-widest pb-1 border-b border-gray-200 mb-2">Mall Operating Hours</div>
+                  <div className="text-[10px] font-bold text-red-700 uppercase tracking-widest pb-1 border-b border-gray-200 mb-2">{hours.popupTitle}</div>
                   <div className="space-y-1 text-gray-600">
-                    <div className="flex justify-between"><span>Weekdays:</span> <span className="font-semibold text-gray-900">10:00 AM - 8:00 PM</span></div>
-                    <div className="flex justify-between"><span>Weekends:</span> <span className="font-semibold text-gray-900">10:00 AM - 10:00 PM</span></div>
+                    {(hours.rows || []).filter((r) => r.inHeader).map((r, i) => (
+                      <div key={i} className="flex justify-between"><span>{r.label}:</span> <span className="font-semibold text-gray-900">{r.hours}</span></div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -134,19 +140,19 @@ const NavigationBar: React.FC = () => {
               <span className="text-gray-300">|</span>
 
               {/* Mall Map Link */}
-              <Link
-                to="/mall-map"
+              <CmsLink
+                href={nav.mapLink}
                 className="flex items-center space-x-1 text-xs font-bold text-gray-900 hover:text-red-700 no-underline hover:no-underline transition-colors whitespace-nowrap group"
               >
                 <svg className="w-3.5 h-3.5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span>MALL MAP</span>
+                <span>{nav.mapLabel}</span>
                 <svg className="w-3 h-3 text-red-600 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>
-              </Link>
+              </CmsLink>
             </div>
 
             {/* Mobile Menu Button */}

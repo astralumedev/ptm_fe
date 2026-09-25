@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { QrCode, X, MapPin, Check } from 'lucide-react';
 import { FloorId, FLOOR_LABELS } from '../../../types/wayfinding';
+import { fill, useFloorTexts, useMapCopy } from './useMapContent';
 import styles from './Wayfinding.module.css';
 
 interface QrSimulationModalProps {
@@ -9,23 +10,17 @@ interface QrSimulationModalProps {
   onSelectEntrance: (floorId: FloorId, locationId: string, name: string) => void;
 }
 
-const PRESET_ENTRANCES: Array<{ floorId: FloorId; locationId: string; name: string }> = [
-  { floorId: 'ground_floor', locationId: 'A101', name: 'Ground Floor Main Entrance (A101)' },
-  { floorId: 'ground_floor', locationId: 'A115', name: 'Ground Floor East Wing Entry (A115)' },
-  { floorId: 'ground_floor', locationId: 'LIFT-U', name: 'Ground Floor North Elevators' },
-  { floorId: 'first_floor', locationId: 'A201', name: 'First Floor North Landing (A201)' },
-  { floorId: 'second_floor', locationId: 'A305', name: 'Second Floor Central Hub (A305)' },
-  { floorId: 'third_floor', locationId: 'A409', name: 'Third Floor Plaza Entrance (A409)' },
-  { floorId: 'fourth_floor', locationId: 'A509', name: 'Fourth Floor Food Court Entry (A509)' },
-  { floorId: 'fifth_floor', locationId: 'L501', name: 'Fifth Floor QFX Cinemas Lobby (L501)' },
-];
-
 export const QrSimulationModal: React.FC<QrSimulationModalProps> = ({
   isOpen,
   onClose,
   onSelectEntrance,
 }) => {
   const [customInput, setCustomInput] = useState('');
+  const copy = useMapCopy();
+  const { names: floorNames } = useFloorTexts();
+  const entrances = (Array.isArray(copy.entrances) ? copy.entrances : []).filter(
+    (e) => e && e.name && e.locationId && e.floorId in FLOOR_LABELS
+  ) as Array<{ floorId: FloorId; locationId: string; name: string }>;
 
   if (!isOpen) return null;
 
@@ -33,11 +28,11 @@ export const QrSimulationModal: React.FC<QrSimulationModalProps> = ({
     e.preventDefault();
     if (!customInput.trim()) return;
     const parts = customInput.split(':');
-    if (parts.length === 2) {
-      onSelectEntrance(parts[0] as FloorId, parts[1], `Custom Point (${parts[1]})`);
+    if (parts.length === 2 && parts[0] in FLOOR_LABELS) {
+      onSelectEntrance(parts[0] as FloorId, parts[1], fill(copy.qrCustomPoint, { id: parts[1] }));
       onClose();
     } else {
-      onSelectEntrance('ground_floor', customInput.trim(), `Point (${customInput.trim()})`);
+      onSelectEntrance('ground_floor', customInput.trim(), fill(copy.qrPoint, { id: customInput.trim() }));
       onClose();
     }
   };
@@ -57,16 +52,16 @@ export const QrSimulationModal: React.FC<QrSimulationModalProps> = ({
             <QrCode size={24} />
           </div>
           <div>
-            <h3 className="text-lg font-extrabold font-arizona-flare">Simulate Entrance QR Scan</h3>
-            <p className="text-xs text-gray-400">Set your current "You Are Here" position</p>
+            <h3 className="text-lg font-extrabold font-arizona-flare">{copy.qrTitle}</h3>
+            <p className="text-xs text-gray-400">{copy.qrSubtitle}</p>
           </div>
         </div>
 
         <div className="mt-4 space-y-2">
           <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block">
-            Select Entrance Preset
+            {copy.qrPresetLabel}
           </label>
-          {PRESET_ENTRANCES.map((entrance, idx) => (
+          {entrances.map((entrance, idx) => (
             <button
               key={idx}
               onClick={() => {
@@ -82,7 +77,7 @@ export const QrSimulationModal: React.FC<QrSimulationModalProps> = ({
                     {entrance.name}
                   </div>
                   <div className="text-xs text-gray-400">
-                    {FLOOR_LABELS[entrance.floorId]} &bull; Shutter {entrance.locationId}
+                    {floorNames[entrance.floorId]} &bull; {copy.qrShutter} {entrance.locationId}
                   </div>
                 </div>
               </div>
@@ -93,18 +88,18 @@ export const QrSimulationModal: React.FC<QrSimulationModalProps> = ({
 
         <form onSubmit={handleCustomSubmit} className="mt-5 pt-4 border-t border-gray-800">
           <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">
-            Or Enter Custom QR Location String
+            {copy.qrCustomLabel}
           </label>
           <div className="flex gap-2">
             <input
               type="text"
-              placeholder="e.g. ground_floor:G-01"
+              placeholder={copy.qrCustomPlaceholder}
               value={customInput}
               onChange={(e) => setCustomInput(e.target.value)}
               className="flex-1 bg-gray-900 border border-gray-800 rounded-xl px-3.5 py-2 text-sm outline-none focus:border-[#b91c1c]"
             />
             <button type="submit" className={styles.btnSecondary}>
-              Apply
+              {copy.qrApply}
             </button>
           </div>
         </form>

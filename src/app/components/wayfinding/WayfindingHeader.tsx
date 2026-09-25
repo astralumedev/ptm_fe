@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, X, MapPin, Store } from 'lucide-react';
-import { WayfindingStore, CATEGORIES, FLOOR_LABELS, FloorId } from '../../../types/wayfinding';
+import { WayfindingStore, FloorId } from '../../../types/wayfinding';
+import { fill, firstUnit, useFloorTexts, useMapCategories, useMapCopy } from './useMapContent';
 import styles from './Wayfinding.module.css';
 
 interface WayfindingHeaderProps {
@@ -8,17 +9,25 @@ interface WayfindingHeaderProps {
   activeCategory: string | null;
   onCategoryChange: (category: string | null) => void;
   onSelectStore: (store: WayfindingStore) => void;
+  /** Pre-filled search text, e.g. from /mall-map?search=… */
+  initialQuery?: string;
 }
+
+const AMENITY_KEYS = ['restroom', 'elevator', 'stairs'];
 
 export const WayfindingHeader: React.FC<WayfindingHeaderProps> = ({
   stores,
   activeCategory,
   onCategoryChange,
   onSelectStore,
+  initialQuery = '',
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const copy = useMapCopy();
+  const { names: floorNames } = useFloorTexts();
+  const categories = useMapCategories();
 
   // Filter search suggestions
   const suggestions = searchQuery.trim()
@@ -26,7 +35,9 @@ export const WayfindingHeader: React.FC<WayfindingHeaderProps> = ({
         .filter((store) => {
           const q = searchQuery.toLowerCase();
           const matchName = store.name.toLowerCase().includes(q);
-          const matchCat = (store.cat || '').toLowerCase().includes(q);
+          const matchCat =
+            (store.cat || '').toLowerCase().includes(q) ||
+            categories.info(store.cat).label.toLowerCase().includes(q);
           const matchShutter = store.shutters?.some((s) => s.toLowerCase().includes(q));
           return matchName || matchCat || matchShutter;
         })
@@ -49,35 +60,6 @@ export const WayfindingHeader: React.FC<WayfindingHeaderProps> = ({
     onSelectStore(store);
   };
 
-  // Distinct category keys for dropdown
-  const categoryKeys = [
-    'womens-fashion',
-    'mens-fashion',
-    'kids',
-    'lingerie',
-    'footwear-bags',
-    'jewelry-watches',
-    'beauty-fragrance',
-    'electronics',
-    'home-living',
-    'handicrafts',
-    'thakali',
-    'restaurant',
-    'cafe',
-    'fast-food',
-    'cinema',
-    'gaming',
-    'beauty-wellness',
-    'finance',
-    'education',
-    'it-tech',
-    'health-fitness',
-    'professional',
-    'restroom',
-    'elevator',
-    'stairs',
-  ];
-
   return (
     <div className={styles.headerControlsBar}>
       {/* Search Input Box */}
@@ -86,7 +68,7 @@ export const WayfindingHeader: React.FC<WayfindingHeaderProps> = ({
         <input
           type="text"
           className={styles.searchInput}
-          placeholder="Search stores, brands, eateries, services, shutter..."
+          placeholder={copy.searchPlaceholder}
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
@@ -111,11 +93,8 @@ export const WayfindingHeader: React.FC<WayfindingHeaderProps> = ({
         {isPopoverOpen && suggestions.length > 0 && (
           <div className={styles.suggestionsPopover}>
             {suggestions.map((store) => {
-              const catInfo = CATEGORIES[store.cat] || CATEGORIES.service;
-              const shutterLabel =
-                store.shutters && store.shutters[0]
-                  ? store.shutters[0].split(':')[1] || store.id
-                  : store.id;
+              const catInfo = categories.info(store.cat);
+              const unit = firstUnit(store.shutters);
 
               return (
                 <div
@@ -140,11 +119,15 @@ export const WayfindingHeader: React.FC<WayfindingHeaderProps> = ({
                     <div className={styles.suggestionName}>{store.name}</div>
                     <div className={styles.suggestionFloor}>
                       <MapPin size={10} className="inline mr-1 text-[#801424]" />
-                      {store.floor
-                        ? FLOOR_LABELS[store.floor as FloorId] || store.floor
-                        : 'Ground Floor'}
-                      <span className="mx-1.5 opacity-40">&bull;</span>
-                      <span className={styles.suggestionShutter}>Unit {shutterLabel}</span>
+                      {unit && store.floor ? (
+                        <>
+                          {floorNames[store.floor as FloorId] || store.floor}
+                          <span className="mx-1.5 opacity-40">&bull;</span>
+                          <span className={styles.suggestionShutter}>{fill(copy.unitLabel, { unit })}</span>
+                        </>
+                      ) : (
+                        <span className={styles.suggestionShutter}>{copy.notPlaced}</span>
+                      )}
                     </div>
                   </div>
 
@@ -168,16 +151,17 @@ export const WayfindingHeader: React.FC<WayfindingHeaderProps> = ({
           value={activeCategory || ''}
           onChange={(e) => onCategoryChange(e.target.value || null)}
         >
-          <option value="">All Categories ({categoryKeys.length})</option>
-          {categoryKeys.map((key) => {
-            const cat = CATEGORIES[key];
-            if (!cat) return null;
-            return (
-              <option key={key} value={key}>
-                {cat.label}
-              </option>
-            );
-          })}
+          <option value="">{fill(copy.allCategories, { count: categories.visible.length })}</option>
+          {categories.visible.map((cat) => (
+            <option key={cat.slug} value={cat.slug}>
+              {cat.shortName || cat.name}
+            </option>
+          ))}
+          {AMENITY_KEYS.map((key) => (
+            <option key={key} value={key}>
+              {categories.info(key).label}
+            </option>
+          ))}
         </select>
       </div>
     </div>

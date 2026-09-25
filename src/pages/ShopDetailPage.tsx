@@ -6,10 +6,19 @@ import PageHeader from '../app/components/PageHeader';
 import Footer from '../app/components/Footer';
 import api from '../services/api';
 import { Store } from '../data/models/Store';
+import { useBlock } from '../content/block';
+import { storePageBlock, fill } from '../content/blocks/directory';
+
+/** Store records may carry mall-map placement (added by the CMS); read it defensively. */
+type StoreWithMap = Store & { mapFloor?: string | null; mapUnits?: string[] | null };
+
+/** Adds https:// to links typed without it, so "www.brand.com" still works. */
+const withProtocol = (url: string) => (/^[a-z][a-z0-9+.-]*:/i.test(url) ? url : `https://${url}`);
 
 export default function ShopDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const t = useBlock(storePageBlock);
   const [shop, setShop] = useState<Store | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,15 +28,16 @@ export default function ShopDetailPage() {
       try {
         setLoading(true);
         if (!slug) return;
-        const response = await api.getStores({ filter: { slug } });
+        const response = await api.getStores({ filter: { slug, status: 'published' } });
         if (response.data && response.data.length > 0) {
           setShop(response.data[0]);
         } else {
-          setError('Store not found');
+          setError(null);
+          setShop(null);
         }
       } catch (err) {
         console.error('Error loading store details:', err);
-        setError('Failed to load store');
+        setError('failed');
       } finally {
         setLoading(false);
       }
@@ -42,7 +52,7 @@ export default function ShopDetailPage() {
         <NavigationBar />
         <div className="flex flex-col items-center justify-center py-32 space-y-4">
           <div className="w-10 h-10 border-4 border-[#801424] border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm font-semibold text-gray-500">Loading store profile...</p>
+          <p className="text-sm font-semibold text-gray-500">{t.loadingText}</p>
         </div>
         <Footer />
       </div>
@@ -57,16 +67,16 @@ export default function ShopDetailPage() {
           <div className="w-14 h-14 bg-red-50 text-[#801424] rounded-full flex items-center justify-center mx-auto text-2xl">
             <FaStore />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 font-arizona-flare">{error || 'Store Not Found'}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 font-arizona-flare">{t.notFoundTitle}</h2>
           <p className="text-xs text-gray-500">
-            We couldn't find the store or boutique you were searching for.
+            {t.notFoundText}
           </p>
           <div className="pt-2 flex justify-center gap-3">
-            <button onClick={() => navigate('/shops/directory')} className="btn-primary text-xs">
-              Explore Directory
+            <button onClick={() => navigate(t.directoryUrl || '/shops/directory')} className="btn-primary text-xs">
+              {t.notFoundPrimary}
             </button>
             <button onClick={() => navigate('/')} className="btn-secondary text-xs">
-              Go Home
+              {t.notFoundSecondary}
             </button>
           </div>
         </div>
@@ -75,16 +85,30 @@ export default function ShopDetailPage() {
     );
   }
 
+  const mapUnits = (shop as StoreWithMap).mapUnits || [];
+  const onMap = mapUnits.length > 0 || Boolean((shop as StoreWithMap).mapFloor);
+  const mapHref = onMap ? `/mall-map?store=${encodeURIComponent(shop.slug)}` : `/mall-map?search=${encodeURIComponent(shop.name)}`;
+  const hours = shop.operation_hours || t.hoursFallback;
+  const phone = shop.contact_number || t.phoneFallback;
+  const gallery = (shop.store_gallery || []).filter((g) => g?.directus_files_id?.data?.full_url);
+  const tags = (shop.tags || []).filter(Boolean);
+  const socials = [
+    { url: shop.website, icon: FaGlobe, label: 'Website' },
+    { url: shop.facebook, icon: FaFacebook, label: 'Facebook' },
+    { url: shop.instagram, icon: FaInstagram, label: 'Instagram' },
+    { url: shop.tiktok, icon: FaTiktok, label: 'TikTok' },
+  ].filter((s): s is { url: string; icon: typeof FaGlobe; label: string } => Boolean(s.url && s.url.trim()));
+
   return (
     <div className="min-h-screen font-montserrat bg-neutral-50/50 text-gray-900">
       <NavigationBar />
 
       <PageHeader
         title={shop.name}
-        subtitle={shop.subtitle || `Explore ${shop.name} at Pokhara Trade Mall`}
-        badge={shop.type?.toUpperCase() || 'RETAIL OUTLET'}
+        subtitle={shop.subtitle || fill(t.subtitleFallback, { name: shop.name })}
+        badge={shop.type?.toUpperCase() || t.badgeFallback}
         breadcrumbs={[
-          { label: 'Directory', href: '/shops/directory' },
+          { label: t.breadcrumb, href: t.directoryUrl },
           { label: shop.name }
         ]}
       />
@@ -94,11 +118,11 @@ export default function ShopDetailPage() {
         {/* Back Link */}
         <div className="mb-8">
           <Link
-            to="/shops/directory"
+            to={t.directoryUrl || '/shops/directory'}
             className="btn-link"
           >
             <FaArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Store Directory</span>
+            <span>{t.backLabel}</span>
           </Link>
         </div>
 
@@ -121,61 +145,55 @@ export default function ShopDetailPage() {
                   )}
                 </div>
 
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 border border-red-200 text-[#801424] text-xs font-bold">
-                  <FaMapMarkerAlt className="w-3.5 h-3.5" />
-                  <span>Floor: {shop.floor || 'Level 1'}</span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 border border-red-200 text-[#801424] text-xs font-bold">
+                    <FaMapMarkerAlt className="w-3.5 h-3.5" />
+                    <span>{fill(t.floorLabel, { floor: shop.floor || t.floorFallback })}</span>
+                  </div>
+                  {shop.unitNumber && t.unitLabel && (
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold">
+                      <span>{fill(t.unitLabel, { unit: shop.unitNumber })}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Description */}
               <div className="prose prose-sm max-w-none text-gray-600 leading-relaxed">
-                <div dangerouslySetInnerHTML={{ __html: shop.store_description || 'Welcome to ' + shop.name + ' at Pokhara Trade Mall.' }} />
+                <div dangerouslySetInnerHTML={{ __html: shop.store_description || fill(t.descriptionFallback, { name: shop.name }) }} />
               </div>
 
+              {/* Tags */}
+              {tags.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2">
+                  {t.tagsHeading && <span className="text-xs font-bold uppercase tracking-wider text-gray-400 mr-2">{t.tagsHeading}</span>}
+                  {tags.map((tag, i) => (
+                    <span key={i} className="text-[11px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-medium">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               {/* Social Channels */}
-              <div className="pt-4 border-t border-gray-100 flex flex-wrap items-center gap-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400 mr-2">Connect:</span>
-                {shop.website && (
-                  <a
-                    href={shop.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-700 hover:text-[#801424] hover:bg-red-50 transition-colors"
-                  >
-                    <FaGlobe className="w-4 h-4" />
-                  </a>
-                )}
-                {shop.facebook && (
-                  <a
-                    href={shop.facebook}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-700 hover:text-[#801424] hover:bg-red-50 transition-colors"
-                  >
-                    <FaFacebook className="w-4 h-4" />
-                  </a>
-                )}
-                {shop.instagram && (
-                  <a
-                    href={shop.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-700 hover:text-[#801424] hover:bg-red-50 transition-colors"
-                  >
-                    <FaInstagram className="w-4 h-4" />
-                  </a>
-                )}
-                {shop.tiktok && (
-                  <a
-                    href={shop.tiktok}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-700 hover:text-[#801424] hover:bg-red-50 transition-colors"
-                  >
-                    <FaTiktok className="w-4 h-4" />
-                  </a>
-                )}
-              </div>
+              {socials.length > 0 && (
+                <div className="pt-4 border-t border-gray-100 flex flex-wrap items-center gap-3">
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-400 mr-2">{t.connectLabel}</span>
+                  {socials.map(({ url, icon: Icon, label }) => (
+                    <a
+                      key={label}
+                      href={withProtocol(url.trim())}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${shop.name} ${label}`}
+                      title={label}
+                      className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-700 hover:text-[#801424] hover:bg-red-50 transition-colors"
+                    >
+                      <Icon className="w-4 h-4" />
+                    </a>
+                  ))}
+                </div>
+              )}
 
             </div>
 
@@ -186,19 +204,25 @@ export default function ShopDetailPage() {
               </h3>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-xs">
-                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-1">
-                  <span className="font-semibold text-gray-500 uppercase tracking-wider block">Hours</span>
-                  <p className="font-bold text-gray-800">
-                    {shop.operation_hours || '10:00 AM – 8:00 PM'}
-                  </p>
-                </div>
+                {hours && (
+                  <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-1">
+                    <span className="font-semibold text-gray-500 uppercase tracking-wider block">{t.hoursLabel}</span>
+                    {hours.split(';').map((line, i) => (
+                      <p key={i} className="font-bold text-gray-800">
+                        {line.trim()}
+                      </p>
+                    ))}
+                  </div>
+                )}
 
-                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-1">
-                  <span className="font-semibold text-gray-500 uppercase tracking-wider block">Direct Phone</span>
-                  <p className="font-bold text-[#801424]">
-                    {shop.contact_number || '+977 61-520000'}
-                  </p>
-                </div>
+                {phone && (
+                  <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-1">
+                    <span className="font-semibold text-gray-500 uppercase tracking-wider block">{t.phoneLabel}</span>
+                    <p className="font-bold text-[#801424]">
+                      {phone}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {shop.contact_number && (
@@ -208,7 +232,21 @@ export default function ShopDetailPage() {
                     className="btn-primary w-full"
                   >
                     <FaPhoneAlt className="w-3.5 h-3.5" />
-                    <span>Call Store Directly</span>
+                    <span>{t.callLabel}</span>
+                  </a>
+                </div>
+              )}
+
+              {shop.website && shop.website.trim() && t.websiteLabel && (
+                <div className={shop.contact_number ? '' : 'pt-2'}>
+                  <a
+                    href={withProtocol(shop.website.trim())}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-secondary w-full"
+                  >
+                    <FaGlobe className="w-3.5 h-3.5" />
+                    <span>{t.websiteLabel}</span>
                   </a>
                 </div>
               )}
@@ -229,13 +267,13 @@ export default function ShopDetailPage() {
             </div>
 
             {/* Gallery Grid if available */}
-            {shop.store_gallery && shop.store_gallery.length > 0 && (
+            {gallery.length > 0 && (
               <div className="bg-white p-6 rounded-3xl border border-gray-200/80 shadow-xs space-y-4">
                 <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
-                  Store Gallery
+                  {t.galleryHeading}
                 </h4>
                 <div className="grid grid-cols-2 gap-3">
-                  {shop.store_gallery.slice(0, 4).map((image, index) => (
+                  {gallery.map((image, index) => (
                     <div
                       key={index}
                       className="rounded-xl overflow-hidden aspect-square bg-gray-100 border border-gray-200"
@@ -253,16 +291,16 @@ export default function ShopDetailPage() {
 
             {/* Wayfinding Card */}
             <div className="bg-gradient-to-br from-gray-900 to-gray-950 text-white p-8 rounded-3xl shadow-xl space-y-4">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-red-400">Navigation</span>
-              <h3 className="text-xl font-bold font-arizona-flare">Find in Mall Map</h3>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-red-400">{t.mapEyebrow}</span>
+              <h3 className="text-xl font-bold font-arizona-flare">{t.mapHeading}</h3>
               <p className="text-xs text-gray-300 leading-relaxed">
-                Locate {shop.name} with step-by-step turn guidance, escalators, and nearest parking lifts.
+                {fill(t.mapText, { name: shop.name })}
               </p>
               <Link
-                to={`/mall-map?search=${encodeURIComponent(shop.name)}`}
+                to={mapHref}
                 className="btn-white w-full"
               >
-                <span>Navigate on Interactive Map</span>
+                <span>{t.mapButton}</span>
               </Link>
             </div>
 

@@ -49,18 +49,30 @@ export interface MediaRecord {
   created_at: string;
 }
 
+export interface Submission {
+  id: number;
+  kind: 'contact' | 'rsvp' | 'leasing' | string;
+  data: Record<string, string>;
+  read: boolean;
+  created_at: string;
+}
+
 export const adminApi = {
   me: () => request<{ admin: AdminUser | null }>('/api/auth'),
   login: (username: string, password: string) =>
     request<{ admin: AdminUser }>('/api/auth', { method: 'POST', json: { action: 'login', username, password } }),
   logout: () => request('/api/auth', { method: 'POST', json: { action: 'logout' } }),
-  changePassword: (current: string, next: string) =>
-    request<{ admin: AdminUser }>('/api/auth', { method: 'POST', json: { action: 'password', current, next } }),
+  changePassword: (current: string, next: string, username?: string) =>
+    request<{ admin: AdminUser }>('/api/auth', { method: 'POST', json: { action: 'password', current, next, username } }),
 
   setupStatus: () => request<{ ready: boolean }>('/api/admin/setup'),
-  runSetup: () => request<{ createdAdmin: boolean; seeded: number }>('/api/admin/setup', { method: 'POST' }),
+  runSetup: () => request<{ createdAdmin: boolean; seeded: number; migrated: number }>('/api/admin/setup', { method: 'POST' }),
 
-  counts: () => request<{ counts: { collection: string; status: string; n: number }[] }>('/api/admin/items?collection=counts'),
+  counts: () => request<{ counts: { collection: string; status: string; n: number }[]; unread: number }>('/api/admin/items?collection=counts'),
+  reorder: (collection: string, ids: number[]) => request('/api/admin/items', { method: 'POST', json: { action: 'reorder', collection, ids } }),
+  submissions: () => request<{ items: Submission[] }>('/api/admin/items?collection=submissions'),
+  markSubmission: (id: number, read: boolean) => request(`/api/admin/items?collection=submissions&id=${id}`, { method: 'PATCH', json: { read } }),
+  removeSubmission: (id: number) => request(`/api/admin/items?collection=submissions&id=${id}`, { method: 'DELETE' }),
   list: (collection: string) => request<{ items: ItemRow[] }>(`/api/admin/items?collection=${collection}`),
   save: (collection: string, row: { id?: number; slug: string; status: string; data: Record<string, unknown> }) =>
     request<{ item: ItemRow }>('/api/admin/items', { method: 'POST', json: { collection, ...row } }),

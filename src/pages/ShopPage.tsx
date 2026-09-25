@@ -1,50 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  FaMapMarkerAlt,
-  FaClock,
-  FaArrowRight,
-  FaFemale,
-  FaTshirt,
-  FaChild,
-  FaHeart,
-  FaShoppingBag,
-  FaGem,
-  FaSpa,
-  FaLaptop,
-  FaCouch,
-  FaGift,
-  FaSearch,
-  FaCompass,
-} from 'react-icons/fa';
+import { FaMapMarkerAlt, FaClock, FaArrowRight, FaShoppingBag, FaGem, FaSearch, FaCompass } from 'react-icons/fa';
 import NavigationBar from '../app/components/NavigationBar';
 import PageHeader from '../app/components/PageHeader';
 import Footer from '../app/components/Footer';
 import api from '../services/api';
 import { Store } from '../data/models/Store';
-
-interface ShopCategoryItem {
-  id: string;
-  name: string;
-  categorySlug: string;
-  subtitle: string;
-  icon: React.ReactNode;
-  storeCount: number;
-}
+import { useBlock } from '../content/block';
+import { useCategories } from '../content/blocks/categories';
+import { shopPageBlock, inCategory, fill } from '../content/blocks/directory';
+import { CmsIcon } from '../content/icons';
+import { CmsLink } from '../content/CmsLink';
 
 export default function ShopPage() {
-  const [featuredStores, setFeaturedStores] = useState<Store[]>([]);
+  const t = useBlock(shopPageBlock);
+  const { bySector, find } = useCategories();
+  const [retailStores, setRetailStores] = useState<Store[]>([]);
   const [loading, setLoading] = useState(true);
+  const featuredStores = useMemo(() => retailStores.filter((s) => Boolean(s.featured)), [retailStores]);
 
   useEffect(() => {
     const fetchStores = async () => {
       try {
         setLoading(true);
         const response = await api.getStores({
-          filter: { status: 'published', type: 'retail', featured: true },
+          filter: { status: 'published', type: 'retail' },
         });
-        setFeaturedStores(response.data || []);
+        setRetailStores(response.data || []);
       } catch (err) {
         console.error('Error fetching featured shop stores:', err);
       } finally {
@@ -55,88 +38,13 @@ export default function ShopPage() {
     fetchStores();
   }, []);
 
-  const retailCategories: ShopCategoryItem[] = [
-    {
-      id: 'womens-fashion',
-      name: "Women's Fashion",
-      categorySlug: 'womens-fashion',
-      subtitle: 'Ethnic & Western Couture',
-      icon: <FaFemale className="w-5 h-5" />,
-      storeCount: 14,
-    },
-    {
-      id: 'mens-fashion',
-      name: "Men's Fashion & Denim",
-      categorySlug: 'mens-fashion',
-      subtitle: 'Formal, Casual & Denim',
-      icon: <FaTshirt className="w-5 h-5" />,
-      storeCount: 12,
-    },
-    {
-      id: 'kids',
-      name: 'Kids & Baby Wear',
-      categorySlug: 'kids',
-      subtitle: 'Playwear & Nursery Kits',
-      icon: <FaChild className="w-5 h-5" />,
-      storeCount: 8,
-    },
-    {
-      id: 'lingerie',
-      name: 'Lingerie & Nightwear',
-      categorySlug: 'lingerie',
-      subtitle: 'Intimate & Loungewear',
-      icon: <FaHeart className="w-5 h-5" />,
-      storeCount: 5,
-    },
-    {
-      id: 'footwear-bags',
-      name: 'Footwear & Luggage',
-      categorySlug: 'footwear-bags',
-      subtitle: 'Shoes, Sneakers & Bags',
-      icon: <FaShoppingBag className="w-5 h-5" />,
-      storeCount: 9,
-    },
-    {
-      id: 'jewelry-watches',
-      name: 'Jewelry & Watches',
-      categorySlug: 'jewelry-watches',
-      subtitle: 'Fine Gold & Luxury Watches',
-      icon: <FaGem className="w-5 h-5" />,
-      storeCount: 6,
-    },
-    {
-      id: 'beauty-fragrance',
-      name: 'Beauty & Fragrance',
-      categorySlug: 'beauty-fragrance',
-      subtitle: 'Cosmetics & K-Beauty',
-      icon: <FaSpa className="w-5 h-5" />,
-      storeCount: 10,
-    },
-    {
-      id: 'electronics',
-      name: 'Tech & Electronics',
-      categorySlug: 'electronics',
-      subtitle: 'Mobiles, PC Rigs & Gadgets',
-      icon: <FaLaptop className="w-5 h-5" />,
-      storeCount: 8,
-    },
-    {
-      id: 'home-living',
-      name: 'Home & Living',
-      categorySlug: 'home-living',
-      subtitle: 'Decor, Bedding & Lifestyle',
-      icon: <FaCouch className="w-5 h-5" />,
-      storeCount: 7,
-    },
-    {
-      id: 'handicrafts',
-      name: 'Nepali Handicrafts',
-      categorySlug: 'handicrafts',
-      subtitle: 'Pashmina & Souvenirs',
-      icon: <FaGift className="w-5 h-5" />,
-      storeCount: 6,
-    },
-  ];
+  const retailCategories = useMemo(
+    () =>
+      bySector('retail')
+        .map((cat) => ({ cat, storeCount: retailStores.filter((st) => inCategory(st, cat, find)).length }))
+        .filter((c) => c.storeCount > 0),
+    [bySector, retailStores, find]
+  );
 
   return (
     <div className="min-h-screen bg-gray-50/50 flex flex-col" style={{ fontFamily: "'Montserrat', sans-serif" }}>
@@ -145,11 +53,11 @@ export default function ShopPage() {
 
       {/* Hero Header */}
       <PageHeader
-        title="Shop & Boutiques"
-        subtitle="Pokhara Trade Mall is your one-stop retail hub for leading international fashion brands, certified tech centers, fine jewelry, beauty, and local Himalayan artisan crafts."
-        badge="PREMIER SHOPPING DESTINATION"
+        title={t.title}
+        subtitle={t.subtitle}
+        badge={t.badge}
         breadcrumbs={[
-          { label: 'Shop' },
+          { label: t.breadcrumb },
         ]}
       />
 
@@ -164,28 +72,30 @@ export default function ShopPage() {
             <div>
               <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-[#801424] uppercase mb-1">
                 <FaGem className="w-3.5 h-3.5" />
-                <span>Curated Highlights</span>
+                <span>{t.featuredEyebrow}</span>
               </div>
               <h2
                 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 uppercase tracking-wide"
                 style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
               >
-                Featured Brands & Boutiques
+                {t.featuredHeading}
               </h2>
             </div>
-            <Link
-              to="/shops/directory"
+            <CmsLink
+              href={t.featuredLinkUrl}
               className="inline-flex items-center gap-2 text-sm font-bold text-[#801424] hover:text-[#5a0c18] transition-colors group no-underline"
             >
-              <span>View All Directory Outlets</span>
+              <span>{t.featuredLinkLabel}</span>
               <FaArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </Link>
+            </CmsLink>
           </div>
 
           {loading ? (
             <div className="py-16 flex justify-center items-center">
               <div className="w-10 h-10 border-4 border-[#801424] border-t-transparent rounded-full animate-spin" />
             </div>
+          ) : featuredStores.length === 0 ? (
+            t.featuredEmpty ? <p className="text-sm text-gray-500 text-center py-8">{t.featuredEmpty}</p> : null
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {featuredStores.slice(0, 8).map((store, index) => (
@@ -204,7 +114,7 @@ export default function ShopPage() {
                     {/* Image Cover */}
                     <div className="relative h-48 w-full overflow-hidden bg-gray-100">
                       <img
-                        src={store.cover.data.full_url}
+                        src={store.cover?.data?.full_url}
                         alt={store.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
@@ -213,7 +123,7 @@ export default function ShopPage() {
                       {/* Floor Badge */}
                       <span className="absolute top-3 right-3 text-[10px] font-semibold text-gray-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/80 flex items-center gap-1">
                         <FaMapMarkerAlt className="w-2.5 h-2.5 text-[#801424]" />
-                        {store.floor || '1st Floor'}
+                        {store.floor || t.fallbackFloor}
                       </span>
 
                       {/* Category Pill */}
@@ -229,7 +139,7 @@ export default function ShopPage() {
                         <div className="flex items-start gap-3 mb-2">
                           <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
                             <img
-                              src={store.logo.data.full_url}
+                              src={store.logo?.data?.full_url}
                               alt={`${store.name} logo`}
                               className="w-full h-full object-cover"
                             />
@@ -266,7 +176,7 @@ export default function ShopPage() {
                         <span
                           className="inline-flex items-center gap-1.5 text-xs font-bold text-[#801424] group-hover:translate-x-0.5 transition-all ml-auto"
                         >
-                          <span>Explore</span>
+                          <span>{t.exploreLabel}</span>
                           <FaArrowRight className="w-3 h-3" />
                         </span>
                       </div>
@@ -285,13 +195,13 @@ export default function ShopPage() {
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-[#801424] uppercase">
               <FaShoppingBag className="w-3.5 h-3.5" />
-              <span>Explore by Category</span>
+              <span>{t.categoriesEyebrow}</span>
             </div>
             <h2
               className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 uppercase tracking-wide"
               style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
             >
-              Shop by Category
+              {t.categoriesHeading}
             </h2>
             <div className="flex items-center justify-center gap-2 my-2.5">
               <div className="w-8 h-0.5 bg-[#801424] rounded-full" />
@@ -299,14 +209,14 @@ export default function ShopPage() {
               <div className="w-8 h-0.5 bg-[#801424] rounded-full" />
             </div>
             <p className="text-sm text-gray-600 leading-relaxed font-light">
-              Select any category below to browse retail stores, specialty boutiques, and tech outlets in our directory.
+              {t.categoriesIntro}
             </p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-5">
-            {retailCategories.map((cat, index) => (
+            {retailCategories.map(({ cat, storeCount }, index) => (
               <motion.div
-                key={cat.id}
+                key={cat.slug}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -314,13 +224,13 @@ export default function ShopPage() {
                 className="h-full"
               >
                 <Link
-                  to={`/shops/directory?category=${cat.categorySlug}`}
+                  to={`/shops/directory?category=${encodeURIComponent(cat.slug)}`}
                   className="group bg-white rounded-2xl border border-gray-200/90 hover:border-[#801424]/40 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-5 sm:p-6 flex flex-col items-center text-center justify-between h-full no-underline cursor-pointer"
                 >
                   <div className="flex flex-col items-center w-full">
                     {/* Icon Container */}
                     <div className="w-14 h-14 rounded-2xl bg-red-50 text-[#801424] group-hover:bg-[#801424] group-hover:text-white transition-all duration-300 flex items-center justify-center text-xl mb-3.5 shadow-xs group-hover:shadow-md group-hover:scale-105">
-                      {cat.icon}
+                      <CmsIcon name={cat.icon} className="w-5 h-5" />
                     </div>
 
                     {/* Category Name */}
@@ -328,7 +238,7 @@ export default function ShopPage() {
                       className="text-sm sm:text-base font-bold text-gray-900 group-hover:text-[#801424] transition-colors leading-tight mb-1"
                       style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                     >
-                      {cat.name}
+                      {cat.shortName || cat.name}
                     </h3>
 
                     {/* Subtitle */}
@@ -340,7 +250,7 @@ export default function ShopPage() {
                   {/* Outlets Count Badge & Arrow */}
                   <div className="pt-3 mt-3 border-t border-gray-100 w-full flex items-center justify-between text-[11px] font-semibold text-gray-500 group-hover:text-[#801424] transition-colors">
                     <span className="bg-gray-50 group-hover:bg-red-50 px-2 py-0.5 rounded-md transition-colors">
-                      {cat.storeCount} Outlets
+                      {fill(t.outletsLabel, { count: storeCount })}
                     </span>
                     <FaArrowRight className="w-2.5 h-2.5 group-hover:translate-x-1 transition-transform text-[#801424]" />
                   </div>
@@ -359,34 +269,32 @@ export default function ShopPage() {
           <div className="relative z-10 lg:col-span-8 space-y-4">
             <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-red-400 uppercase">
               <FaSearch className="w-3.5 h-3.5" />
-              <span>Full Store Directory</span>
+              <span>{t.bannerEyebrow}</span>
             </div>
             <h2
               className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight"
               style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
             >
-              Looking for a Specific Brand, Shutter or Floor?
+              {t.bannerHeading}
             </h2>
             <p className="text-sm sm:text-base text-gray-300 font-light leading-relaxed max-w-2xl">
-              Access the complete, searchable directory with real-time keyword search, category filters, floor-by-floor listings, and interactive map links.
+              {t.bannerText}
             </p>
           </div>
 
           <div className="relative z-10 lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 justify-center">
-            <Link
-              to="/shops/directory"
-              className="btn-primary"
-            >
-              <FaSearch className="w-3.5 h-3.5" />
-              <span>Open Store Directory</span>
-            </Link>
-            <Link
-              to="/mall-map"
-              className="btn-dark"
-            >
-              <FaCompass className="w-3.5 h-3.5 text-red-400" />
-              <span>Interactive Mall Map</span>
-            </Link>
+            {t.bannerPrimaryLabel && (
+              <CmsLink href={t.bannerPrimaryUrl} className="btn-primary">
+                <FaSearch className="w-3.5 h-3.5" />
+                <span>{t.bannerPrimaryLabel}</span>
+              </CmsLink>
+            )}
+            {t.bannerSecondaryLabel && (
+              <CmsLink href={t.bannerSecondaryUrl} className="btn-dark">
+                <FaCompass className="w-3.5 h-3.5 text-red-400" />
+                <span>{t.bannerSecondaryLabel}</span>
+              </CmsLink>
+            )}
           </div>
         </section>
 

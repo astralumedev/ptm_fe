@@ -3,9 +3,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   FaUtensils,
-  FaCoffee,
-  FaPizzaSlice,
-  FaHamburger,
   FaMapMarkerAlt,
   FaClock,
   FaPhoneAlt,
@@ -18,19 +15,17 @@ import PageHeader from '../app/components/PageHeader';
 import Footer from '../app/components/Footer';
 import api from '../services/api';
 import { Store } from '../data/models/Store';
-
-const DINE_CATEGORIES = [
-  { id: 'all', name: 'All Dining', icon: <FaUtensils className="w-3.5 h-3.5" /> },
-  { id: 'thakali', name: 'Nepali & Thakali', icon: <FaUtensils className="w-3.5 h-3.5" /> },
-  { id: 'restaurant', name: 'Restaurants & Multi-Cuisine', icon: <FaPizzaSlice className="w-3.5 h-3.5" /> },
-  { id: 'cafe', name: 'Artisan Cafés & Bakeries', icon: <FaCoffee className="w-3.5 h-3.5" /> },
-  { id: 'fast-food', name: 'Fast Food & Quick Bites', icon: <FaHamburger className="w-3.5 h-3.5" /> },
-];
-
-const INITIAL_PAGE_SIZE = 6;
-const PAGE_SIZE_INCREMENT = 4;
+import { useBlock } from '../content/block';
+import { useCategories } from '../content/blocks/categories';
+import { dinePageBlock, inCategory, fill } from '../content/blocks/directory';
+import { CmsIcon } from '../content/icons';
+import { CmsLink } from '../content/CmsLink';
 
 export default function DinePage() {
+  const t = useBlock(dinePageBlock);
+  const INITIAL_PAGE_SIZE = Number(t.initialCount) > 0 ? Number(t.initialCount) : 6;
+  const PAGE_SIZE_INCREMENT = Number(t.loadMoreCount) > 0 ? Number(t.loadMoreCount) : 4;
+  const { bySector, find } = useCategories();
   const [diningStores, setDiningStores] = useState<Store[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -61,8 +56,22 @@ export default function DinePage() {
 
   const filteredStores = useMemo(() => {
     if (activeCategory === 'all') return diningStores;
-    return diningStores.filter((s) => s.categorySlug === activeCategory || s.tags?.some((t) => t.toLowerCase().includes(activeCategory)));
-  }, [diningStores, activeCategory]);
+    const cat = find(activeCategory);
+    return diningStores.filter(
+      (s) => (cat && inCategory(s, cat, find)) || s.tags?.some((tag) => tag.toLowerCase().includes(activeCategory))
+    );
+  }, [diningStores, activeCategory, find]);
+
+  // Filter buttons: dining categories that currently have at least one eatery.
+  const dineCategories = useMemo(
+    () => [
+      { id: 'all', name: t.allLabel, icon: 'utensils' },
+      ...bySector('dine')
+        .filter((cat) => diningStores.some((s) => inCategory(s, cat, find)))
+        .map((cat) => ({ id: cat.slug, name: cat.name, icon: cat.icon })),
+    ],
+    [bySector, diningStores, find, t.allLabel]
+  );
 
   const displayedStores = useMemo(() => {
     return filteredStores.slice(0, visibleCount);
@@ -90,11 +99,11 @@ export default function DinePage() {
 
       {/* Hero Header */}
       <PageHeader
-        title="Dine & Taste"
-        subtitle="From authentic Himalayan Mustang Thakali and organic single-origin coffee to gourmet thin-crust pizza and vibrant casual dining, indulge your senses."
-        badge="GOURMET & CASUAL DINING"
+        title={t.title}
+        subtitle={t.subtitle}
+        badge={t.badge}
         breadcrumbs={[
-          { label: 'Dine' },
+          { label: t.breadcrumb },
         ]}
       />
 
@@ -109,17 +118,17 @@ export default function DinePage() {
             <div>
               <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-[#801424] uppercase mb-1">
                 <FaUtensils className="w-3.5 h-3.5" />
-                <span>Culinary Highlights</span>
+                <span>{t.featuredEyebrow}</span>
               </div>
               <h2
                 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 uppercase tracking-wide"
                 style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
               >
-                Featured Eateries & Cafes
+                {t.featuredHeading}
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-gray-500 max-w-md">
-              Handpicked standout restaurants, artisanal bakeries, and traditional kitchens inside Pokhara Trade Mall.
+              {t.featuredIntro}
             </p>
           </div>
 
@@ -144,7 +153,7 @@ export default function DinePage() {
                   >
                     <div className="relative h-52 w-full overflow-hidden bg-gray-100">
                       <img
-                        src={store.cover.data.full_url}
+                        src={store.cover?.data?.full_url}
                         alt={store.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
@@ -152,16 +161,16 @@ export default function DinePage() {
 
                       <span className="absolute top-3 right-3 text-[11px] font-semibold text-gray-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/80 flex items-center gap-1">
                         <FaMapMarkerAlt className="w-2.5 h-2.5 text-[#801424]" />
-                        {store.floor || '4th Floor'}
+                        {store.floor || t.fallbackFloor}
                       </span>
 
                       <span className="absolute bottom-3 left-3 text-[10px] font-bold uppercase tracking-widest text-white bg-[#801424]/90 backdrop-blur-xs px-2.5 py-0.5 rounded-full shadow-xs">
-                        {store.category || 'Dining'}
+                        {store.category || t.fallbackCategory}
                       </span>
 
                       <span className="absolute top-3 left-3 text-[10px] font-bold text-amber-900 bg-amber-100/95 backdrop-blur-md px-2 py-0.5 rounded-full shadow-xs border border-amber-300 flex items-center gap-1">
                         <FaCheckCircle className="w-2.5 h-2.5 text-amber-700" />
-                        Signature Spot
+                        {t.featuredBadge}
                       </span>
                     </div>
 
@@ -169,7 +178,7 @@ export default function DinePage() {
                       <div>
                         <div className="flex items-start gap-3 mb-2">
                           <div className="w-11 h-11 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
-                            <img src={store.logo.data.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
+                            <img src={store.logo?.data?.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
                           </div>
                           <div className="flex-1">
                             <h3
@@ -209,7 +218,7 @@ export default function DinePage() {
                         <span
                           className="inline-flex items-center gap-1.5 text-xs font-bold text-[#801424] group-hover:translate-x-0.5 transition-all ml-auto"
                         >
-                          <span>View Menu & Info</span>
+                          <span>{t.featuredCta}</span>
                           <FaArrowRight className="w-3 h-3" />
                         </span>
                       </div>
@@ -229,23 +238,23 @@ export default function DinePage() {
             <div>
               <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-[#801424] uppercase mb-1">
                 <FaUtensils className="w-3.5 h-3.5" />
-                <span>Browse All Flavors</span>
+                <span>{t.directoryEyebrow}</span>
               </div>
               <h2
                 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 uppercase tracking-wide"
                 style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
               >
-                Dining Directory
+                {t.directoryHeading}
               </h2>
             </div>
             <span className="text-xs sm:text-sm text-gray-500 font-medium">
-              Showing {displayedStores.length} of {filteredStores.length} Dining Spots
+              {fill(t.showingText, { shown: displayedStores.length, total: filteredStores.length })}
             </span>
           </div>
 
           {/* Category Filter Switcher */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-            {DINE_CATEGORIES.map((cat) => {
+            {dineCategories.map((cat) => {
               const isSelected = activeCategory === cat.id;
               return (
                 <button
@@ -257,7 +266,7 @@ export default function DinePage() {
                       : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200/80'
                   }`}
                 >
-                  <span>{cat.icon}</span>
+                  <span><CmsIcon name={cat.icon} className="w-3.5 h-3.5" /></span>
                   <span>{cat.name}</span>
                 </button>
               );
@@ -280,7 +289,7 @@ export default function DinePage() {
                 >
                   <div className="relative h-48 w-full overflow-hidden bg-gray-100">
                     <img
-                      src={store.cover.data.full_url}
+                      src={store.cover?.data?.full_url}
                       alt={store.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
@@ -288,11 +297,11 @@ export default function DinePage() {
 
                     <span className="absolute top-3 right-3 text-[11px] font-semibold text-gray-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/80 flex items-center gap-1">
                       <FaMapMarkerAlt className="w-2.5 h-2.5 text-[#801424]" />
-                      {store.floor || '4th Floor'}
+                      {store.floor || t.fallbackFloor}
                     </span>
 
                     <span className="absolute bottom-3 left-3 text-[10px] font-bold uppercase tracking-widest text-white bg-[#801424]/90 backdrop-blur-xs px-2.5 py-0.5 rounded-full shadow-xs">
-                      {store.category || 'Dining'}
+                      {store.category || t.fallbackCategory}
                     </span>
                   </div>
 
@@ -300,7 +309,7 @@ export default function DinePage() {
                     <div>
                       <div className="flex items-start gap-3 mb-2">
                         <div className="w-11 h-11 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
-                          <img src={store.logo.data.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
+                          <img src={store.logo?.data?.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
                         </div>
                         <div className="flex-1">
                           <h3
@@ -329,7 +338,7 @@ export default function DinePage() {
                       ) : (
                         <div className="flex items-center text-[11px] text-gray-500 gap-1">
                           <FaMapMarkerAlt className="w-3 h-3 text-[#801424]" />
-                          <span>Pokhara Trade Mall</span>
+                          <span>{t.fallbackLocation}</span>
                         </div>
                       )}
 
@@ -347,7 +356,7 @@ export default function DinePage() {
                         <span
                           className="inline-flex items-center gap-1.5 text-xs font-bold text-[#801424] group-hover:translate-x-0.5 transition-all"
                         >
-                          <span>Details</span>
+                          <span>{t.detailsLabel}</span>
                           <FaArrowRight className="w-3 h-3" />
                         </span>
                       </div>
@@ -357,6 +366,10 @@ export default function DinePage() {
               </motion.div>
             ))}
           </div>
+
+          {!loading && filteredStores.length === 0 && t.emptyText && (
+            <p className="text-sm text-gray-500 text-center py-8">{t.emptyText}</p>
+          )}
 
           {/* Paginated "Load More" Button */}
           {hasMore && (
@@ -369,11 +382,11 @@ export default function DinePage() {
                 {isLoadingMore ? (
                   <>
                     <FaSpinner className="w-3.5 h-3.5 animate-spin text-[#801424]" />
-                    <span>Loading Outlets...</span>
+                    <span>{t.loadingMoreLabel}</span>
                   </>
                 ) : (
                   <>
-                    <span>Load More Dining Outlets ({filteredStores.length - visibleCount} Remaining)</span>
+                    <span>{fill(t.loadMoreLabel, { count: filteredStores.length - visibleCount })}</span>
                     <FaArrowRight className="w-3 h-3" />
                   </>
                 )}
@@ -391,31 +404,29 @@ export default function DinePage() {
           <div className="relative z-10 max-w-3xl space-y-4">
             <div className="inline-flex items-center space-x-2 text-xs font-bold tracking-widest text-red-400 uppercase">
               <FaUtensils className="w-3.5 h-3.5" />
-              <span>Culinary Excellence</span>
+              <span>{t.spotlightEyebrow}</span>
             </div>
             <h2
               className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-wide leading-tight"
               style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
             >
-              Savor Exceptional Dining & Vibrant Gatherings
+              {t.spotlightHeading}
             </h2>
             <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-light">
-              From casual weekend brunch catch-ups and artisanal espresso roasts to authentic Himalayan feasts and delightful pre-movie dinners, Pokhara Trade Mall brings together a rich tapestry of flavors for food lovers and families alike.
+              {t.spotlightText}
             </p>
             <div className="pt-4 flex flex-wrap items-center gap-4">
-              <Link
-                to="/shops/directory"
-                className="btn-primary"
-              >
-                <span>Browse Full Directory</span>
-                <FaArrowRight className="w-3 h-3" />
-              </Link>
-              <Link
-                to="/contact"
-                className="btn-dark"
-              >
-                <span>Plan A Visit & Contact</span>
-              </Link>
+              {t.spotlightPrimaryLabel && (
+                <CmsLink href={t.spotlightPrimaryUrl} className="btn-primary">
+                  <span>{t.spotlightPrimaryLabel}</span>
+                  <FaArrowRight className="w-3 h-3" />
+                </CmsLink>
+              )}
+              {t.spotlightSecondaryLabel && (
+                <CmsLink href={t.spotlightSecondaryUrl} className="btn-dark">
+                  <span>{t.spotlightSecondaryLabel}</span>
+                </CmsLink>
+              )}
             </div>
           </div>
         </section>

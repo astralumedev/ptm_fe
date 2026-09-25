@@ -3,6 +3,8 @@ import { Link, useBlocker, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Trash2 } from 'lucide-react';
 import { collectionByKey, getPath, setPath, slugify } from '../schema';
 import { adminApi } from '../lib/http';
+import { useAdminCategories } from '../lib/useAdminCategories';
+import { SECTOR_STORE_TYPE } from '@/content/blocks/categories';
 import { useCollection } from '../lib/useCollection';
 import { FieldGrid } from '../components/Fields';
 import { Dialog, ErrorNote, FieldShell, Spinner, StatusPill, useToast } from '../components/ui';
@@ -16,6 +18,7 @@ export default function ItemEditor() {
   const navigate = useNavigate();
   const toast = useToast();
   const { items, error: loadError, upsert, remove } = useCollection(def.key);
+  const { find: findCategory } = useAdminCategories();
   const row = useMemo(() => (isNew ? null : items?.find((r) => String(r.id) === id) || null), [items, id, isNew]);
 
   const initial = useMemo<Draft | null>(() => {
@@ -70,6 +73,11 @@ export default function ItemEditor() {
     try {
       let data = setPath(draft.data, def.slugKey, draft.slug);
       if (def.key === 'blogs' && !isNew) data = setPath(data, 'updated_on', new Date().toISOString());
+      if (def.key === 'stores') {
+        // The category decides which section of the site lists the store and the label it shows.
+        const cat = findCategory(data.categorySlug);
+        if (cat) data = { ...data, category: cat.name, type: SECTOR_STORE_TYPE[cat.sector] };
+      }
       const { item } = await adminApi.save(def.key, { id: row?.id, slug: draft.slug, status: nextStatus, data });
       upsert(item);
       setDraft({ slug: item.slug, status: item.status, data: item.data });
@@ -80,7 +88,7 @@ export default function ItemEditor() {
     } finally {
       setSaving(false);
     }
-  }, [draft, def, row, isNew, upsert, toast, navigate]);
+  }, [draft, def, row, isNew, upsert, toast, navigate, findCategory]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

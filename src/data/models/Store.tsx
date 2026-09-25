@@ -91,6 +91,9 @@ export interface Store {
   categorySlug?: string;
   unitNumber?: string;
   tags?: string[];
+  /** Mall map placement: floor id (e.g. 'ground_floor') and the units the store occupies. */
+  mapFloor?: string;
+  mapUnits?: string[];
 }
 
 export interface StoreResponse {

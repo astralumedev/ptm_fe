@@ -1,7 +1,8 @@
-import { sql, SCHEMA, COLLECTIONS } from '../_lib/db';
+import { sql, ensureSchema, COLLECTIONS } from '../_lib/db';
 import { route, noStore } from '../_lib/http';
 import { currentAdmin, hashPassword } from '../_lib/auth';
 import seed from '../_lib/seed.json';
+import storeMapUnits from '../../src/data/storeMapUnits.json';
 
 async function tablesExist() {
   const rows = (await sql()`SELECT to_regclass('public.admins') AS t`) as { t: string | null }[];
@@ -24,7 +25,7 @@ export default route(async (req, res) => {
 
   if (adminCount > 0 && !(await currentAdmin(req))) return res.status(401).json({ error: 'Not signed in' });
 
-  for (const stmt of SCHEMA) await db.query(stmt);
+  await ensureSchema();
 
   let createdAdmin = false;
   if (adminCount === 0) {
@@ -51,5 +52,16 @@ export default route(async (req, res) => {
     }
   }
 
-  res.json({ ok: true, createdAdmin, seeded });
+  // Migration: stores created before the map picker existed get their mall-map units.
+  const units = storeMapUnits as Record<string, { floor: string; shutter: string }>;
+  const unmapped = (await db`SELECT id, slug FROM content WHERE collection = 'stores' AND NOT (data ? 'mapFloor')`) as { id: number; slug: string }[];
+  let migrated = 0;
+  for (const r of unmapped) {
+    const u = units[r.slug];
+    const patch = JSON.stringify(u ? { mapFloor: u.floor, mapUnits: [u.shutter] } : { mapFloor: '', mapUnits: [] });
+    await db`UPDATE content SET data = data || ${patch}::jsonb WHERE id = ${r.id}`;
+    migrated++;
+  }
+
+  res.json({ ok: true, createdAdmin, seeded, migrated });
 });

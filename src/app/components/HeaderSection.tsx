@@ -1,74 +1,37 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import MobileMenuToggle from './MobileMenuToggle';
 import MobileNavigationDrawer from './MobileNavigationDrawer';
 import styles from './HeaderSection.module.css';
-import { menuItems } from './navData';
-
-interface NewsItem {
-  id: string;
-  title: string;
-  category: string;
-  date: string;
-  summary: string;
-  imageUrl: string;
-  href: string;
-}
-
-const latestNewsAndEvents: NewsItem[] = [
-  {
-    id: 'festive-sale',
-    title: 'Festive Shopping Extravaganza 2026',
-    category: 'EVENT',
-    date: 'Aug 15 - Aug 25',
-    summary: 'Up to 50% OFF across top fashion, apparel & footwear brands at Pokhara Trade Mall!',
-    imageUrl: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80',
-    href: '/latest#events',
-  },
-  {
-    id: 'qfx-upgrade',
-    title: 'QFX Cinemas New 4K Screen Unveiling',
-    category: 'NEWS',
-    date: 'Aug 20',
-    summary: 'Experience ultra-crisp 4K Laser Projection and immersive Dolby Atmos surround sound at Screen 2.',
-    imageUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80',
-    href: '/latest#events',
-  },
-  {
-    id: 'food-fest',
-    title: 'Mustang Thakali Food & Wine Fest',
-    category: 'BLOG',
-    date: 'Aug 28',
-    summary: 'Taste authentic Himalayan Thakali delicacies and local artisan fruit wines on the rooftop terrace.',
-    imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80',
-    href: '/latest#blogs',
-  },
-  {
-    id: 'boutiques',
-    title: 'New Luxury Fashion Boutiques Opening',
-    category: 'STORE',
-    date: 'Sep 05',
-    summary: 'Discover exclusive premium designer wear, cosmetics, and luxury accessories on the Ground Floor.',
-    imageUrl: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80',
-    href: '/shops/retail',
-  },
-];
+import { useMenuItems } from './navData';
+import { useSiteNav, useMallHours } from '@/content/blocks/site';
+import { CmsLink } from '@/content/CmsLink';
+import { useBlock } from '@/content/block';
+import { liveOnly } from '@/content/visibility';
+import { homeHeroBlock } from '@/content/blocks/home';
 
 const HeaderSection = () => {
+  const menuItems = useMenuItems();
+  const nav = useSiteNav();
+  const hours = useMallHours();
+  const hero = useBlock(homeHeroBlock);
+  const slides = useMemo(() => liveOnly(hero.slides), [hero.slides]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
+  const intervalMs = Math.max(1, Number(hero.intervalSeconds) || 4.5) * 1000;
 
   // Auto-cycle through news and events items
   useEffect(() => {
+    if (slides.length <= 1) return;
     const timer = setInterval(() => {
-      setActiveStoryIndex((prevIndex) => (prevIndex + 1) % latestNewsAndEvents.length);
-    }, 4500);
+      setActiveStoryIndex((prevIndex) => (prevIndex + 1) % slides.length);
+    }, intervalMs);
     return () => clearInterval(timer);
-  }, []);
+  }, [slides.length, intervalMs]);
 
-  const activeStory = latestNewsAndEvents[activeStoryIndex];
+  const activeStory = slides.length ? slides[activeStoryIndex % slides.length] : null;
 
   return (
     <header className="relative w-full" style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}>
@@ -80,8 +43,8 @@ const HeaderSection = () => {
 
         {/* Subtle Background Image Overlay */}
         <img
-          src="/mall_images/ptm_hero.webp"
-          alt="Pokhara Trade Mall Building"
+          src={hero.backgroundUrl}
+          alt={hero.backgroundAlt}
           className="absolute inset-0 object-cover w-full h-full opacity-20 mix-blend-luminosity pointer-events-none"
         />
 
@@ -94,7 +57,7 @@ const HeaderSection = () => {
               className="text-xl sm:text-3xl md:text-4xl font-bold text-white tracking-wider uppercase leading-snug sm:leading-tight drop-shadow-md text-center lg:text-left"
               style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
             >
-              ELEVATE YOUR SHOPPING EXPERIENCE
+              {hero.title}
             </h1>
 
             <div className="flex items-center justify-center lg:justify-start gap-2 my-2.5 sm:my-3.5">
@@ -107,30 +70,30 @@ const HeaderSection = () => {
               className="text-gray-200 text-xs sm:text-sm leading-relaxed max-w-lg font-light mb-6 text-center lg:text-left"
               style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
-              Your premier lifestyle destination for global fashion brands, gourmet Thakali dining, QFX cinemas, and everyday essentials in Pokhara.
+              {hero.intro}
             </p>
 
             {/* Direct Action Buttons */}
             <div className="flex flex-wrap items-center gap-3.5 pt-1">
-              <Link
-                to="/shops/directory"
-                className="btn-primary"
-              >
-                <span>Explore Stores</span>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-              <Link
-                to="/latest"
-                className="btn-dark"
-              >
-                <span>What's On & Events</span>
-              </Link>
+              {(hero.buttons || []).filter((btn) => btn && btn.label).map((btn, i) => (
+                <CmsLink
+                  key={i}
+                  href={btn.href}
+                  className={btn.style === 'dark' ? 'btn-dark' : 'btn-primary'}
+                >
+                  <span>{btn.label}</span>
+                  {btn.style !== 'dark' && (
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    </svg>
+                  )}
+                </CmsLink>
+              ))}
             </div>
           </div>
 
           {/* Right Section: Elegant Glass Hero Showcase for WHAT'S ON */}
+          {activeStory && (
           <div className="w-full lg:w-6/12 flex justify-center lg:justify-end">
             <div className="w-full bg-black/40 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-white/10 p-4 sm:p-6 md:p-7 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col justify-between min-h-[340px] sm:min-h-[420px]">
               
@@ -140,7 +103,7 @@ const HeaderSection = () => {
                   className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-widest uppercase"
                   style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                 >
-                  WHAT'S ON
+                  {hero.showcaseTitle}
                 </h3>
                 <div className="flex items-center justify-center gap-2 my-2">
                   <div className="w-8 h-0.5 bg-[#801424] rounded-full" />
@@ -150,13 +113,13 @@ const HeaderSection = () => {
               </div>
 
               {/* Main Animated Showcase Display (Entire Card Clickable) */}
-              <Link
-                to={activeStory.href}
+              <CmsLink
+                href={activeStory.href}
                 className="block relative rounded-xl sm:rounded-2xl overflow-hidden h-[200px] sm:h-[260px] group shadow-lg my-1 cursor-pointer !no-underline"
               >
                 <AnimatePresence mode="wait">
                   <motion.div
-                    key={activeStory.id}
+                    key={activeStoryIndex % slides.length}
                     initial={{ opacity: 0, scale: 1.02 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.98 }}
@@ -194,15 +157,15 @@ const HeaderSection = () => {
                     </div>
                   </motion.div>
                 </AnimatePresence>
-              </Link>
+              </CmsLink>
 
               {/* Bottom Interactive Indicator Dots */}
               <div className="flex items-center justify-center gap-2 sm:gap-2.5 pt-3">
-                {latestNewsAndEvents.map((item, idx) => {
-                  const isActive = activeStoryIndex === idx;
+                {slides.map((item, idx) => {
+                  const isActive = activeStoryIndex % slides.length === idx;
                   return (
                     <button
-                      key={item.id}
+                      key={idx}
                       onClick={() => setActiveStoryIndex(idx)}
                       aria-label={`Go to slide ${idx + 1}: ${item.title}`}
                       className={`rounded-full transition-all duration-300 cursor-pointer ${
@@ -217,6 +180,7 @@ const HeaderSection = () => {
 
             </div>
           </div>
+          )}
 
         </div>
       </div>
@@ -230,8 +194,8 @@ const HeaderSection = () => {
             <div className="relative z-20 flex items-center flex-shrink-0">
               <Link to="/" className="flex items-center no-underline hover:no-underline">
                 <img
-                  src="/tm_logo_nobg.png"
-                  alt="Pokhara Trade Mall Logo"
+                  src={nav.logoUrl}
+                  alt={nav.logoAlt}
                   className="w-36 sm:w-40 md:w-44 lg:w-48 h-auto max-h-14 sm:max-h-16 md:max-h-20 object-contain transition-transform hover:scale-105"
                 />
               </Link>
@@ -246,14 +210,14 @@ const HeaderSection = () => {
 
                 if (!hasSub) {
                   return (
-                    <Link
+                    <CmsLink
                       key={item.label}
-                      to={item.href || '#'}
+                      href={item.href || '#'}
                       className={`text-gray-800 font-semibold text-sm tracking-widest no-underline hover:no-underline hover:text-red-700 ${styles.navLink} transition-colors whitespace-nowrap`}
                       style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                     >
                       {item.label.toUpperCase()}
-                    </Link>
+                    </CmsLink>
                   );
                 }
 
@@ -304,15 +268,15 @@ const HeaderSection = () => {
                               )}
                               <div className="space-y-1 pt-1">
                                 {group.items.map((subItem) => (
-                                  <Link
+                                  <CmsLink
                                     key={subItem.label}
-                                    to={subItem.href}
+                                    href={subItem.href}
                                     onClick={() => setActiveDropdown(null)}
                                     className="block px-3 py-2 text-sm tracking-wider text-gray-700 hover:text-red-700 hover:bg-red-50/80 no-underline hover:no-underline rounded-lg font-medium transition-all"
                                     style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                                   >
                                     {subItem.label}
-                                  </Link>
+                                  </CmsLink>
                                 ))}
                               </div>
                             </div>
@@ -332,15 +296,16 @@ const HeaderSection = () => {
                 <svg className="w-3.5 h-3.5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-gray-500 uppercase tracking-widest text-[10px]">TIMINGS:</span>
-                <span className="text-gray-900 font-bold text-xs whitespace-nowrap">10 AM - 8 PM</span>
+                <span className="text-gray-500 uppercase tracking-widest text-[10px]">{hours.pillLabel}</span>
+                <span className="text-gray-900 font-bold text-xs whitespace-nowrap">{hours.shortHours}</span>
 
                 {/* Hover Schedule Popup */}
                 <div className="absolute top-full right-0 mt-2.5 hidden group-hover:block bg-white border border-gray-200 rounded-xl p-3 shadow-2xl text-xs text-gray-800 min-w-[210px] z-50">
-                  <div className="text-[10px] font-bold text-red-700 uppercase tracking-widest pb-1 border-b border-gray-200 mb-2">Mall Operating Hours</div>
+                  <div className="text-[10px] font-bold text-red-700 uppercase tracking-widest pb-1 border-b border-gray-200 mb-2">{hours.popupTitle}</div>
                   <div className="space-y-1 text-gray-600">
-                    <div className="flex justify-between"><span>Weekdays:</span> <span className="font-semibold text-gray-900">10:00 AM - 8:00 PM</span></div>
-                    <div className="flex justify-between"><span>Weekends:</span> <span className="font-semibold text-gray-900">10:00 AM - 10:00 PM</span></div>
+                    {(hours.rows || []).filter((r) => r.inHeader).map((r, i) => (
+                      <div key={i} className="flex justify-between"><span>{r.label}:</span> <span className="font-semibold text-gray-900">{r.hours}</span></div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -348,19 +313,19 @@ const HeaderSection = () => {
               <span className="text-gray-300">|</span>
 
               {/* Mall Map Link */}
-              <Link
-                to="/mall-map"
+              <CmsLink
+                href={nav.mapLink}
                 className="flex items-center space-x-1 text-xs font-bold text-gray-900 hover:text-red-700 no-underline hover:no-underline transition-colors whitespace-nowrap group"
               >
                 <svg className="w-3.5 h-3.5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span>MALL MAP</span>
+                <span>{nav.mapLabel}</span>
                 <svg className="w-3 h-3 text-red-600 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>
-              </Link>
+              </CmsLink>
             </div>
 
             {/* Mobile Menu Button */}

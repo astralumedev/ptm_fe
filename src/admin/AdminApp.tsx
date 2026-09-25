@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import './admin.css';
 import { adminApi, AdminUser, ApiError } from './lib/http';
@@ -12,6 +12,8 @@ import CollectionList from './pages/CollectionList';
 import ItemEditor from './pages/ItemEditor';
 import MediaPage from './pages/MediaPage';
 import { SettingsPage, AccountPage } from './pages/SettingsPage';
+import { SiteContentIndex, SiteContentEditor } from './pages/SiteContent';
+import InboxPage from './pages/Inbox';
 
 type Phase = { kind: 'loading' } | { kind: 'setup' } | { kind: 'login' } | { kind: 'error'; message: string } | { kind: 'in'; admin: AdminUser };
 
@@ -22,6 +24,17 @@ function KnownCollection({ children }: { children: React.ReactNode }) {
 
 export default function AdminApp() {
   const [phase, setPhase] = useState<Phase>({ kind: 'loading' });
+  const [unread, setUnread] = useState(0);
+  const signedIn = phase.kind === 'in' && !phase.admin.mustChange;
+
+  // Once per sign-in: apply pending database updates (idempotent), then fetch the inbox badge.
+  useEffect(() => {
+    if (!signedIn) return;
+    adminApi.runSetup().catch(() => {}).finally(() => {
+      adminApi.counts().then((c) => setUnread(c.unread)).catch(() => {});
+    });
+  }, [signedIn]);
+  const onUnreadChange = useCallback((n: number) => setUnread(n), []);
 
   const boot = async () => {
     setPhase({ kind: 'loading' });
@@ -83,9 +96,12 @@ export default function AdminApp() {
     const admin = phase.admin;
     body = (
       <Routes>
-        <Route element={<Shell username={admin.username} onLogout={logout} />}>
+        <Route element={<Shell username={admin.username} onLogout={logout} unread={unread} />}>
           <Route index element={<Overview username={admin.username} />} />
           <Route path="media" element={<MediaPage />} />
+          <Route path="inbox" element={<InboxPage onUnreadChange={onUnreadChange} />} />
+          <Route path="content" element={<SiteContentIndex />} />
+          <Route path="content/:block" element={<SiteContentKeyed />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="account" element={<AccountPage admin={admin} onChange={(a) => setPhase({ kind: 'in', admin: a })} />} />
           <Route path=":collection" element={<KnownCollection><CollectionList /></KnownCollection>} />
@@ -101,6 +117,11 @@ export default function AdminApp() {
       <ToastProvider>{body}</ToastProvider>
     </div>
   );
+}
+
+function SiteContentKeyed() {
+  const { block } = useParams();
+  return <SiteContentEditor key={block} />;
 }
 
 // Remount the editor per item so drafts never bleed between records.
