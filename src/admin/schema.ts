@@ -245,7 +245,6 @@ export const SETTINGS_FIELDS: Field[] = [
   { key: 'instagram', label: 'Instagram', type: 'url', half: true },
   { key: 'tiktok', label: 'TikTok', type: 'url', half: true },
   { key: 'twitter', label: 'X / Twitter', type: 'url', half: true },
-  { key: 'notifyEmail', label: 'Email alerts for website messages', type: 'text', placeholder: 'e.g. info@pokharatrademall.com', help: 'Contact messages, RSVPs and leasing enquiries are also emailed here (separate several with commas). Needs the email service to be switched on by your developer; the Inbox always has them.' },
 ];
 
 export const collectionByKey = (key?: string) => COLLECTIONS.find((c) => c.key === key);

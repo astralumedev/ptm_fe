@@ -36,8 +36,6 @@ Set in Vercel (Project → Settings → Environment Variables):
 | `DATABASE_URL` | yes | Added by the Neon integration |
 | `BLOB_STORE_ID`, `BLOB_WEBHOOK_PUBLIC_KEY` | yes | Added when the Blob store is connected |
 | `SESSION_SECRET` | recommended | Signs admin sessions. Falls back to a key derived from `DATABASE_URL` |
-| `RESEND_API_KEY` | optional | Turns on email alerts for new submissions. Recipients are set in the admin under *Contact & social → Email alerts* |
-| `RESEND_FROM` | optional | Sender, e.g. `Pokhara Trade Mall <noreply@yourdomain>` (a domain verified in Resend) |
 
 ## Images and free-tier limits
 

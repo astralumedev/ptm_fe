@@ -20,6 +20,8 @@ const PrivacyPolicyPage = lazy(() => import('../pages/PrivacyPolicyPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 import { SeoManager } from '../content/seo';
 import { ContentNotice } from '../content/ContentNotice';
+import AnnouncementBar from './components/AnnouncementBar';
+import PromoPopup from './components/PromoPopup';
 
 function PageLoading() {
   return <div className="min-h-screen bg-white" aria-busy="true" />;
@@ -36,7 +38,7 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route>
       <Route path="/admin/*" element={<Suspense fallback={null}><AdminApp /></Suspense>} />
-      <Route element={<div className="App"><SeoManager /><ContentNotice />{isStaffBrowser && <Suspense fallback={null}><StaffEditButton /></Suspense>}<Suspense fallback={<PageLoading />}><Outlet /></Suspense></div>}>
+      <Route element={<div className="App"><SeoManager /><ContentNotice /><AnnouncementBar /><PromoPopup />{isStaffBrowser && <Suspense fallback={null}><StaffEditButton /></Suspense>}<Suspense fallback={<PageLoading />}><Outlet /></Suspense></div>}>
         <Route path="/" element={<HomePage />} />
         <Route path="/shop" element={<ShopPage />} />
         <Route path="/shops" element={<ShopPage />} />

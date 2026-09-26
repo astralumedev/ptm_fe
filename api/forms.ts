@@ -62,37 +62,6 @@ export default route(async (req, res) => {
     ok = await insert();
   }
   if (!ok) return res.status(429).json({ error: 'Too many submissions. Please try again in a few minutes.' });
-  await notifyStaff(kind, data).catch((e) => console.error('notify failed', e));
   res.json({ ok: true });
 });
 
-const KIND_LABEL: Record<Kind, string> = { contact: 'New message', rsvp: 'New event RSVP', leasing: 'New leasing enquiry' };
-const escHtml = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-/**
- * Optional email alert via Resend. Active only when RESEND_API_KEY is set and a notification
- * address is filled in under Contact & social; the Inbox always has every submission regardless.
- */
-async function notifyStaff(kind: Kind, data: Record<string, string>) {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) return;
-  const rows = (await sql()`SELECT data FROM content WHERE collection = 'settings' LIMIT 1`) as { data: { notifyEmail?: string } }[];
-  const to = String(rows[0]?.data?.notifyEmail || '').split(/[,;]/).map((e) => e.trim()).filter((e) => EMAIL.test(e));
-  if (!to.length) return;
-  const subject = `${KIND_LABEL[kind]}${data.name ? ' from ' + data.name : ''}${data.eventTitle ? ' · ' + data.eventTitle : ''}`;
-  const html = Object.entries(data)
-    .filter(([k]) => k !== 'eventId')
-    .map(([k, v]) => `<p><strong>${escHtml(k)}</strong><br>${escHtml(v).replace(/\n/g, '<br>')}</p>`)
-    .join('') + '<p style="color:#6b7280">Reply to the sender directly, or open the Inbox in the admin panel.</p>';
-  await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: process.env.RESEND_FROM || 'Pokhara Trade Mall <onboarding@resend.dev>',
-      to,
-      subject,
-      html,
-      ...(data.email ? { reply_to: data.email } : {}),
-    }),
-  });
-}

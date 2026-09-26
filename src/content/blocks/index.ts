@@ -7,10 +7,12 @@ import { directoryBlocks } from './directory';
 import { latestBlocks } from './latest';
 import { mapBlocks } from './map';
 import { seoBlock, notFoundBlock } from './seo';
+import { promotionBlocks } from './promotions';
 
 /** Every editable site section, in the order the admin lists them. */
 export const ALL_BLOCKS: BlockDef<any>[] = [
   ...siteBlocks,
+  ...promotionBlocks,
   ...homeBlocks,
   categoriesBlock,
   // shop-type-page belongs to ShopTypePage, which no route renders; listing it would edit nothing.
