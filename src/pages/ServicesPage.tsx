@@ -180,7 +180,7 @@ export default function ServicesPage() {
   const [loading, setLoading] = useState(true);
   const [leasingOpen, setLeasingOpen] = useState(false);
   const groups = useServiceGroups(allServices);
-  const hotline = (settings?.phone || '+977 61-520000').split('/')[0].trim();
+  const hotline = (settings?.phone || '').split('/')[0].trim();
   const amenityId = amenities.anchor?.trim() || 'parking';
   const cards = (amenities.cards || []).filter((c) => !c.hidden);
 
@@ -247,7 +247,7 @@ export default function ServicesPage() {
           >
             <div className="relative h-44 w-full overflow-hidden bg-gray-100">
               {store.cover?.data?.full_url && (
-                <img
+                <img loading="lazy" decoding="async"
                   src={store.cover.data.full_url}
                   alt={store.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -270,7 +270,7 @@ export default function ServicesPage() {
                 <div className="flex items-start gap-3 mb-2">
                   <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
                     {store.logo?.data?.full_url && (
-                      <img src={store.logo.data.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
+                      <img loading="lazy" decoding="async" src={store.logo.data.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
                     )}
                   </div>
                   <div className="flex-1">
@@ -448,7 +448,7 @@ export default function ServicesPage() {
                     )}
                     {hasDetails && (
                       <div className="pt-2 border-t border-gray-100 text-xs text-gray-600 space-y-1">
-                        {card.showHotline && <p><strong>{card.hotlineLabel}</strong> {hotline}</p>}
+                        {card.showHotline && hotline && <p><strong>{card.hotlineLabel}</strong> {hotline}</p>}
                         {card.hours && <p><strong>{card.hoursLabel}</strong> {card.hours}</p>}
                       </div>
                     )}

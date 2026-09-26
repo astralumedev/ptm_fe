@@ -107,7 +107,7 @@ export default function ContentPage() {
       {(!page.gallery || page.gallery.length === 0) && page.cover_image?.data?.full_url && (
         <section className="w-full bg-white relative overflow-hidden">
           <div className="relative h-[50vh] w-[85%] mx-auto rounded-2xl overflow-clip">
-            <img
+            <img loading="lazy" decoding="async"
               src={page.cover_image.data.full_url}
               alt={page.title}
               className="object-cover w-full h-full"

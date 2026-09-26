@@ -6,6 +6,7 @@ import { pagesBlocks } from './pages';
 import { directoryBlocks } from './directory';
 import { latestBlocks } from './latest';
 import { mapBlocks } from './map';
+import { seoBlock, notFoundBlock } from './seo';
 
 /** Every editable site section, in the order the admin lists them. */
 export const ALL_BLOCKS: BlockDef<any>[] = [
@@ -17,6 +18,8 @@ export const ALL_BLOCKS: BlockDef<any>[] = [
   ...latestBlocks,
   ...pagesBlocks,
   ...mapBlocks,
+  seoBlock,
+  notFoundBlock,
 ];
 
 export const blockByKey = (key?: string) => ALL_BLOCKS.find((b) => b.key === key);

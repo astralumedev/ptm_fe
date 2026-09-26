@@ -30,9 +30,9 @@ export default function PrivacyPolicyPage() {
   const policy = useBlock(privacyPolicyBlock);
   const settings = useBundle()?.settings?.[0];
   const sections = (policy.sections || []).filter((s) => !s.hidden);
-  const email = settings?.email || 'info@pokharatrademall.com';
-  const phone = settings?.phone || '+977 61-520000';
-  const address = settings?.address || 'Chipledhunga, Pokhara-4, Kaski, Gandaki Province, Nepal';
+  const email = settings?.email || '';
+  const phone = settings?.phone || '';
+  const address = settings?.address || '';
 
   return (
     <div className="min-h-screen bg-neutral-50/60 text-gray-900 selection:bg-[#801424] selection:text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
@@ -85,9 +85,9 @@ export default function PrivacyPolicyPage() {
 
               <div className="bg-neutral-50 rounded-xl p-5 border border-gray-200 text-xs sm:text-sm space-y-2 text-gray-700">
                 <p><strong className="text-gray-900">Administration Office:</strong> {policy.company}</p>
-                <p><strong className="text-gray-900">Location:</strong> {address}</p>
-                <p><strong className="text-gray-900">Email:</strong> <a href={`mailto:${email}`} className="text-[#801424] hover:underline font-medium">{email}</a></p>
-                <p><strong className="text-gray-900">Contact:</strong> {phone}</p>
+                {address && <p><strong className="text-gray-900">Location:</strong> {address}</p>}
+                {email && <p><strong className="text-gray-900">Email:</strong> <a href={`mailto:${email}`} className="text-[#801424] hover:underline font-medium">{email}</a></p>}
+                {phone && <p><strong className="text-gray-900">Contact:</strong> {phone}</p>}
               </div>
 
               {policy.contactLinkLabel && (

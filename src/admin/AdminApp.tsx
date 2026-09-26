@@ -26,6 +26,13 @@ export default function AdminApp() {
   const [phase, setPhase] = useState<Phase>({ kind: 'loading' });
   const [unread, setUnread] = useState(0);
   const signedIn = phase.kind === 'in' && !phase.admin.mustChange;
+  // Lets the public site show an "Edit this page" shortcut on this browser (no data, just a flag).
+  useEffect(() => {
+    try {
+      if (signedIn) localStorage.setItem('ptm-staff', '1');
+      else if (phase.kind === 'login') localStorage.removeItem('ptm-staff');
+    } catch { /* storage blocked */ }
+  }, [signedIn, phase.kind]);
 
   // Once per sign-in: apply pending database updates (idempotent), then fetch the inbox badge.
   useEffect(() => {

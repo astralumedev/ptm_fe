@@ -76,7 +76,7 @@ const MobileNavigationDrawer: React.FC<MobileNavigationDrawerProps> = ({ isOpen,
             {/* Drawer Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 bg-gray-50/90 flex-shrink-0">
               <Link to="/" onClick={onClose} className="flex items-center no-underline">
-                <img
+                <img loading="lazy" decoding="async"
                   src={nav.logoUrl}
                   alt={nav.logoAlt}
                   className="h-10 sm:h-12 w-auto object-contain"

@@ -152,7 +152,7 @@ export default function DinePage() {
                     className="group bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between h-full cursor-pointer !no-underline text-inherit block"
                   >
                     <div className="relative h-52 w-full overflow-hidden bg-gray-100">
-                      <img
+                      <img loading="lazy" decoding="async"
                         src={store.cover?.data?.full_url}
                         alt={store.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -178,7 +178,7 @@ export default function DinePage() {
                       <div>
                         <div className="flex items-start gap-3 mb-2">
                           <div className="w-11 h-11 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
-                            <img src={store.logo?.data?.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
+                            <img loading="lazy" decoding="async" src={store.logo?.data?.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
                           </div>
                           <div className="flex-1">
                             <h3
@@ -288,7 +288,7 @@ export default function DinePage() {
                   className="group bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between h-full cursor-pointer !no-underline text-inherit block"
                 >
                   <div className="relative h-48 w-full overflow-hidden bg-gray-100">
-                    <img
+                    <img loading="lazy" decoding="async"
                       src={store.cover?.data?.full_url}
                       alt={store.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -309,7 +309,7 @@ export default function DinePage() {
                     <div>
                       <div className="flex items-start gap-3 mb-2">
                         <div className="w-11 h-11 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
-                          <img src={store.logo?.data?.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
+                          <img loading="lazy" decoding="async" src={store.logo?.data?.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
                         </div>
                         <div className="flex-1">
                           <h3

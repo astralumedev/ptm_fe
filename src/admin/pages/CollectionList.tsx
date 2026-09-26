@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Plus, Search, ImageOff, RotateCw, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { collectionByKey, getPath, imageUrlOf } from '../schema';
 import { useCollection } from '../lib/useCollection';
@@ -14,7 +14,8 @@ export default function CollectionList() {
   const def = collectionByKey(collection);
   const navigate = useNavigate();
   const { items, error, reload, replaceAll } = useCollection(def?.key || '');
-  const [q, setQ] = useState('');
+  const [params] = useSearchParams();
+  const [q, setQ] = useState(params.get('q') || '');
   const [filter, setFilter] = useState<Filter>('all');
   const [ordering, setOrdering] = useState<ItemRow[] | null>(null);
   const [savingOrder, setSavingOrder] = useState(false);

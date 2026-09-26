@@ -24,7 +24,7 @@ function SpotlightSection({ spot, flipped }: { spot: Spotlight; flipped: boolean
       {/* Media & Visual (right on desktop when flipped) */}
       <div className={`lg:col-span-6 ${flipped ? 'lg:order-2 ' : ''}relative h-80 sm:h-96 lg:h-full bg-gray-950 overflow-hidden`}>
         {spot.image && (
-          <img
+          <img loading="lazy" decoding="async"
             src={spot.image}
             alt={spot.imageAlt || spot.title}
             className="w-full h-full object-cover opacity-90 hover:scale-105 transition-transform duration-700"

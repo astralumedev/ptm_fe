@@ -19,6 +19,7 @@ export default function ItemEditor() {
   const toast = useToast();
   const { items, error: loadError, upsert, remove } = useCollection(def.key);
   const { find: findCategory } = useAdminCategories();
+  const { items: stores } = useCollection('stores');
   const row = useMemo(() => (isNew ? null : items?.find((r) => String(r.id) === id) || null), [items, id, isNew]);
 
   const initial = useMemo<Draft | null>(() => {
@@ -52,6 +53,19 @@ export default function ItemEditor() {
       if (!d) return d;
       const next = { ...d, data: setPath(d.data, path, value) };
       if (path === def.titleKey && !slugTouched) next.slug = slugify(String(value));
+      // An offer's store details follow the store picked, so they never drift from the store record.
+      if (def.key === 'offers' && path === 'storeSlug') {
+        const store = stores?.find((s) => s.slug === value)?.data;
+        if (store) {
+          next.data = {
+            ...next.data,
+            storeName: store.name || '',
+            storeCategory: store.category || '',
+            storeLogo: store.logo?.data?.full_url || '',
+            storeLink: `/stores/${value}`,
+          };
+        }
+      }
       return next;
     });
     if (errors[path]) setErrors((e) => ({ ...e, [path]: '' }));

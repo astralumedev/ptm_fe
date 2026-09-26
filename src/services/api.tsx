@@ -1,8 +1,8 @@
 import { Blog, BlogResponse } from '@/data/models/Blog';
 import { Store, StoreResponse } from '@/data/models/Store';
 import { SiteSettings, SiteSettingsResponse } from '@/data/models/SiteSettings';
-import type { PageData } from '@/data/mockMallData';
-import type { MallEvent, MallOffer } from '@/data/latestData';
+import type { PageData } from '@/data/models/Page';
+import type { MallEvent, MallOffer } from '@/data/models/Latest';
 import { liveOnly } from '@/content/visibility';
 
 interface BlogFilter {
@@ -48,29 +48,26 @@ export interface PageResponse {
   public: boolean;
 }
 
-interface ContentBundle {
+
+export interface ContentBundle {
   stores: Store[];
   blogs: Blog[];
   pages: PageData[];
   events: MallEvent[];
   offers: MallOffer[];
   settings: SiteSettings[];
-  /** Saved site sections, keyed by slug. Missing ones fall back to their defaults. */
+  /** Saved site sections, keyed by slug. */
   blocks: Array<Record<string, any> & { slug: string }>;
+  /** True when the content service could not be reached; the site renders empty states. */
+  unavailable?: boolean;
 }
 
-/** Bundled content used when the API is unreachable (e.g. plain `vite` dev without `vercel dev`). */
-async function fallbackBundle(): Promise<ContentBundle> {
-  const [mall, latest] = await Promise.all([import('@/data/mockMallData'), import('@/data/latestData')]);
-  return {
-    stores: mall.mockStores,
-    blogs: mall.mockBlogs,
-    pages: mall.mockPages,
-    settings: mall.mockSiteSettings,
-    events: latest.mockEvents,
-    offers: latest.mockOffers,
-    blocks: [],
-  };
+const EMPTY_BUNDLE: ContentBundle = { stores: [], blogs: [], pages: [], events: [], offers: [], settings: [], blocks: [], unavailable: true };
+
+async function fetchBundle(): Promise<ContentBundle> {
+  const res = await fetch('/api/content', { headers: { Accept: 'application/json' } });
+  if (!res.ok || !res.headers.get('content-type')?.includes('json')) throw new Error(`content ${res.status}`);
+  return (await res.json()) as ContentBundle;
 }
 
 let bundlePromise: Promise<ContentBundle> | null = null;
@@ -90,17 +87,10 @@ export function subscribeBundle(fn: () => void) {
  */
 export function loadBundle(): Promise<ContentBundle> {
   if (!bundlePromise) {
-    bundlePromise = fetch('/api/content', { headers: { Accept: 'application/json' } })
-      .then(async (res) => {
-        if (!res.ok || !res.headers.get('content-type')?.includes('json')) throw new Error(`content ${res.status}`);
-        const data = (await res.json()) as ContentBundle;
-        if (!data.stores?.length && !data.pages?.length) throw new Error('empty content');
-        return data;
-      })
-      .catch((err) => {
-        console.warn('Using bundled content:', err);
-        return fallbackBundle();
-      })
+    // One retry covers a cold start or a flaky mobile connection; after that the site shows
+    // its empty states and a notice rather than stale or invented content.
+    bundlePromise = fetchBundle()
+      .catch(() => new Promise<ContentBundle>((resolve) => setTimeout(() => fetchBundle().then(resolve, () => resolve(EMPTY_BUNDLE)), 1500)))
       .then((data) => {
         snapshot = { ...data, blocks: data.blocks || [] };
         listeners.forEach((l) => l());

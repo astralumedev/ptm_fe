@@ -2,21 +2,32 @@ import { lazy, Suspense } from 'react';
 import { createBrowserRouter, createRoutesFromElements, Outlet, Route, RouterProvider } from 'react-router-dom';
 import './globals.css';
 
-// Import pages
+// Home loads with the first request; every other page is its own chunk, fetched on first visit.
 import HomePage from '../pages/HomePage';
-import ShopPage from '../pages/ShopPage';
-import ShopDirectoryPage from '../pages/ShopDirectoryPage';
-import DinePage from '../pages/DinePage';
-import EntertainPage from '../pages/EntertainPage';
-import ServicesPage from '../pages/ServicesPage';
-import ShopDetailPage from '../pages/ShopDetailPage';
-import LatestPage from '../pages/LatestPage';
-import BlogDetailPage from '../pages/BlogDetailPage';
-import ContactPage from '../pages/ContactPage';
-import ContentPage from '../pages/ContentPage';
-import MallMapPage from '../pages/MallMapPage';
-import AboutPage from '../pages/AboutPage';
-import PrivacyPolicyPage from '../pages/PrivacyPolicyPage';
+const ShopPage = lazy(() => import('../pages/ShopPage'));
+const ShopDirectoryPage = lazy(() => import('../pages/ShopDirectoryPage'));
+const DinePage = lazy(() => import('../pages/DinePage'));
+const EntertainPage = lazy(() => import('../pages/EntertainPage'));
+const ServicesPage = lazy(() => import('../pages/ServicesPage'));
+const ShopDetailPage = lazy(() => import('../pages/ShopDetailPage'));
+const LatestPage = lazy(() => import('../pages/LatestPage'));
+const BlogDetailPage = lazy(() => import('../pages/BlogDetailPage'));
+const ContactPage = lazy(() => import('../pages/ContactPage'));
+const ContentPage = lazy(() => import('../pages/ContentPage'));
+const MallMapPage = lazy(() => import('../pages/MallMapPage'));
+const AboutPage = lazy(() => import('../pages/AboutPage'));
+const PrivacyPolicyPage = lazy(() => import('../pages/PrivacyPolicyPage'));
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
+import { SeoManager } from '../content/seo';
+import { ContentNotice } from '../content/ContentNotice';
+
+function PageLoading() {
+  return <div className="min-h-screen bg-white" aria-busy="true" />;
+}
+
+// Staff-only shortcut; its code is only downloaded on a browser that has signed in to the admin.
+const StaffEditButton = lazy(() => import('../content/StaffEditButton'));
+const isStaffBrowser = (() => { try { return localStorage.getItem('ptm-staff') === '1'; } catch { return false; } })();
 
 // The admin panel is split into its own chunk so visitors never download it.
 const AdminApp = lazy(() => import('../admin/AdminApp'));
@@ -25,7 +36,7 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route>
       <Route path="/admin/*" element={<Suspense fallback={null}><AdminApp /></Suspense>} />
-      <Route element={<div className="App"><Outlet /></div>}>
+      <Route element={<div className="App"><SeoManager /><ContentNotice />{isStaffBrowser && <Suspense fallback={null}><StaffEditButton /></Suspense>}<Suspense fallback={<PageLoading />}><Outlet /></Suspense></div>}>
         <Route path="/" element={<HomePage />} />
         <Route path="/shop" element={<ShopPage />} />
         <Route path="/shops" element={<ShopPage />} />
@@ -58,6 +69,7 @@ const router = createBrowserRouter(
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/page/:slug" element={<ContentPage />} />
         <Route path="/mall-map" element={<MallMapPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Route>,
   ),

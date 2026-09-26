@@ -49,7 +49,7 @@ export const COLLECTIONS: CollectionDef[] = [
     blank: () => ({
       name: '', subtitle: '', type: 'retail', featured: false, logo: emptyAsset(), cover: emptyAsset(),
       store_description: '', tags: [], store_gallery: [], mapFloor: '', mapUnits: [], website: null, instagram: null, facebook: null, tiktok: null,
-      contact_number: null, operation_hours: '10:00 AM - 8:00 PM', owner: { id: 1 }, created_on: new Date().toISOString(),
+      contact_number: null, operation_hours: '', owner: { id: 1 }, created_on: new Date().toISOString(),
     }),
     sections: [
       {
@@ -203,6 +203,7 @@ export const COLLECTIONS: CollectionDef[] = [
       {
         title: 'Store',
         fields: [
+          { key: 'storeSlug', label: 'Store', type: 'store', help: 'Picking a store fills in the name, category, logo and link below. You can still adjust them.' },
           { key: 'storeName', label: 'Store name', type: 'text', half: true },
           { key: 'storeCategory', label: 'Store category', type: 'text', half: true },
           { key: 'storeLink', label: 'Store page link', type: 'text', placeholder: '/stores/levis-store' },
@@ -214,7 +215,7 @@ export const COLLECTIONS: CollectionDef[] = [
   },
   {
     key: 'pages',
-    label: 'Pages',
+    label: 'Extra pages',
     singular: 'page',
     icon: FileText,
     titleKey: 'title',
@@ -236,14 +237,15 @@ export const COLLECTIONS: CollectionDef[] = [
 ];
 
 export const SETTINGS_FIELDS: Field[] = [
-  { key: 'phone', label: 'Phone', type: 'text', half: true },
-  { key: 'email', label: 'Email', type: 'text', half: true },
-  { key: 'address', label: 'Address', type: 'text' },
+  { key: 'phone', label: 'Phone', type: 'text', half: true, required: true, help: 'Separate several numbers with “/”. The first one is used for tap-to-call.' },
+  { key: 'email', label: 'Email', type: 'text', half: true, required: true },
+  { key: 'address', label: 'Address', type: 'text', required: true },
   { key: 'location_info', label: 'Location details', type: 'textarea', help: 'Shown on the contact page and footer.' },
   { key: 'facebook', label: 'Facebook', type: 'url', half: true },
   { key: 'instagram', label: 'Instagram', type: 'url', half: true },
   { key: 'tiktok', label: 'TikTok', type: 'url', half: true },
   { key: 'twitter', label: 'X / Twitter', type: 'url', half: true },
+  { key: 'notifyEmail', label: 'Email alerts for website messages', type: 'text', placeholder: 'e.g. info@pokharatrademall.com', help: 'Contact messages, RSVPs and leasing enquiries are also emailed here (separate several with commas). Needs the email service to be switched on by your developer; the Inbox always has them.' },
 ];
 
 export const collectionByKey = (key?: string) => COLLECTIONS.find((c) => c.key === key);

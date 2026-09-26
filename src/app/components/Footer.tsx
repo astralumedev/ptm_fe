@@ -32,14 +32,14 @@ const Footer: React.FC = () => {
 
   const rawPhones = siteSettings?.phone 
     ? siteSettings.phone.split('/').map(p => p.trim()) 
-    : ['+977 61-520000', '+977 9856012345'];
+    : [];
 
   if (loading) {
     return (
       <footer className="relative bg-gray-100 text-gray-800 py-14 border-t border-gray-200" style={{ fontFamily: "'Montserrat', sans-serif" }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col items-start">
-            <img
+            <img loading="lazy" decoding="async"
               src={footer.logoUrl}
               alt="Pokhara Trade Mall Logo"
               className='w-60 md:w-72 h-auto object-contain drop-shadow-sm'
@@ -56,7 +56,7 @@ const Footer: React.FC = () => {
         
         {/* Column 1: Logo & Overview */}
         <div className="lg:col-span-1 flex flex-col items-start">
-          <img
+          <img loading="lazy" decoding="async"
             src={footer.logoUrl}
             alt="Pokhara Trade Mall Logo"
             className='w-60 md:w-72 h-auto object-contain drop-shadow-sm transition-transform hover:scale-105'
@@ -99,15 +99,15 @@ const Footer: React.FC = () => {
                 </a>
               </li>
             ))}
-            <li>
+            {siteSettings?.email && <li>
               <a
-                href={`mailto:${siteSettings?.email || 'info@pokharatrademall.com'}`}
+                href={`mailto:${siteSettings.email}`}
                 className="group flex items-center text-gray-700 hover:text-[#801424] transition-colors"
               >
                 <FaEnvelope className="w-4 h-4 mr-3 text-gray-800 group-hover:text-[#801424] transition-colors flex-shrink-0" />
-                <span className="leading-tight">{siteSettings?.email || 'info@pokharatrademall.com'}</span>
+                <span className="leading-tight">{siteSettings.email}</span>
               </a>
-            </li>
+            </li>}
           </ul>
 
           <div className="flex items-center space-x-3 pt-1">

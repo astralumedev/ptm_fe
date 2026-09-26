@@ -469,7 +469,7 @@ export const aboutCtaBlock = defineBlock<AboutCta>({
 export interface ContactPageContent {
   title: string; subtitle: string; badge: string;
   phoneTitle: string; phoneText: string; emailTitle: string; emailText: string;
-  hoursTitle: string; hours: string[];
+  hoursTitle: string;
   formEyebrow: string; formHeading: string; formIntro: string;
   nameLabel: string; namePlaceholder: string; phoneLabel: string; phonePlaceholder: string;
   emailLabel: string; emailPlaceholder: string; topicLabel: string; topics: string[];
@@ -482,7 +482,7 @@ export const contactPageBlock = defineBlock<ContactPageContent>({
   key: 'contact-page',
   group: 'Contact page',
   label: 'Contact page',
-  description: 'Texts, opening hours, form labels and map on the Contact page. Phone, email and address come from Site settings. Messages sent with the form arrive in the admin Inbox.',
+  description: 'Texts, form labels and map on the Contact page. Phone, email and address come from Contact & social; opening hours from Mall timings. Messages sent with the form arrive in the admin Inbox.',
   page: '/contact',
   fields: [
     text('title', 'Page title', { half: true }), text('badge', 'Small badge above the title', { half: true }),
@@ -490,7 +490,6 @@ export const contactPageBlock = defineBlock<ContactPageContent>({
     text('phoneTitle', 'Phone card: title', { half: true }), text('phoneText', 'Phone card: small text', { half: true, help: 'The number itself comes from Site settings.' }),
     text('emailTitle', 'Email card: title', { half: true }), text('emailText', 'Email card: small text', { half: true, help: 'The address itself comes from Site settings.' }),
     text('hoursTitle', 'Hours card: title'),
-    { key: 'hours', label: 'Opening hours lines', type: 'tags', help: 'One line each, e.g. "Retail: 10:00 AM – 8:00 PM (Weekdays)". Press Enter after each.' },
     text('formEyebrow', 'Form: small red label', { half: true }), text('formHeading', 'Form: heading', { half: true }),
     area('formIntro', 'Form: intro text'),
     text('nameLabel', 'Name field label', { half: true }), text('namePlaceholder', 'Name field example', { half: true }),
@@ -513,7 +512,6 @@ export const contactPageBlock = defineBlock<ContactPageContent>({
     phoneTitle: 'Direct Phone Lines', phoneText: 'Customer desk & management inquiries',
     emailTitle: 'Email Support', emailText: 'General questions, media & feedback',
     hoursTitle: 'Operating Hours',
-    hours: ['Retail: 10:00 AM – 8:00 PM (Weekdays)', 'QFX Cinema: 7:00 AM – 12:00 AM'],
     formEyebrow: 'Send a Message',
     formHeading: 'How Can We Help You?',
     formIntro: 'Fill out the form below and our team will get back to you within 24 hours.',

@@ -181,7 +181,7 @@ export default function AboutPage() {
 
                 {/* Main Hero Image */}
                 <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white aspect-[4/5] group">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={hero.image}
                     alt={hero.imageAlt}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -329,7 +329,7 @@ export default function AboutPage() {
                     <div className="w-full md:w-1/2">
                       <div className="group relative rounded-2xl overflow-hidden shadow-lg border border-gray-200/80 bg-white aspect-[16/10]">
                         {event.image && (
-                          <img
+                          <img loading="lazy" decoding="async"
                             src={event.image}
                             alt={event.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -564,7 +564,7 @@ export default function AboutPage() {
                   {/* Photo Frame */}
                   <div className="relative aspect-[4/4] bg-gray-100 overflow-hidden">
                     {member.image && (
-                      <img
+                      <img loading="lazy" decoding="async"
                         src={member.image}
                         alt={member.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 grayscale group-hover:grayscale-0"
@@ -642,7 +642,7 @@ export default function AboutPage() {
                 <div className="lg:col-span-4 flex justify-center lg:justify-end">
                   <div className="p-6 rounded-2xl bg-gray-50 border border-gray-200 text-center w-full max-w-xs">
                     {leadership.logo && (
-                      <img
+                      <img loading="lazy" decoding="async"
                         src={leadership.logo}
                         alt="Pokhara Trade Mall Logo"
                         className="w-36 h-auto mx-auto mb-3"
@@ -727,7 +727,7 @@ export default function AboutPage() {
 
               {features.communityImage && (
                 <div className="relative rounded-2xl overflow-hidden aspect-[16/10] border border-white/10 shadow-2xl">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={features.communityImage}
                     alt={features.communityImageAlt}
                     className="w-full h-full object-cover"

@@ -1,15 +1,11 @@
-// Regenerates api/_lib/seed.json from the in-repo mock data. Run: npm run seed:export
-import { writeFileSync } from 'fs';
-import { mockStores, mockBlogs, mockSiteSettings, mockPages } from '../src/data/mockMallData';
-import { mockEvents, mockOffers } from '../src/data/latestData';
+// Refreshes the site-section (block) part of api/_lib/seed.json from the block definitions.
+// Run after adding or changing a block: npm run seed:blocks
+// The next admin sign-in inserts any block the database does not have yet; existing ones are untouched.
+import { readFileSync, writeFileSync } from 'fs';
+import { ALL_BLOCKS } from '../src/content/blocks';
 
-const seed = {
-  stores: mockStores,
-  blogs: mockBlogs,
-  pages: mockPages,
-  events: mockEvents,
-  offers: mockOffers,
-  settings: mockSiteSettings,
-};
-writeFileSync('api/_lib/seed.json', JSON.stringify(seed));
-console.log('seed.json written');
+const path = 'api/_lib/seed.json';
+const seed = JSON.parse(readFileSync(path, 'utf8'));
+seed.blocks = ALL_BLOCKS.map((b) => ({ slug: b.key, status: 'published', ...b.defaults }));
+writeFileSync(path, JSON.stringify(seed));
+console.log(`seed.json: ${seed.blocks.length} blocks`);

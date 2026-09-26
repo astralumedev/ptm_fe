@@ -104,7 +104,7 @@ export const WayfindingHeader: React.FC<WayfindingHeaderProps> = ({
                 >
                   {/* Thumbnail / Logo */}
                   {store.logo ? (
-                    <img
+                    <img loading="lazy" decoding="async"
                       src={store.logo}
                       alt={store.name}
                       className={styles.suggestionLogo}

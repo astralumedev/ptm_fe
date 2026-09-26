@@ -16,7 +16,7 @@ import PageHeader, { PageHeaderTab } from '../app/components/PageHeader';
 import Footer from '../app/components/Footer';
 import api from '../services/api';
 import { Blog } from '../data/models/Blog';
-import { MallEvent, MallOffer } from '../data/latestData';
+import { MallEvent, MallOffer } from '../data/models/Latest';
 import { useBlock } from '../content/block';
 import { latestPageBlock } from '../content/blocks/latest';
 import { submitForm } from '../content/forms';
@@ -207,7 +207,7 @@ export const LatestPage: React.FC = () => {
                     className="bg-white rounded-3xl overflow-hidden border border-gray-200/80 shadow-md hover:shadow-xl transition-all duration-300 grid grid-cols-1 lg:grid-cols-12 group"
                   >
                     <div className="lg:col-span-7 relative h-72 sm:h-96 lg:h-full overflow-hidden bg-gray-900">
-                      <img
+                      <img loading="lazy" decoding="async"
                         src={featuredBlog.cover_image?.data?.full_url || '/placeholder.jpg'}
                         alt={featuredBlog.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-95"
@@ -283,7 +283,7 @@ export const LatestPage: React.FC = () => {
                       <div>
                         {/* Image */}
                         <Link to={`/blogs/${blog.slug}`} className="block relative aspect-16/10 overflow-hidden bg-gray-100">
-                          <img
+                          <img loading="lazy" decoding="async"
                             src={blog.cover_image?.data?.full_url || '/placeholder.jpg'}
                             alt={blog.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -375,7 +375,7 @@ export const LatestPage: React.FC = () => {
                   >
                     {/* Left Event Image + Date Badge */}
                     <div className="sm:w-5/12 relative min-h-[220px] sm:min-h-full bg-gray-900 overflow-hidden">
-                      <img
+                      <img loading="lazy" decoding="async"
                         src={event.imageUrl}
                         alt={event.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
@@ -510,7 +510,7 @@ export const LatestPage: React.FC = () => {
                   >
                     {/* Top Image + Discount Badge */}
                     <div className="relative aspect-16/9 bg-gray-900 overflow-hidden">
-                      <img
+                      <img loading="lazy" decoding="async"
                         src={offer.imageUrl}
                         alt={offer.title}
                         className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500"
@@ -608,7 +608,7 @@ export const LatestPage: React.FC = () => {
               className="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200"
             >
               <div className="relative aspect-16/9 bg-gray-900">
-                <img
+                <img loading="lazy" decoding="async"
                   src={selectedEvent.imageUrl}
                   alt={selectedEvent.title}
                   className="w-full h-full object-cover"

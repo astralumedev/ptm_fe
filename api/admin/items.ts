@@ -43,6 +43,17 @@ export default route(async (req, res) => {
   }
 
   if (req.method === 'GET') {
+    // Full backup of everything staff have entered (content, inbox, media index).
+    if (collection === 'export') {
+      const [content, submissions, media] = await Promise.all([
+        db`SELECT collection, slug, status, sort, data, created_at, updated_at FROM content ORDER BY collection, sort, id`,
+        withSchema(() => db`SELECT kind, data, read, created_at FROM submissions ORDER BY created_at`),
+        db`SELECT url, thumb_url, width, height, size, name, created_at FROM media ORDER BY created_at`,
+      ]);
+      const stamp = new Date().toISOString().slice(0, 10);
+      res.setHeader('Content-Disposition', `attachment; filename="ptm-backup-${stamp}.json"`);
+      return res.json({ exportedAt: new Date().toISOString(), content, submissions, media });
+    }
     if (collection === 'counts') {
       const counts = await db`SELECT collection, status, count(*)::int AS n FROM content GROUP BY 1, 2`;
       const unread = (await withSchema(() => db`SELECT count(*)::int AS n FROM submissions WHERE read = false`)) as { n: number }[];

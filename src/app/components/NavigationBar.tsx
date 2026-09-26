@@ -23,7 +23,7 @@ const NavigationBar: React.FC = () => {
           <div className="relative flex h-18 sm:h-22 md:h-26 py-2 sm:py-3 items-center justify-between">
             <div className="relative z-20 flex items-center flex-shrink-0">
               <Link to="/" className="flex items-center no-underline hover:no-underline">
-                <img
+                <img fetchPriority="high" decoding="async"
                   src={nav.logoUrl}
                   alt={nav.logoAlt}
                   className="w-36 sm:w-40 md:w-44 lg:w-48 h-auto max-h-14 sm:max-h-16 md:max-h-20 object-contain transition-transform hover:scale-105"

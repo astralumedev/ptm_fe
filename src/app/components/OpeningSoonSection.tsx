@@ -54,7 +54,7 @@ export default function OpeningSoonSection() {
               >
                 {/* Image Side */}
                 <div className="relative w-full sm:w-2/5 h-48 sm:h-auto overflow-hidden bg-gray-950">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={store.imageUrl}
                     alt={store.name}
                     className="object-cover w-full h-full hover:scale-105 transition-transform duration-700 opacity-85"

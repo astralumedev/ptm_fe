@@ -8,10 +8,12 @@ import api from '../services/api';
 import { Blog } from '../data/models/Blog';
 import { useBlock } from '../content/block';
 import { blogPageBlock } from '../content/blocks/latest';
+import { usePageMeta } from '../content/seo';
 
 export default function BlogDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const [blog, setBlog] = useState<Blog | null>(null);
+  usePageMeta(blog ? { title: blog.title, description: blog.content, image: blog.cover_image?.data?.full_url } : null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const c = useBlock(blogPageBlock);
@@ -154,7 +156,7 @@ export default function BlogDetailPage() {
             {/* Featured Image */}
             {blog.cover_image?.data?.full_url && (
               <div className="rounded-2xl overflow-hidden aspect-[16/9] shadow-md border border-gray-100 bg-gray-100">
-                <img
+                <img loading="lazy" decoding="async"
                   src={blog.cover_image.data.full_url}
                   alt={blog.title}
                   className="w-full h-full object-cover"

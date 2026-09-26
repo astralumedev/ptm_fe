@@ -60,17 +60,16 @@ export const MallMapPage: React.FC = () => {
   const [viewportState, setViewportState] = useState({ k: 0.25, x: 0, y: 0 });
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
 
-  // 1a. Stores (CMS stores + optional demo fillers); reloads if the demo toggle changes
-  const showDemoStores = copy.showDemoStores !== false;
+  // 1a. Stores from the CMS
   useEffect(() => {
     let cancelled = false;
-    wayfindingService.getStores({ includeDemo: showDemoStores }).then((loaded) => {
+    wayfindingService.getStores().then((loaded) => {
       if (!cancelled) setStores(loaded);
     });
     return () => {
       cancelled = true;
     };
-  }, [showDemoStores]);
+  }, []);
 
   // 1b. Initial Load of Floor Plans
   useEffect(() => {

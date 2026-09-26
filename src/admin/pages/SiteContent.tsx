@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useBlocker, useParams } from 'react-router-dom';
+import { Link, useBlocker, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ChevronRight, ExternalLink, RotateCcw, Search } from 'lucide-react';
 import { ALL_BLOCKS, blockByKey } from '@/content/blocks';
 import { mergeBlock } from '@/content/block';
@@ -10,22 +10,35 @@ import { FieldGrid } from '../components/Fields';
 import { Dialog, ErrorNote, Spinner, relativeTime, useToast } from '../components/ui';
 import { PageHead } from './Layout';
 
+const SITE_WIDE = ['Header & navigation', 'Footer'];
+
 export function SiteContentIndex() {
   const { items, error } = useCollection('blocks');
+  const [params, setParams] = useSearchParams();
+  const onPage = params.get('page');
   const [q, setQ] = useState('');
   const groups = useMemo(() => {
     const needle = q.trim().toLowerCase();
     const map = new Map<string, typeof ALL_BLOCKS>();
+    // From "Edit this page" on the website: that page's sections plus the site-wide ones.
+    const pageBlocks = onPage ? ALL_BLOCKS.filter((b) => b.page === onPage) : null;
     for (const b of ALL_BLOCKS) {
+      if (pageBlocks && !pageBlocks.includes(b) && !SITE_WIDE.includes(b.group)) continue;
       if (needle && ![b.label, b.group, b.description].some((t) => t?.toLowerCase().includes(needle))) continue;
       map.set(b.group, [...(map.get(b.group) || []), b]);
     }
     return [...map.entries()];
-  }, [q]);
+  }, [q, onPage]);
 
   return (
     <>
       <PageHead title="Site content" lead="Every heading, banner, menu and section of the website. Changes go live within a minute of saving." />
+      {onPage && (
+        <div className="flex flex-wrap items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-[var(--adm-accent-soft)] text-[13.5px] text-[var(--adm-accent)]">
+          Showing the sections on <code className="font-mono">{onPage}</code> and the site-wide header and footer.
+          <button className="underline cursor-pointer" onClick={() => setParams({})}>Show everything</button>
+        </div>
+      )}
       <div className="relative sm:w-80 mb-6">
         <Search className="absolute left-2.5 top-2.5 size-4 text-[var(--adm-ink-3)] pointer-events-none" />
         <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Find a section, e.g. hero, FAQ, parking" className="adm-input !pl-8" aria-label="Find a section" />

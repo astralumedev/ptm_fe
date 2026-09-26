@@ -423,7 +423,7 @@ export default function ShopDirectoryPage() {
                 >
                   {/* Cover Header */}
                   <div className="relative h-48 w-full overflow-hidden bg-gray-100">
-                    <img
+                    <img loading="lazy" decoding="async"
                       src={store.cover?.data?.full_url}
                       alt={store.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -452,7 +452,7 @@ export default function ShopDirectoryPage() {
                     <div>
                       <div className="flex items-start gap-3 mb-2">
                         <div className="w-11 h-11 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
-                          <img
+                          <img loading="lazy" decoding="async"
                             src={store.logo?.data?.full_url}
                             alt={`${store.name} logo`}
                             className="w-full h-full object-cover"
@@ -534,7 +534,7 @@ export default function ShopDirectoryPage() {
               >
                 <div className="flex items-start sm:items-center gap-4">
                   <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
-                    <img src={store.logo?.data?.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
+                    <img loading="lazy" decoding="async" src={store.logo?.data?.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
                   </div>
                   <div className="space-y-1">
                     <div className="flex flex-wrap items-center gap-2">

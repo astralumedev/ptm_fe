@@ -73,7 +73,7 @@ export default function CarouselGallery({ gallery }: { gallery: GalleryItem[] })
             className="relative w-full h-[400px] md:h-[500px]"
           >
             <div className="relative w-full h-full">
-              <img
+              <img loading="lazy" decoding="async"
                 src={gallery[current].directus_files_id.data.full_url}
                 alt={`Gallery image ${current + 1}`}
                 className="object-cover rounded-lg pointer-events-none select-none w-full h-full"
@@ -85,13 +85,13 @@ export default function CarouselGallery({ gallery }: { gallery: GalleryItem[] })
 
         {/* Preload prev and next images hidden offscreen */}
         <div style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}>
-          <img
+          <img loading="lazy" decoding="async"
             src={gallery[prevIndex].directus_files_id.data.full_url}
             alt=""
             width={1}
             height={1}
           />
-          <img
+          <img loading="lazy" decoding="async"
             src={gallery[nextIndex].directus_files_id.data.full_url}
             alt=""
             width={1}

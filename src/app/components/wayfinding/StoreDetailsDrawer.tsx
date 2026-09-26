@@ -263,7 +263,7 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
             <>
               <div className={styles.drawerPeekInfo}>
                 {selectedStore?.logo ? (
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={selectedStore.logo}
                     alt={selectedStore.name}
                     className="w-8 h-8 rounded-lg bg-white p-0.5 object-contain flex-shrink-0"
@@ -391,7 +391,7 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
                     onClick={() => handleSelectSuggestion(store)}
                   >
                     {store.logo ? (
-                      <img
+                      <img loading="lazy" decoding="async"
                         src={store.logo}
                         alt={store.name}
                         className={styles.suggestionLogo}
@@ -637,7 +637,7 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
               {/* Header with Image if available */}
               {selectedStore?.image && (
                 <div className="relative h-28 w-full rounded-xl overflow-hidden bg-gray-900 border border-gray-800">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={selectedStore.image}
                     alt={selectedStore.name}
                     className="w-full h-full object-cover"
@@ -650,7 +650,7 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
                 <div className="flex items-start gap-3 min-w-0">
                   {selectedStore?.logo && (
                     <div className="w-12 h-12 rounded-xl bg-white p-1 border border-gray-700 flex-shrink-0 shadow-sm overflow-hidden">
-                      <img
+                      <img loading="lazy" decoding="async"
                         src={selectedStore.logo}
                         alt={selectedStore.name}
                         className="w-full h-full object-contain"
@@ -809,7 +809,7 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
                         onClick={() => onSelectStore(store)}
                       >
                         {store.logo ? (
-                          <img
+                          <img loading="lazy" decoding="async"
                             src={store.logo}
                             alt={store.name}
                             className={styles.sidebarStoreLogo}

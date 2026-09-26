@@ -32,7 +32,7 @@ export default function QFXSection() {
               <span className="text-xs uppercase tracking-widest text-[#801424] font-bold bg-[#801424]/10 px-3 py-1 rounded-full">
                 {content.badge}
               </span>
-              {content.logoUrl && <img
+              {content.logoUrl && <img loading="lazy" decoding="async"
                 src={content.logoUrl}
                 alt="QFX Cinemas Logo"
                 className="h-6 w-auto object-contain"
@@ -116,7 +116,7 @@ export default function QFXSection() {
                 {/* Large Height Poster Aspect Box */}
                 <div className="relative w-full h-[420px] sm:h-[460px] md:h-[500px] overflow-hidden bg-gray-950">
                   {/* Poster Image */}
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={movie.posterUrl}
                     alt={movie.title}
                     className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100"

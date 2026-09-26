@@ -5,6 +5,7 @@ import PageHeader from '../app/components/PageHeader';
 import Footer from '../app/components/Footer';
 import { useBlock, useBundle } from '../content/block';
 import { contactPageBlock } from '../content/blocks/pages';
+import { useMallHours } from '../content/blocks/site';
 import { submitForm } from '../content/forms';
 
 const inputClass =
@@ -26,9 +27,10 @@ const ContactPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
-  const phone = settings?.phone || '+977 61-520000 / +977 9856012345';
-  const email = settings?.email || 'info@pokharatrademall.com';
-  const address = settings?.address || 'Chipledhunga Road, Ward 4 / 9, Pokhara 33700, Nepal';
+  const hours = useMallHours();
+  const phone = settings?.phone || '';
+  const email = settings?.email || '';
+  const address = settings?.address || '';
 
   // The chosen topic, or the first one when nothing (or a since-removed topic) is selected.
   const subject = topics.includes(formData.subject) ? formData.subject : topics[0] || '';
@@ -72,12 +74,12 @@ const ContactPage: React.FC = () => {
             </div>
             <h3 className="text-lg font-bold text-gray-900 mb-1 font-arizona-flare">{c.phoneTitle}</h3>
             <p className="text-xs text-gray-500 mb-4">{c.phoneText}</p>
-            <a
+            {phone && <a
               href={telHref(phone)}
               className="text-sm font-bold text-[#801424] hover:text-[#600f1b] transition-colors block"
             >
               {phone}
-            </a>
+            </a>}
           </div>
 
           <div className="bg-white p-8 rounded-3xl border border-gray-200/80 shadow-xs hover:shadow-lg transition-all">
@@ -86,12 +88,12 @@ const ContactPage: React.FC = () => {
             </div>
             <h3 className="text-lg font-bold text-gray-900 mb-1 font-arizona-flare">{c.emailTitle}</h3>
             <p className="text-xs text-gray-500 mb-4">{c.emailText}</p>
-            <a
+            {email && <a
               href={`mailto:${email}`}
               className="text-sm font-bold text-[#801424] hover:text-[#600f1b] transition-colors block"
             >
               {email}
-            </a>
+            </a>}
           </div>
 
           <div className="bg-white p-8 rounded-3xl border border-gray-200/80 shadow-xs hover:shadow-lg transition-all">
@@ -99,8 +101,8 @@ const ContactPage: React.FC = () => {
               <FaClock />
             </div>
             <h3 className="text-lg font-bold text-gray-900 mb-1 font-arizona-flare">{c.hoursTitle}</h3>
-            {(c.hours || []).map((line, idx, all) => (
-              <p key={idx} className={`text-xs text-gray-500${idx < all.length - 1 ? ' mb-1' : ''}`}>{line}</p>
+            {hours.rows.map((row, idx, all) => (
+              <p key={idx} className={`text-xs text-gray-500${idx < all.length - 1 ? ' mb-1' : ''}`}>{row.label}: {row.hours}</p>
             ))}
           </div>
         </div>

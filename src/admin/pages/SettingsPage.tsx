@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Download } from 'lucide-react';
 import { SETTINGS_FIELDS, setPath } from '../schema';
 import { adminApi, AdminUser } from '../lib/http';
 import { useCollection } from '../lib/useCollection';
@@ -20,6 +21,8 @@ export function SettingsPage() {
 
   const save = async () => {
     if (!data) return;
+    const missing = SETTINGS_FIELDS.find((f) => f.required && !String(data[f.key] ?? '').trim());
+    if (missing) { setError(`${missing.label} is required: it is shown in the footer and on the contact page.`); return; }
     setSaving(true);
     setError('');
     try {
@@ -53,6 +56,11 @@ export function AccountPage({ admin, onChange }: { admin: AdminUser; onChange: (
     <div className="max-w-md">
       <PageHead title="Account" lead="Change the username or password used to sign in. Saving signs out every other device." />
       <PasswordForm username={admin.username} onDone={(a) => { onChange(a); toast('ok', 'Account updated'); }} />
+      <section className="mt-10 pt-6 border-t border-[var(--adm-line)]">
+        <h2 className="text-[15px] font-semibold">Backup</h2>
+        <p className="mt-1 mb-3 text-[13.5px] text-[var(--adm-ink-3)]">Download everything on the website (stores, posts, sections, settings, inbox and the image list) as one file. Keep a copy before big changes.</p>
+        <a className="adm-btn" href="/api/admin/items?collection=export" download><Download className="size-4" /> Download backup</a>
+      </section>
     </div>
   );
 }

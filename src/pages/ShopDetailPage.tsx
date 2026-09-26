@@ -8,6 +8,7 @@ import api from '../services/api';
 import { Store } from '../data/models/Store';
 import { useBlock } from '../content/block';
 import { storePageBlock, fill } from '../content/blocks/directory';
+import { usePageMeta } from '../content/seo';
 
 /** Store records may carry mall-map placement (added by the CMS); read it defensively. */
 type StoreWithMap = Store & { mapFloor?: string | null; mapUnits?: string[] | null };
@@ -20,6 +21,7 @@ export default function ShopDetailPage() {
   const navigate = useNavigate();
   const t = useBlock(storePageBlock);
   const [shop, setShop] = useState<Store | null>(null);
+  usePageMeta(shop ? { title: shop.name, description: shop.subtitle || shop.store_description, image: shop.cover?.data?.full_url || shop.logo?.data?.full_url } : null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -259,7 +261,7 @@ export default function ShopDetailPage() {
             
             {/* Primary Cover Image */}
             <div className="bg-white p-3 rounded-3xl border border-gray-200/80 shadow-md overflow-hidden aspect-[4/3] group">
-              <img
+              <img loading="lazy" decoding="async"
                 src={shop.cover?.data?.full_url || shop.logo?.data?.full_url || '/mall_images/ptm_hero.webp'}
                 alt={shop.name}
                 className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
@@ -278,7 +280,7 @@ export default function ShopDetailPage() {
                       key={index}
                       className="rounded-xl overflow-hidden aspect-square bg-gray-100 border border-gray-200"
                     >
-                      <img
+                      <img loading="lazy" decoding="async"
                         src={image.directus_files_id.data.full_url}
                         alt={`${shop.name} photo ${index + 1}`}
                         className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"

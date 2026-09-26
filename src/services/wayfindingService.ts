@@ -1,31 +1,21 @@
 import { FloorId, FloorData, WayfindingStore, FLOOR_LABELS } from '../types/wayfinding';
 import api from './api';
 import type { Store } from '../data/models/Store';
-import legacyUnits from '../data/storeMapUnits.json';
 
 export interface WayfindingStoresResponse {
   stores: WayfindingStore[];
 }
 
-export interface GetStoresOptions {
-  /** Fill units no real store has claimed with the sample stores from stores.json. */
-  includeDemo?: boolean;
-}
-
 type CmsStore = Store & { mapFloor?: string | null; mapUnits?: string[] | string | null };
 
-const LEGACY_UNITS = legacyUnits as Record<string, { floor: string; shutter: string }>;
 const isFloor = (f: unknown): f is FloorId => typeof f === 'string' && f in FLOOR_LABELS;
 
-/** Map placement of a CMS store: its own map fields, else the pre-CMS table, else unplaced. */
+/** Map placement of a CMS store from its Mall map floor / units; unplaced when not set. */
 function placement(store: CmsStore): { floor?: FloorId; units: string[] } {
   const units = (Array.isArray(store.mapUnits) ? store.mapUnits : String(store.mapUnits || '').split(','))
     .map((u) => String(u).trim())
     .filter(Boolean);
-  if (isFloor(store.mapFloor)) return { floor: store.mapFloor, units };
-  const legacy = LEGACY_UNITS[store.slug];
-  if (legacy && isFloor(legacy.floor)) return { floor: legacy.floor, units: [legacy.shutter] };
-  return { units: [] };
+  return isFloor(store.mapFloor) ? { floor: store.mapFloor, units } : { units: [] };
 }
 
 function toMapStore(store: CmsStore): WayfindingStore {
@@ -53,40 +43,18 @@ class WayfindingService {
     this.baseUrl = envApiUrl ? envApiUrl.replace(/\/$/, '') : '';
   }
 
-  private async getDemoStores(): Promise<WayfindingStore[]> {
-    try {
-      const endpoint = this.baseUrl ? `${this.baseUrl}/api/stores` : '/wayfinding/data/stores.json';
-      const response = await fetch(endpoint);
-      if (!response.ok) return [];
-      const data = await response.json();
-      const list: WayfindingStore[] = data.stores || (Array.isArray(data) ? data : []);
-      return list.map((s) => ({ ...s, slug: '', floor: s.floor || s.shutters?.[0]?.split(':')[0] })); // demo stores have no store page
-    } catch (error) {
-      console.error('WayfindingService: Error loading demo stores', error);
-      return [];
-    }
-  }
-
   /**
-   * Map stores: published CMS stores placed by their Map floor/Units. Stores without units are
-   * returned too (searchable, not drawn). Optional demo stores only fill unclaimed units.
+   * Map stores: published CMS stores placed by their Mall map floor / units. Stores without
+   * units are returned too, so visitors can still find them in search.
    */
-  async getStores({ includeDemo = true }: GetStoresOptions = {}): Promise<WayfindingStore[]> {
-    let official: WayfindingStore[] = [];
+  async getStores(): Promise<WayfindingStore[]> {
     try {
       const res = await api.getStores({ filter: { status: 'published' } });
-      official = (res.data as CmsStore[]).filter((s) => s && s.name).map(toMapStore);
+      return (res.data as CmsStore[]).filter((s) => s && s.name).map(toMapStore);
     } catch (error) {
       console.error('WayfindingService: Error loading stores', error);
+      return [];
     }
-    if (!includeDemo) return official;
-
-    const claimed = new Set(official.flatMap((s) => s.shutters || []).map((k) => k.toLowerCase()));
-    const ids = new Set(official.map((s) => s.id));
-    const demo = (await this.getDemoStores()).filter(
-      (s) => !ids.has(s.id) && s.shutters?.length && !s.shutters.some((k) => claimed.has(k.toLowerCase())),
-    );
-    return [...official, ...demo];
   }
 
   /**

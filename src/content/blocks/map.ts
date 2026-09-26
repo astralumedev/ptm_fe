@@ -34,15 +34,9 @@ export const mapPageBlock = defineBlock({
   group: 'Mall map',
   label: 'Mall map settings & text',
   description:
-    'Floor names, entrance points, placeholder stores and every label on the interactive mall map. Store positions are set on each store (Map floor + Units). In texts, words in {curly brackets} are filled in automatically — keep them.',
+    'Floor names, entrance points and every label on the interactive mall map. Store positions are set on each store (Map floor + Units). In texts, words in {curly brackets} are filled in automatically — keep them.',
   page: '/mall-map',
   fields: [
-    {
-      key: 'showDemoStores',
-      label: 'Show placeholder demo stores on unassigned units',
-      type: 'toggle',
-      help: 'Fills units that no real store has claimed with sample shops, so the map does not look empty. Turn off once real stores are placed.',
-    },
     {
       key: 'floors',
       label: 'Floors',
@@ -148,7 +142,6 @@ export const mapPageBlock = defineBlock({
     t('qrPoint', 'Entrance picker: point name', '{id} = unit.'),
   ],
   defaults: {
-    showDemoStores: true,
     floors: [
       floor('lower_ground_floor', 'LG', 'Lower Ground', 'Lower Ground', 'Basement Parking & Groceries'),
       floor('ground_floor', 'G', 'Ground Floor', 'Ground Floor', 'Jewelry, Tech & Banking'),

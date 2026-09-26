@@ -66,7 +66,7 @@ export default function FeaturedStoresSection() {
               >
                 {/* Cover Image Container */}
                 <div className={`relative w-full ${store.tall ? 'h-64 sm:h-72 lg:h-80' : 'h-56 sm:h-64 lg:h-72'} overflow-hidden bg-gray-100`}>
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={store.imageUrl}
                     alt={store.name}
                     className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ease-out"

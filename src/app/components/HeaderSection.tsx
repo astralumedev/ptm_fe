@@ -42,7 +42,7 @@ const HeaderSection = () => {
         <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#801424]/20 rounded-full blur-3xl pointer-events-none" />
 
         {/* Subtle Background Image Overlay */}
-        <img
+        <img fetchPriority="high" decoding="async"
           src={hero.backgroundUrl}
           alt={hero.backgroundAlt}
           className="absolute inset-0 object-cover w-full h-full opacity-20 mix-blend-luminosity pointer-events-none"
@@ -126,7 +126,7 @@ const HeaderSection = () => {
                     transition={{ duration: 0.4, ease: "easeOut" }}
                     className="absolute inset-0"
                   >
-                    <img
+                    <img decoding="async"
                       src={activeStory.imageUrl}
                       alt={activeStory.title}
                       className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 opacity-80"
@@ -193,7 +193,7 @@ const HeaderSection = () => {
             {/* Logo on Left */}
             <div className="relative z-20 flex items-center flex-shrink-0">
               <Link to="/" className="flex items-center no-underline hover:no-underline">
-                <img
+                <img fetchPriority="high" decoding="async"
                   src={nav.logoUrl}
                   alt={nav.logoAlt}
                   className="w-36 sm:w-40 md:w-44 lg:w-48 h-auto max-h-14 sm:max-h-16 md:max-h-20 object-contain transition-transform hover:scale-105"
