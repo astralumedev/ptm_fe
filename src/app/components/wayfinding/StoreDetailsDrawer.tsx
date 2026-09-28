@@ -18,6 +18,7 @@ import {
   ChevronUp,
   ChevronDown,
   SlidersHorizontal,
+  RotateCcw,
 } from 'lucide-react';
 import {
   WayfindingStore,
@@ -48,6 +49,8 @@ interface StoreDetailsDrawerProps {
   onStepChange: (index: number) => void;
   onNextStep: () => void;
   onPrevStep: () => void;
+  /** Plays the walking animation for the current step again. */
+  onReplay?: () => void;
   onCloseDetails: () => void;
   onCloseDirections: () => void;
 }
@@ -68,6 +71,7 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
   onStepChange,
   onNextStep,
   onPrevStep,
+  onReplay,
   onCloseDetails,
   onCloseDirections,
 }) => {
@@ -86,11 +90,9 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Auto-expand when navigating or when store is clicked from search
+  // While navigating on a phone, keep the sheet low so the walk on the map stays in view.
   useEffect(() => {
-    if (isNavigating) {
-      setSheetMode('expanded');
-    }
+    if (isNavigating) setSheetMode(window.innerWidth < 1024 ? 'peek' : 'expanded');
   }, [isNavigating]);
 
   // Handle Swipe Gesture on Handle Area
@@ -541,6 +543,11 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
                   <p className={styles.activeStepText}>
                     {routeResult.steps[activeStepIndex].text}
                   </p>
+                  {onReplay && (
+                    <button onClick={onReplay} className="mt-2 inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#fca5a5] hover:text-white transition-colors">
+                      <RotateCcw size={12} /> {copy.replay}
+                    </button>
+                  )}
 
                   {/* Step Action Buttons */}
                   <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-white/10">

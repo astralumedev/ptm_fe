@@ -1,0 +1,51 @@
+/* Mall map motion: walker, route, markers, shutter. All of it respects reduced motion. */
+
+.pm-floor-enter { animation: pm-floor-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.pm-floor-enter.pm-up { --pm-from: 60px; }
+.pm-floor-enter.pm-down { --pm-from: -60px; }
+@keyframes pm-floor-in {
+  from { opacity: 0; transform: translateY(var(--pm-from, 0)) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Walker: arms and legs swing from the shoulder/hip while moving. */
+.pm-walker .pm-limb { transform-box: fill-box; transform-origin: 50% 0; }
+.pm-walker.is-walking .pm-leg-a, .pm-walker.is-walking .pm-arm-b { animation: pm-swing 0.52s ease-in-out infinite alternate; }
+.pm-walker.is-walking .pm-leg-b, .pm-walker.is-walking .pm-arm-a { animation: pm-swing 0.52s ease-in-out infinite alternate-reverse; }
+.pm-walker.is-walking .pm-body { animation: pm-bob 0.26s ease-in-out infinite alternate; }
+@keyframes pm-swing { from { transform: rotate(-26deg); } to { transform: rotate(26deg); } }
+@keyframes pm-bob { from { transform: translateY(0); } to { transform: translateY(-1.4px); } }
+.pm-walker .pm-shadow { transition: opacity 300ms; }
+/* Arrived: the walker steps aside so the destination pin reads clearly. */
+.pm-walker.is-arrived { transition: opacity 500ms 500ms, transform 500ms 500ms; opacity: 0; transform: translateY(6px); }
+.pm-walker.is-leaving { animation: pm-leave 700ms ease-in forwards; }
+@keyframes pm-leave { to { opacity: 0; transform: scale(0.4); } }
+.pm-walker.is-arriving { animation: pm-arrive 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes pm-arrive { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: none; } }
+
+/* Route: the travelled part is solid, what's ahead is a soft dotted guide. */
+.pm-route-ahead { animation: pm-march 1.1s linear infinite; }
+@keyframes pm-march { to { stroke-dashoffset: -28; } }
+
+.pm-pulse { transform-box: fill-box; transform-origin: center; animation: pm-pulse 2.2s cubic-bezier(0.2, 0.6, 0.35, 1) infinite; }
+.pm-pulse.pm-delay { animation-delay: 1.1s; }
+@keyframes pm-pulse { 0% { transform: scale(0.35); opacity: 0.85; } 100% { transform: scale(1.6); opacity: 0; } }
+
+.pm-pop { transform-box: fill-box; transform-origin: 50% 100%; animation: pm-pop 620ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes pm-pop { from { opacity: 0; transform: translateY(-14px) scale(0.6); } to { opacity: 1; transform: none; } }
+
+.pm-badge { transform-box: fill-box; transform-origin: 50% 100%; animation: pm-badge 420ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes pm-badge { from { opacity: 0; transform: translateY(6px) scale(0.92); } to { opacity: 1; transform: none; } }
+
+/* Shutter over the destination: rolls up when the walker arrives. */
+.pm-shutter { transition: transform 1100ms cubic-bezier(0.65, 0, 0.35, 1), opacity 400ms 900ms; }
+.pm-shutter.is-open { opacity: 0; }
+.pm-dest-glow { animation: pm-glow 1.6s ease-in-out infinite alternate; }
+@keyframes pm-glow { from { opacity: 0.35; } to { opacity: 0.9; } }
+
+.pm-beam { transform-box: view-box; transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pm-floor-enter, .pm-walker *, .pm-walker, .pm-route-ahead, .pm-pulse, .pm-pop, .pm-badge, .pm-dest-glow { animation: none !important; }
+  .pm-shutter { transition: none; }
+}

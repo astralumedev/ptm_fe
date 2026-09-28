@@ -15,6 +15,7 @@ const BlogDetailPage = lazy(() => import('../pages/BlogDetailPage'));
 const ContactPage = lazy(() => import('../pages/ContactPage'));
 const ContentPage = lazy(() => import('../pages/ContentPage'));
 const MallMapPage = lazy(() => import('../pages/MallMapPage'));
+const QrScanRedirect = lazy(() => import('../pages/MallMapPage').then((m) => ({ default: m.QrScanRedirect })));
 const AboutPage = lazy(() => import('../pages/AboutPage'));
 const PrivacyPolicyPage = lazy(() => import('../pages/PrivacyPolicyPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
@@ -71,6 +72,7 @@ const router = createBrowserRouter(
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/page/:slug" element={<ContentPage />} />
         <Route path="/mall-map" element={<MallMapPage />} />
+        <Route path="/q/:code" element={<QrScanRedirect />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Route>,

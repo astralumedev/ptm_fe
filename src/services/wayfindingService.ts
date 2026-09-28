@@ -1,4 +1,4 @@
-import { FloorId, FloorData, WayfindingStore, FLOOR_LABELS } from '../types/wayfinding';
+import { FloorId, WayfindingStore, FLOOR_LABELS } from '../types/wayfinding';
 import api from './api';
 import type { Store } from '../data/models/Store';
 
@@ -36,13 +36,6 @@ function toMapStore(store: CmsStore): WayfindingStore {
 }
 
 class WayfindingService {
-  private baseUrl: string;
-
-  constructor() {
-    const envApiUrl = import.meta.env.VITE_WAYFINDING_API_URL;
-    this.baseUrl = envApiUrl ? envApiUrl.replace(/\/$/, '') : '';
-  }
-
   /**
    * Map stores: published CMS stores placed by their Mall map floor / units. Stores without
    * units are returned too, so visitors can still find them in search.
@@ -55,48 +48,6 @@ class WayfindingService {
       console.error('WayfindingService: Error loading stores', error);
       return [];
     }
-  }
-
-  /**
-   * Fetches floor locations and geometry for a specific floor.
-   * If VITE_WAYFINDING_API_URL is configured, fetches from `${baseUrl}/api/floors/${floorId}`,
-   * otherwise fetches static asset `/wayfinding/data/${floorId}.json`.
-   */
-  async getFloorData(floorId: FloorId): Promise<FloorData | null> {
-    try {
-      const endpoint = this.baseUrl
-        ? `${this.baseUrl}/api/floors/${floorId}`
-        : `/wayfinding/data/${floorId}.json`;
-
-      const response = await fetch(endpoint);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch floor data for ${floorId}: ${response.statusText}`);
-      }
-
-      const data: FloorData = await response.json();
-      return data;
-    } catch (error) {
-      console.error(`WayfindingService: Error loading floor data for ${floorId}`, error);
-      return null;
-    }
-  }
-
-  /**
-   * Batch fetches floor data for all specified floors.
-   */
-  async getAllFloorsData(floors: FloorId[]): Promise<Record<FloorId, FloorData>> {
-    const results: Record<string, FloorData> = {};
-    
-    await Promise.all(
-      floors.map(async (f) => {
-        const data = await this.getFloorData(f);
-        if (data) {
-          results[f] = data;
-        }
-      })
-    );
-
-    return results as Record<FloorId, FloorData>;
   }
 }
 

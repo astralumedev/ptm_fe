@@ -21,12 +21,6 @@ export interface MapFloorText {
   desc: string;
 }
 
-export interface MapEntrance {
-  floorId: string;
-  locationId: string;
-  name: string;
-}
-
 const floor = (id: string, short: string, label: string, name: string, desc: string): MapFloorText => ({ id, short, label, name, desc });
 
 export const mapPageBlock = defineBlock({
@@ -34,7 +28,7 @@ export const mapPageBlock = defineBlock({
   group: 'Mall map',
   label: 'Mall map settings & text',
   description:
-    'Floor names, entrance points and every label on the interactive mall map. Store positions are set on each store (Map floor + Units). In texts, words in {curly brackets} are filled in automatically — keep them.',
+    'Floor names and every label on the interactive mall map. Shops, units, QR codes and store positions are edited in Map management. In texts, words in {curly brackets} are filled in automatically — keep them.',
   page: '/mall-map',
   fields: [
     {
@@ -54,21 +48,7 @@ export const mapPageBlock = defineBlock({
       ],
       itemDefaults: { id: 'ground_floor', short: '', label: '', name: '', desc: '' },
     },
-    {
-      key: 'entrances',
-      label: '"You are here" entrance points',
-      type: 'list',
-      itemName: 'entrance',
-      itemTitle: 'name',
-      help: 'Shown in the QR / entrance picker. Unit is the unit or shutter id on that floor, e.g. A101.',
-      fields: [
-        { key: 'name', label: 'Name', type: 'text', required: true },
-        { key: 'floorId', label: 'Floor', type: 'select', options: FLOOR_OPTIONS, half: true },
-        { key: 'locationId', label: 'Unit', type: 'text', half: true },
-      ],
-      itemDefaults: { name: '', floorId: 'ground_floor', locationId: '' },
-    },
-    t('defaultStartName', 'Default starting point name', 'Used for directions until a visitor picks an entrance.'),
+    t('defaultStartName', 'Default starting point name', 'Used for directions until a visitor scans a QR code or picks where they are.'),
     t('mainEntrance', 'Fallback starting point name'),
     t('youAreHere', 'Map: "you are here" marker'),
     t('startPoint', 'Map: start marker fallback'),
@@ -131,15 +111,26 @@ export const mapPageBlock = defineBlock({
     t('zoomFit', 'Controls: fit floor'),
     t('qrButton', 'Controls: entrance picker'),
 
-    t('qrTitle', 'Entrance picker: title'),
-    t('qrSubtitle', 'Entrance picker: subtitle'),
-    t('qrPresetLabel', 'Entrance picker: list heading'),
-    t('qrShutter', 'Entrance picker: unit prefix'),
-    t('qrCustomLabel', 'Entrance picker: custom heading'),
-    t('qrCustomPlaceholder', 'Entrance picker: custom hint'),
-    t('qrApply', 'Entrance picker: apply button'),
-    t('qrCustomPoint', 'Entrance picker: custom point name', '{id} = unit.'),
-    t('qrPoint', 'Entrance picker: point name', '{id} = unit.'),
+    t('hereTitle', 'Where are you: title'),
+    t('hereSubtitle', 'Where are you: subtitle'),
+    t('hereEmpty', 'Where are you: no points yet'),
+
+    t('stepSameFloor', 'Directions: same floor', '{m} = metres, {name} = destination, {side} = side text.'),
+    t('stepToTransit', 'Directions: to the lift/stairs', '{m}, {transit}, {direction}, {floor}.'),
+    t('stepArrive', 'Directions: after the lift/stairs', '{m}, {name}, {side}, {floor}.'),
+    t('sideLeft', 'Directions: on the left'),
+    t('sideRight', 'Directions: on the right'),
+    t('sideAhead', 'Directions: straight ahead'),
+    t('wordLift', 'Word for lift'),
+    t('wordStairs', 'Word for stairs'),
+    t('wordUp', 'Word for up'),
+    t('wordDown', 'Word for down'),
+    t('transitBadge', 'Map: lift/stairs badge', '{transit}, {direction}, {floor}.'),
+    t('noRoute', 'Directions: no route found'),
+    t('continuing', 'Trip banner: continuing', '{name} = destination.'),
+    t('changeTrip', 'Trip banner: change'),
+    t('endTrip', 'Trip banner: end'),
+    t('replay', 'Directions: replay walk'),
   ],
   defaults: {
     floors: [
@@ -151,16 +142,6 @@ export const mapPageBlock = defineBlock({
       floor('fourth_floor', '4F', '4th Floor', 'Fourth Floor', 'Food Court & Engineering'),
       floor('fifth_floor', '5F', '5th Floor', 'Fifth Floor', 'QFX Cineplex & 4D VR'),
     ] as MapFloorText[],
-    entrances: [
-      { floorId: 'ground_floor', locationId: 'A101', name: 'Ground Floor Main Entrance (A101)' },
-      { floorId: 'ground_floor', locationId: 'A115', name: 'Ground Floor East Wing Entry (A115)' },
-      { floorId: 'ground_floor', locationId: 'LIFT-U', name: 'Ground Floor North Elevators' },
-      { floorId: 'first_floor', locationId: 'A201', name: 'First Floor North Landing (A201)' },
-      { floorId: 'second_floor', locationId: 'A305', name: 'Second Floor Central Hub (A305)' },
-      { floorId: 'third_floor', locationId: 'A409', name: 'Third Floor Plaza Entrance (A409)' },
-      { floorId: 'fourth_floor', locationId: 'A509', name: 'Fourth Floor Food Court Entry (A509)' },
-      { floorId: 'fifth_floor', locationId: 'L501', name: 'Fifth Floor QFX Cinemas Lobby (L501)' },
-    ] as MapEntrance[],
     defaultStartName: 'Ground Floor Main Entrance',
     mainEntrance: 'Main Entrance',
     youAreHere: 'You Are Here',
@@ -222,17 +203,28 @@ export const mapPageBlock = defineBlock({
     zoomIn: 'Zoom In',
     zoomOut: 'Zoom Out',
     zoomFit: 'Fit Floor to Screen',
-    qrButton: 'Simulate QR Code Entrance / You Are Here',
+    qrButton: 'Where are you?',
 
-    qrTitle: 'Simulate Entrance QR Scan',
-    qrSubtitle: 'Set your current "You Are Here" position',
-    qrPresetLabel: 'Select Entrance Preset',
-    qrShutter: 'Shutter',
-    qrCustomLabel: 'Or Enter Custom QR Location String',
-    qrCustomPlaceholder: 'e.g. ground_floor:G-01',
-    qrApply: 'Apply',
-    qrCustomPoint: 'Custom Point ({id})',
-    qrPoint: 'Point ({id})',
+    hereTitle: 'Where are you?',
+    hereSubtitle: 'Scan any map QR code in the mall, or pick the one nearest to you.',
+    hereEmpty: 'Map points will appear here soon.',
+
+    stepSameFloor: 'Walk about {m} m to {name}, {side}.',
+    stepToTransit: 'Walk about {m} m to the {transit} and go {direction} to {floor}.',
+    stepArrive: 'On {floor}, walk about {m} m to {name}, {side}.',
+    sideLeft: 'on your left',
+    sideRight: 'on your right',
+    sideAhead: 'straight ahead',
+    wordLift: 'lift',
+    wordStairs: 'stairs',
+    wordUp: 'up',
+    wordDown: 'down',
+    transitBadge: 'Take the {transit} {direction} to {floor}',
+    noRoute: "We couldn't find a walking route there yet. Ask at the information desk and we'll point the way.",
+    continuing: 'Continuing to {name}',
+    changeTrip: 'Change',
+    endTrip: 'End',
+    replay: 'Replay walk',
   },
 });
 

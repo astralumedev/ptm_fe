@@ -24,6 +24,10 @@ export interface WayfindingLocation {
   dims?: string;
   area?: string;
   block?: string;
+  /** Lifts/stairs: shaft name linking this unit to the same lift/stair on other floors. */
+  link?: string;
+  /** Units combined into this one by a merge, kept so the merge can be undone. */
+  mergedFrom?: WayfindingLocation[];
 }
 
 export interface WayfindingStore {
@@ -42,24 +46,41 @@ export interface WayfindingStore {
 }
 
 export interface FloorData {
+  imageSize?: { w: number; h: number };
   locations: WayfindingLocation[];
   silhouette?: Array<{ x: number; y: number } | [number, number]>;
-  youAreHere?: { x: number; y: number };
+  youAreHere?: { x: number; y: number } | null;
+  /** Optional traced floor-plan image shown under the map in the editor. */
+  underlay?: { url: string; x: number; y: number; w: number; h: number; opacity: number };
 }
 
-export interface GraphNode {
+/** A printed QR code in the building: a fixed "you are here" point. */
+export interface QrPoint {
+  code: string;
+  name: string;
   floorId: FloorId;
   x: number;
   y: number;
-  id: string;
-  label: string;
-  isTransit?: boolean;
-  isWaypoint?: boolean;
+  /** Direction the person scanning is facing, in degrees (0 = up on the map). */
+  heading?: number | null;
+  note?: string;
 }
 
-export interface GraphEdge {
-  target: string;
-  weight: number;
+export interface MapPoint {
+  x: number;
+  y: number;
+}
+
+/** One continuous walk on a single floor. */
+export interface RouteLeg {
+  floorId: FloorId;
+  points: MapPoint[];
+  /** Metres walked on this leg. */
+  metres: number;
+  /** How the leg ends: at a lift/stairs to another floor, or at the destination. */
+  end:
+    | { kind: 'transit'; unitId: string; cat: 'elevator' | 'stairs'; toFloor: FloorId }
+    | { kind: 'destination'; unitId?: string; side?: 'left' | 'right' | 'ahead' };
 }
 
 export interface RouteStep {
@@ -67,13 +88,16 @@ export interface RouteStep {
   floorId: FloorId;
   type: 'start' | 'walk' | 'floor_change' | 'destination';
   icon?: string;
+  /** Leg of the route this step describes. */
+  legIndex: number;
 }
 
 export interface PathResult {
   steps: RouteStep[];
+  legs: RouteLeg[];
+  /** Metres walked, all floors together. */
   totalDistance: number;
   estTimeMinutes: number;
-  nodePath: string[];
 }
 
 export const CATEGORIES: Record<string, CategoryInfo> = {
@@ -149,28 +173,3 @@ export const FLOOR_LABELS: Record<FloorId, string> = {
   fourth_floor: "Fourth Floor",
   fifth_floor: "Fifth Floor"
 };
-
-export const CORRIDOR_SEGMENTS = [
-  // 1. North Wing (Main North Entrance down to Central Concourse)
-  { id: "C1", a: { x: 1400, y: 480 }, b: { x: 1400, y: 2260 } },
-
-  // 2. Central Main Concourse (Connecting West, Central Atrium, and East Wings)
-  { id: "C2", a: { x: 1050, y: 2260 }, b: { x: 2320, y: 2260 } },
-
-  // 3. South-West Wing Corridors
-  { id: "C3", a: { x: 1050, y: 2260 }, b: { x: 1050, y: 3180 } },
-  { id: "C4", a: { x: 1050, y: 2730 }, b: { x: 1580, y: 2730 } },
-  { id: "C5", a: { x: 1580, y: 2730 }, b: { x: 1580, y: 3200 } },
-  { id: "C5B", a: { x: 1050, y: 3180 }, b: { x: 1940, y: 3180 } },
-
-  // 4. Central Link between South-West & South-East
-  { id: "C6", a: { x: 2080, y: 2260 }, b: { x: 2080, y: 3050 } },
-  { id: "C7", a: { x: 1940, y: 3050 }, b: { x: 2250, y: 3050 } },
-  { id: "C7B", a: { x: 1940, y: 3050 }, b: { x: 1940, y: 3200 } },
-
-  // 5. South-East Long Wing Hallway & Cross Aisles
-  { id: "C8", a: { x: 2250, y: 2260 }, b: { x: 2250, y: 4580 } },
-  { id: "C9", a: { x: 1940, y: 3600 }, b: { x: 2520, y: 3600 } },
-  { id: "C10", a: { x: 1940, y: 4100 }, b: { x: 2520, y: 4100 } },
-  { id: "C11", a: { x: 1940, y: 4480 }, b: { x: 2520, y: 4480 } },
-];

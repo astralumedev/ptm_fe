@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import './admin.css';
 import { adminApi, AdminUser, ApiError } from './lib/http';
@@ -14,6 +14,8 @@ import MediaPage from './pages/MediaPage';
 import { SettingsPage, AccountPage } from './pages/SettingsPage';
 import { SiteContentIndex, SiteContentEditor } from './pages/SiteContent';
 import InboxPage from './pages/Inbox';
+
+const MapManager = lazy(() => import('./pages/map/MapManager'));
 
 type Phase = { kind: 'loading' } | { kind: 'setup' } | { kind: 'login' } | { kind: 'error'; message: string } | { kind: 'in'; admin: AdminUser };
 
@@ -109,6 +111,7 @@ export default function AdminApp() {
           <Route path="inbox" element={<InboxPage onUnreadChange={onUnreadChange} />} />
           <Route path="content" element={<SiteContentIndex />} />
           <Route path="content/:block" element={<SiteContentKeyed />} />
+          <Route path="map" element={<Suspense fallback={<div className="h-screen grid place-items-center"><Spinner /></div>}><MapManager /></Suspense>} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="account" element={<AccountPage admin={admin} onChange={(a) => setPhase({ kind: 'in', admin: a })} />} />
           <Route path=":collection" element={<KnownCollection><CollectionList /></KnownCollection>} />

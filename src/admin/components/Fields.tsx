@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, KeyboardEvent } from 'react';
+import { loadMap } from '../../services/mapData';
 import { X, ChevronDown, ChevronUp, ArrowUp, ArrowDown, Copy, Trash2, Plus, EyeOff, CalendarClock, Search } from 'lucide-react';
 import { Field, getPath, imageUrlOf, setPath, toAsset } from '../schema';
 import { FieldShell, Toggle } from './ui';
@@ -220,15 +221,10 @@ function StoreSelect({ id, value, onChange }: { id: string; value?: string; onCh
 }
 
 interface MapUnit { id: string; block?: string; area?: string; cat: string }
-const floorCache = new Map<string, Promise<MapUnit[]>>();
-function loadFloorUnits(floor: string) {
-  if (!floorCache.has(floor)) {
-    floorCache.set(floor, fetch(`/wayfinding/data/${floor}.json`)
-      .then((r) => (r.ok ? r.json() : { locations: [] }))
-      .then((d) => (d.locations || []).filter((l: MapUnit) => l.cat === 'shop').map((l: MapUnit) => ({ id: l.id, block: l.block, area: l.area, cat: l.cat })))
-      .catch(() => []));
-  }
-  return floorCache.get(floor)!;
+function loadFloorUnits(floor: string): Promise<MapUnit[]> {
+  return loadMap()
+    .then((b) => (b.floors[floor as keyof typeof b.floors]?.locations || []).filter((l) => l.cat === 'shop').map((l) => ({ id: l.id, block: l.block, area: l.area, cat: l.cat })))
+    .catch(() => []);
 }
 
 /** Picks units from the real floor plan, showing which ones other stores already occupy. */

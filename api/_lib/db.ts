@@ -65,6 +65,29 @@ export const SCHEMA = [
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   )`,
   `CREATE INDEX IF NOT EXISTS submissions_recent_idx ON submissions (created_at DESC)`,
+  // Mall map: one document per floor (units, outline, "you are here"), edited in Map management.
+  `CREATE TABLE IF NOT EXISTS map_floors (
+    id TEXT PRIMARY KEY,
+    data JSONB NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`,
+  // Every saved version of a floor, so a bad edit can be rolled back.
+  `CREATE TABLE IF NOT EXISTS map_history (
+    id SERIAL PRIMARY KEY,
+    floor_id TEXT NOT NULL,
+    data JSONB NOT NULL,
+    note TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`,
+  `CREATE INDEX IF NOT EXISTS map_history_floor_idx ON map_history (floor_id, created_at DESC)`,
+  // QR codes placed around the building: each one is a fixed "you are here" point.
+  `CREATE TABLE IF NOT EXISTS map_qr (
+    code TEXT PRIMARY KEY,
+    data JSONB NOT NULL,
+    scans INTEGER NOT NULL DEFAULT 0,
+    last_scan_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`,
 ];
 
 /** Runs the idempotent schema. Cheap: every statement is IF NOT EXISTS. */

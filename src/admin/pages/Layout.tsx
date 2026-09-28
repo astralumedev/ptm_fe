@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Images, Settings2, UserRound, LogOut, Menu, X, ExternalLink, PanelsTopLeft, Inbox } from 'lucide-react';
+import { LayoutDashboard, Images, Settings2, UserRound, LogOut, Menu, X, ExternalLink, PanelsTopLeft, Inbox, Map as MapIcon } from 'lucide-react';
 import { COLLECTIONS } from '../schema';
 import { Logo } from '../components/ui';
 
@@ -34,6 +34,7 @@ function Nav({ username, onLogout, unread }: { username: string; onLogout: () =>
           <Inbox className="size-4" /> <span className="flex-1">Inbox</span>
           {unread > 0 && <span className="min-w-5 h-5 px-1.5 grid place-items-center rounded-full bg-[var(--adm-accent)] text-white text-[11.5px] font-semibold" aria-label={`${unread} unread`}>{unread > 99 ? '99+' : unread}</span>}
         </NavLink>
+        <NavLink to="/admin/map" className={linkCls}><MapIcon className="size-4" /> Map management</NavLink>
         <p className="mt-4 mb-1 px-2.5 text-[12px] font-medium text-[var(--adm-ink-3)]">Content</p>
         <NavLink to="/admin/content" className={linkCls}><PanelsTopLeft className="size-4" /> Site content</NavLink>
         {COLLECTIONS.map((c) => (
@@ -78,7 +79,8 @@ export function Shell({ username, onLogout, unread }: { username: string; onLogo
         </div>
       )}
 
-      <main className="min-w-0 px-4 sm:px-8 py-6 lg:py-8 max-w-[1120px] w-full">
+      {/* The map editor uses the whole screen; everything else is a readable column. */}
+      <main className={pathname.startsWith('/admin/map') ? 'min-w-0 w-full' : 'min-w-0 px-4 sm:px-8 py-6 lg:py-8 max-w-[1120px] w-full'}>
         <Outlet />
       </main>
     </div>

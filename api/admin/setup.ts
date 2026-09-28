@@ -2,6 +2,7 @@ import { sql, ensureSchema, COLLECTIONS } from '../_lib/db';
 import { route, noStore } from '../_lib/http';
 import { currentAdmin, hashPassword } from '../_lib/auth';
 import seed from '../_lib/seed.json';
+import { seedMap } from '../_lib/map';
 
 type SeedItem = Record<string, unknown>;
 
@@ -21,6 +22,7 @@ async function tablesExist() {
  *   - seeds every collection that is still empty
  *   - adds any site section (block) the database does not have yet, so all content lives in the CMS
  *   - removes page rows superseded by dedicated pages
+ *   - loads the mall map floors and QR points on first run
  * Open while no admin exists (first run); afterwards requires a signed-in admin.
  */
 export default route(async (req, res) => {
@@ -66,5 +68,7 @@ export default route(async (req, res) => {
 
   const removed = await db`DELETE FROM content WHERE collection = 'pages' AND slug = ANY(${SUPERSEDED_PAGES}) RETURNING id`;
 
-  res.json({ ok: true, createdAdmin, seeded, removed: removed.length });
+  const map = await seedMap();
+
+  res.json({ ok: true, createdAdmin, seeded, removed: removed.length, map });
 });

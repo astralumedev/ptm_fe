@@ -77,7 +77,7 @@ export const COLLECTIONS: CollectionDef[] = [
           { key: 'floor', label: 'Floor (as shown on the store page)', type: 'select', options: FLOORS, half: true },
           { key: 'unitNumber', label: 'Unit label', type: 'text', half: true, placeholder: 'e.g. Unit 108, Wing A' },
           { key: 'mapFloor', label: 'Mall map floor', type: 'select', options: MAP_FLOORS, half: true, help: 'Where the store is highlighted on the mall map.' },
-          { key: 'mapUnits', label: 'Mall map units', type: 'mapUnits', floorKey: 'mapFloor', help: 'Pick every unit the store occupies. Visitors get directions to it.' },
+          { key: 'mapUnits', label: 'Mall map units', type: 'mapUnits', floorKey: 'mapFloor', help: 'Pick every unit the store occupies. Visitors get directions to it. You can also place stores by clicking on the plan in Map management.' },
           { key: 'operation_hours', label: 'Opening hours', type: 'text', half: true },
           { key: 'contact_number', label: 'Phone', type: 'text', half: true },
         ],
