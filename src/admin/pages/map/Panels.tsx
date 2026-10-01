@@ -2,7 +2,7 @@ import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle, ArrowRightLeft, Combine, Copy, Download, ExternalLink, Link2, MapPin, Printer, QrCode,
-  RotateCcw, RotateCw, Scissors, Search, Split, Store, Trash2, Ungroup, X, History, Check,
+  RotateCcw, RotateCw, Scissors, Search, Split, Store, Trash2, Ungroup, X, History, Check, Move,
 } from 'lucide-react';
 import type { FloorData, FloorId, QrPoint, WayfindingLocation } from '../../../types/wayfinding';
 import { isTransitCat } from '../../../lib/mapRouter';
@@ -295,10 +295,12 @@ export function MultiPanel({ units, stores, onMerge, onGiveTo, onDelete, onClear
 // ---------------------------------------------------------------------------------------------
 // Floor (nothing selected)
 
-export function FloorPanel({ floorId, floor, doc, floorName, versions, loadingVersions, onRestore, onUnderlay, onLoadVersions }: {
+export function FloorPanel({ floorId, floor, doc, floorName, versions, loadingVersions, onRestore, onUnderlay, onLoadVersions, aligning, onAlign }: {
   floorId: FloorId; floor: FloorData; doc: MapDoc; floorName: string;
   versions: MapVersion[] | null; loadingVersions: boolean; onLoadVersions: () => void; onRestore: (id: number) => void;
   onUnderlay: (u: FloorData['underlay'] | null) => void;
+  aligning: boolean;
+  onAlign: (on: boolean) => void;
 }) {
   const shops = floor.locations.filter((l) => l.cat === 'shop');
   const taken = new Set(Object.values(doc.place).filter((pl) => pl.floor === floorId).flatMap((pl) => pl.units.map((u) => u.toLowerCase())));
@@ -317,13 +319,16 @@ export function FloorPanel({ floorId, floor, doc, floorName, versions, loadingVe
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[12.5px] text-[var(--adm-ink-3)] leading-relaxed">Click a unit to edit it or assign its shutter. Drag to move, pull the corners to resize, Shift-click to pick several. Hold Space and drag, or right-drag, to move around the plan.</p>
+        <p className="mt-3 text-[12.5px] text-[var(--adm-ink-3)] leading-relaxed">Drag the empty plan to move around; scroll or pinch to zoom. Click a unit to edit it or assign its shutter, drag it to move, pull its corners to resize. Shift-click or Shift-drag to pick several.</p>
       </Section>
       <Section title="Floor plan image">
         <p className="text-[12.5px] text-[var(--adm-ink-3)] mb-2">Optional. A scan of the architect's plan shown under the units while you edit, so you can trace them. Visitors never see it.</p>
-        <ImageInput preset="cover" value={u?.url || ''} onChange={(url) => onUnderlay(url ? { url, x: u?.x ?? 0, y: u?.y ?? 0, w: u?.w ?? size.w, h: u?.h ?? size.h, opacity: u?.opacity ?? 0.5 } : null)} />
+        <ImageInput preset="plan" value={u?.url || ''} onChange={(url) => onUnderlay(url ? { url, x: u?.x ?? 0, y: u?.y ?? 0, w: u?.w ?? size.w, h: u?.h ?? size.h, opacity: u?.opacity ?? 0.5 } : null)} />
         {u && (
           <div className="mt-3 flex flex-col gap-2">
+            <button className={`adm-btn adm-btn-sm ${aligning ? 'adm-btn-primary' : ''}`} onClick={() => onAlign(!aligning)}>
+              {aligning ? <><Check className="size-3.5" /> Done aligning</> : <><Move className="size-3.5" /> Align image with the units</>}
+            </button>
             <label className="text-[12.5px] text-[var(--adm-ink-2)] font-medium">Visibility {Math.round(u.opacity * 100)}%
               <input type="range" min={5} max={100} value={Math.round(u.opacity * 100)} onChange={(e) => onUnderlay({ ...u, opacity: Number(e.target.value) / 100 })} className="w-full accent-[var(--adm-accent)]" />
             </label>

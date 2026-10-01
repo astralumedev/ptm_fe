@@ -34,6 +34,11 @@ interface Props {
   problemUnits: Set<string>;
   /** Extra drawing on top of the plan (e.g. the split preview). */
   extra?: React.ReactNode;
+  /** Show the traced floor-plan image under the units. */
+  showUnderlay: boolean;
+  /** Align mode: the floor-plan image can be dragged and resized to line up with the units. */
+  aligning: boolean;
+  onUnderlay: (u: NonNullable<FloorData['underlay']>) => void;
 }
 
 export interface EditorCanvasHandle extends MapCanvasHandle { fitFloor(): void }
@@ -50,7 +55,9 @@ type Drag =
   | { mode: 'marquee'; start: MapPoint; rect: Rect; additive: boolean }
   | { mode: 'vertex'; index: number; pts: [number, number][] }
   | { mode: 'qr'; key: string; start: MapPoint; orig: MapPoint; dx: number; dy: number }
-  | { mode: 'heading'; key: string; center: MapPoint; heading: number };
+  | { mode: 'heading'; key: string; center: MapPoint; heading: number }
+  | { mode: 'ulmove'; start: MapPoint; orig: Rect; rect: Rect }
+  | { mode: 'ulsize'; corner: 'nw' | 'ne' | 'se' | 'sw'; start: MapPoint; orig: Rect; rect: Rect };
 
 type Guide = { axis: 'x' | 'y'; at: number };
 
@@ -111,6 +118,7 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
     }
     if (drag.mode === 'resize') return { ...floor, locations: floor.locations.map((u) => (u.id === drag.id ? { ...u, ...drag.rect } : u)) };
     if (drag.mode === 'vertex') return { ...floor, silhouette: drag.pts };
+    if ((drag.mode === 'ulmove' || drag.mode === 'ulsize') && floor.underlay) return { ...floor, underlay: { ...floor.underlay, ...drag.rect } };
     return floor;
   }, [floor, drag]);
 
@@ -211,6 +219,16 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
         setDrag({ ...d, pts });
       } else if (d.mode === 'qr') {
         setDrag({ ...d, dx: m.x - d.start.x, dy: m.y - d.start.y });
+      } else if (d.mode === 'ulmove') {
+        setDrag({ ...d, rect: { ...d.orig, x: Math.round(d.orig.x + m.x - d.start.x), y: Math.round(d.orig.y + m.y - d.start.y) } });
+      } else if (d.mode === 'ulsize') {
+        // Corners scale the drawing about the opposite corner, keeping its proportions (Shift = free).
+        const o = d.orig;
+        const ax = d.corner.includes('w') ? o.x + o.w : o.x, ay = d.corner.includes('n') ? o.y + o.h : o.y;
+        let w = Math.max(50, Math.abs(m.x - ax)), h = Math.max(50, Math.abs(m.y - ay));
+        if (!e.shiftKey) { const sc = Math.max(w / o.w, h / o.h); w = o.w * sc; h = o.h * sc; }
+        const x = d.corner.includes('w') ? ax - w : ax, y = d.corner.includes('n') ? ay - h : ay;
+        setDrag({ ...d, rect: { x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) } });
       } else if (d.mode === 'heading') {
         let deg = (Math.atan2(m.x - d.center.x, -(m.y - d.center.y)) * 180) / Math.PI;
         if (!e.altKey) deg = Math.round(deg / 15) * 15;
@@ -236,6 +254,7 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
       if (d.mode === 'vertex') P.onSilhouette(d.pts);
       if (d.mode === 'qr' && (Math.abs(d.dx) > 1 || Math.abs(d.dy) > 1)) P.onMoveQr(d.key, { x: Math.round(d.orig.x + d.dx), y: Math.round(d.orig.y + d.dy) });
       if (d.mode === 'heading') P.onMoveQr(d.key, { heading: d.heading });
+      if ((d.mode === 'ulmove' || d.mode === 'ulsize') && P.floor.underlay) P.onUnderlay({ ...P.floor.underlay, ...d.rect });
     };
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
@@ -277,12 +296,14 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
     if (!isLeft(e)) return;
     const m = toMap(e);
     if (tool === 'draw') { e.stopPropagation(); setDrag({ mode: 'draw', start: m, rect: { x: m.x, y: m.y, w: 0, h: 0 }, guides: [] }); return; }
-    if (tool === 'select') { e.stopPropagation(); setDrag({ mode: 'marquee', start: m, rect: { x: m.x, y: m.y, w: 0, h: 0 }, additive: e.shiftKey }); return; }
+    // Select tool: a plain drag moves around the plan (handled by the canvas); Shift-drag picks units in a box.
+    if (tool === 'select' && e.shiftKey) { e.stopPropagation(); setDrag({ mode: 'marquee', start: m, rect: { x: m.x, y: m.y, w: 0, h: 0 }, additive: true }); return; }
   };
 
   const onTap = (m: MapPoint, e: PointerEvent) => {
     if ((e.target as Element)?.closest?.('[data-handle]')) return;
-    if (tool === 'qr') p.onPlaceQr({ x: Math.round(m.x), y: Math.round(m.y) });
+    if (tool === 'select' && !(e.target as Element)?.closest?.('[data-unit]') && !e.shiftKey) p.onSelect(null);
+    else if (tool === 'qr') p.onPlaceQr({ x: Math.round(m.x), y: Math.round(m.y) });
     else if (tool === 'route' && !(e.target as Element)?.closest?.('[data-unit]')) p.onRouteClick(m, null);
     else if (tool === 'outline') {
       const pts = silhouettePoints(floor.silhouette).map((q) => [Math.round(q.x), Math.round(q.y)] as [number, number]);
@@ -308,7 +329,7 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
   const guides = drag && 'guides' in drag ? drag.guides : [];
   const sil = drag?.mode === 'vertex' ? drag.pts.map(([x, y]) => ({ x, y })) : silhouettePoints(floor.silhouette);
   const qrs = Object.entries(doc.qr).filter(([, q]) => q.floorId === floorId);
-  const cursor = tool === 'draw' ? 'crosshair' : tool === 'qr' ? 'copy' : tool === 'route' ? 'pointer' : tool === 'outline' ? 'cell' : 'default';
+  const cursor = tool === 'draw' ? 'crosshair' : tool === 'qr' ? 'copy' : tool === 'route' ? 'pointer' : tool === 'outline' ? 'cell' : 'grab';
 
   return (
     <MapCanvas
@@ -318,7 +339,7 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
       fitPad={24}
       minK={0.04}
       maxK={6}
-      panWithLeft={false}
+      panWithLeft
       cursor={cursor}
       defs={<>
         <MapDefs />
@@ -331,8 +352,26 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
         <g>
           <rect x={-6000} y={-6000} width={16000} height={18000} fill="url(#ed-dots)" onPointerDown={onBackgroundDown} />
           <g onPointerDown={(e) => { if ((e.target as Element).closest('[data-unit]')) return; onBackgroundDown(e); }}>
-            <FloorPlan floor={shown} k={k} occupantOf={occupantOf} styleOf={styleOf} theme={THEME} onUnitDown={onUnitDown} showIds />
+            <FloorPlan floor={shown} k={k} occupantOf={occupantOf} styleOf={styleOf} theme={THEME} onUnitDown={p.aligning ? undefined : onUnitDown} showIds showUnderlay={p.showUnderlay} />
           </g>
+
+          {/* Align the floor-plan image: drag it, pull a corner to scale it */}
+          {p.aligning && shown.underlay && (() => {
+            const u = shown.underlay;
+            const rect = { x: u.x, y: u.y, w: u.w, h: u.h };
+            return (
+              <g>
+                <rect data-handle x={u.x} y={u.y} width={u.w} height={u.h} fill="rgba(46,48,148,0.04)" stroke={ACCENT} strokeWidth={2} strokeDasharray="8 6" vectorEffect="non-scaling-stroke" style={{ cursor: 'move' }}
+                  onPointerDown={(e) => { if (e.button !== 0) return; e.stopPropagation(); setDrag({ mode: 'ulmove', start: toMap(e), orig: rect, rect }); }} />
+                {(['nw', 'ne', 'se', 'sw'] as const).map((c) => (
+                  <Fixed key={c} x={c.includes('w') ? u.x : u.x + u.w} y={c.includes('n') ? u.y : u.y + u.h}>
+                    <rect data-handle x={-7} y={-7} width={14} height={14} rx={3} fill="#fff" stroke={ACCENT} strokeWidth={2.5} style={{ cursor: c === 'nw' || c === 'se' ? 'nwse-resize' : 'nesw-resize' }}
+                      onPointerDown={(e) => { if (e.button !== 0) return; e.stopPropagation(); setDrag({ mode: 'ulsize', corner: c, start: toMap(e), orig: rect, rect }); }} />
+                  </Fixed>
+                ))}
+              </g>
+            );
+          })()}
 
           {/* Outline editing */}
           {tool === 'outline' && (

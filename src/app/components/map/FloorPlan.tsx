@@ -30,6 +30,8 @@ interface Props {
   /** Hide labels/icons (the editor draws its own while dragging). */
   showLabels?: boolean;
   showIds?: boolean;
+  /** Editor only: draw the traced floor-plan image under the units. Visitors never see it. */
+  showUnderlay?: boolean;
   children?: ReactNode;
 }
 
@@ -97,7 +99,8 @@ function Label({ box, text, k, color, halo, sub, max = 46, weight = 650 }: { box
   );
 }
 
-function FloorPlanImpl({ floor, k, occupantOf, styleOf, theme, onUnitDown, onUnitClick, showLabels = true, showIds, children }: Props) {
+function FloorPlanImpl({ floor, k, occupantOf, styleOf, theme, onUnitDown, onUnitClick, showLabels = true, showIds, showUnderlay, children }: Props) {
+  const traced = !!(showUnderlay && floor.underlay);
   const sil = useMemo(() => silhouettePoints(floor.silhouette).map((p) => `${p.x},${p.y}`).join(' '), [floor.silhouette]);
 
   // Stores spread over several units get one label over the whole shop.
@@ -123,10 +126,10 @@ function FloorPlanImpl({ floor, k, occupantOf, styleOf, theme, onUnitDown, onUni
 
   return (
     <g>
-      {floor.underlay && (
+      {traced && floor.underlay && (
         <image href={floor.underlay.url} x={floor.underlay.x} y={floor.underlay.y} width={floor.underlay.w} height={floor.underlay.h} opacity={floor.underlay.opacity} preserveAspectRatio="none" style={{ pointerEvents: 'none' }} />
       )}
-      {sil && <polygon points={sil} fill={theme.plate} stroke={theme.plateStroke} strokeWidth={2} vectorEffect="non-scaling-stroke" strokeLinejoin="round" />}
+      {sil && <polygon points={sil} fill={traced ? 'rgba(255,255,255,0.12)' : theme.plate} stroke={theme.plateStroke} strokeWidth={2} vectorEffect="non-scaling-stroke" strokeLinejoin="round" />}
 
       {/* Shops over several units are drawn as one space, without the inner walls. */}
       {groups.list.map((g) => {
@@ -146,7 +149,7 @@ function FloorPlanImpl({ floor, k, occupantOf, styleOf, theme, onUnitDown, onUni
         const s = styleOf(u, occ);
         const merged = groups.byUnit.has(u.id);
         return (
-          <g key={u.id} data-unit={u.id} style={{ opacity: s.opacity ?? 1, transition: 'opacity 260ms ease', cursor: onUnitClick || onUnitDown ? 'pointer' : undefined }}
+          <g key={u.id} data-unit={u.id} style={{ opacity: (s.opacity ?? 1) * (traced ? 0.72 : 1), transition: 'opacity 260ms ease', cursor: onUnitClick || onUnitDown ? 'pointer' : undefined }}
             onPointerDown={onUnitDown ? (e) => onUnitDown(u, e) : undefined}
             onClick={onUnitClick ? (e) => onUnitClick(u, e) : undefined}>
             {merged

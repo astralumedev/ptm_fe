@@ -6,9 +6,10 @@ import { adminApi, MediaRecord } from './http';
  * resized to the largest size the site ever shows, re-encoded as WebP, plus a small thumbnail
  * for the admin grid. Files are named by content hash, so re-uploading the same image is free.
  */
-export type ImagePreset = 'logo' | 'cover' | 'content';
+export type ImagePreset = 'logo' | 'cover' | 'content' | 'plan';
 
-const MAX_EDGE: Record<ImagePreset, number> = { logo: 512, cover: 1920, content: 1600 };
+// 'plan': architect drawings traced in Map management stay large enough to zoom into.
+const MAX_EDGE: Record<ImagePreset, number> = { logo: 512, cover: 1920, content: 1600, plan: 4000 };
 const QUALITY = 0.8;
 const THUMB_EDGE = 400;
 const MAX_INPUT_BYTES = 30 * 1024 * 1024;

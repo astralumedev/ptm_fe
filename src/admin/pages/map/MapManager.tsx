@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
-  MousePointer2, Square, Hexagon, QrCode, Route, Undo2, Redo2, Save, ZoomIn, ZoomOut, Maximize, Layers, AlertTriangle, Store as StoreIcon, SlidersHorizontal,
+  MousePointer2, Square, Hexagon, QrCode, Route, Undo2, Redo2, Save, ZoomIn, ZoomOut, Maximize, Layers, Image as ImageIcon, AlertTriangle, Store as StoreIcon, SlidersHorizontal,
 } from 'lucide-react';
 import type { FloorData, FloorId, MapPoint, QrPoint, RouteLeg, WayfindingLocation } from '../../../types/wayfinding';
 import { CATEGORIES, FLOOR_LABELS } from '../../../types/wayfinding';
@@ -20,7 +20,7 @@ import { ChecksPanel, FloorPanel, MultiPanel, Problem, QrDetail, QrListPanel, St
 import { loadMap } from '../../../services/mapData';
 
 const TOOLS: { id: Tool; label: string; key: string; icon: typeof Square; hint: string }[] = [
-  { id: 'select', label: 'Select & move', key: 'V', icon: MousePointer2, hint: 'Click units to edit. Drag to move, corners to resize, Shift-click for several.' },
+  { id: 'select', label: 'Select & move', key: 'V', icon: MousePointer2, hint: 'Drag the empty plan to move around. Click a unit to edit it, drag it to move, pull its corners to resize. Shift-click or Shift-drag to pick several.' },
   { id: 'draw', label: 'Draw unit', key: 'R', icon: Square, hint: 'Drag on the plan to draw a new unit. Edges snap to neighbours (hold Alt to stop snapping).' },
   { id: 'outline', label: 'Building outline', key: 'O', icon: Hexagon, hint: 'Drag corners to reshape. Click the plan to add a corner, double-click a corner to remove it.' },
   { id: 'qr', label: 'Place QR code', key: 'Q', icon: QrCode, hint: 'Click where a QR sign will hang. Drag it to move; drag the round handle to set which way people face.' },
@@ -63,9 +63,11 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
   const [params, setParams] = useSearchParams();
   const { doc, saved, commit, undo, redo, canUndo, canRedo, changes, markSaved, reset } = useMapDoc(initial);
   const floorId = (FLOOR_ORDER.includes(params.get('floor') as FloorId) ? params.get('floor') : 'ground_floor') as FloorId;
-  const setFloor = (f: FloorId) => { const n = new URLSearchParams(params); n.set('floor', f); setParams(n, { replace: true }); setSelection(null); };
+  const setFloor = (f: FloorId) => { const n = new URLSearchParams(params); n.set('floor', f); setParams(n, { replace: true }); setSelection(null); setAligning(false); };
   const floor = doc.floors[floorId];
   const [tool, setTool] = useState<Tool>('select');
+  const [showUnderlay, setShowUnderlay] = useState(true);
+  const [aligning, setAligning] = useState(false);
   const [selection, setSelection] = useState<Selection>(null);
   const [tab, setTab] = useState<Tab>('edit');
   const [placing, setPlacing] = useState<StoreMeta | null>(null);
@@ -248,7 +250,7 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
       if (mod && e.key.toLowerCase() === 'd') { e.preventDefault(); duplicate(); return; }
       if (mod) return;
       if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deleteSelection(); return; }
-      if (e.key === 'Escape') { setSelection(null); setPlacing(null); setTool('select'); setRouteTest(NO_ROUTE); return; }
+      if (e.key === 'Escape') { setAligning(false); setSelection(null); setPlacing(null); setTool('select'); setRouteTest(NO_ROUTE); return; }
       const step = e.shiftKey ? 10 : 1;
       if (e.key === 'ArrowLeft') { e.preventDefault(); nudge(-step, 0); return; }
       if (e.key === 'ArrowRight') { e.preventDefault(); nudge(step, 0); return; }
@@ -340,6 +342,10 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
           <div className="flex-1" />
           <button onClick={() => canvas.current?.zoomBy(1.4)} className="grid place-items-center size-9 rounded-lg text-[var(--adm-ink-2)] hover:bg-[var(--adm-panel)]" title="Zoom in (+)" aria-label="Zoom in"><ZoomIn className="size-[18px]" /></button>
           <button onClick={() => canvas.current?.zoomBy(1 / 1.4)} className="grid place-items-center size-9 rounded-lg text-[var(--adm-ink-2)] hover:bg-[var(--adm-panel)]" title="Zoom out (-)" aria-label="Zoom out"><ZoomOut className="size-[18px]" /></button>
+          {floor?.underlay && (
+            <button onClick={() => { setShowUnderlay((v) => !v); setAligning(false); }} aria-pressed={showUnderlay} title={showUnderlay ? 'Hide floor plan image' : 'Show floor plan image'} aria-label="Toggle floor plan image"
+              className={`grid place-items-center size-9 rounded-lg transition-colors cursor-pointer ${showUnderlay ? 'bg-[var(--adm-accent-soft)] text-[var(--adm-accent)]' : 'text-[var(--adm-ink-2)] hover:bg-[var(--adm-panel)]'}`}><ImageIcon className="size-[18px]" /></button>
+          )}
           <button onClick={() => canvas.current?.fitFloor()} className="grid place-items-center size-9 rounded-lg text-[var(--adm-ink-2)] hover:bg-[var(--adm-panel)]" title="Fit floor (0)" aria-label="Fit floor"><Maximize className="size-[18px]" /></button>
         </div>
 
@@ -373,9 +379,12 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
             route={{ start: routeTest.startFloor === floorId ? routeTest.start : null, leg: routeTest.legs.find((l) => l.floorId === floorId) || null, key: `${routeTest.key}-${floorId}`, destLabel: routeTest.destLabel }}
             problemUnits={problemUnits}
             extra={splitOverlay}
+            showUnderlay={showUnderlay}
+            aligning={aligning && showUnderlay && !!floor.underlay}
+            onUnderlay={(u) => commit((d) => updateFloor(d, floorId, (f) => ({ ...f, underlay: u })))}
           />
           <div className="hidden lg:block pointer-events-none absolute left-3 bottom-3 max-w-md px-3 py-2 rounded-lg bg-white/95 border border-[var(--adm-line)] shadow-sm text-[12.5px] text-[var(--adm-ink-2)]">
-            <b className="text-[var(--adm-ink)]">{activeTool.label}.</b> {placing ? `Click a shop unit to place ${placing.name}.` : tool === 'route' && routeTest.start && !routeTest.legs.length ? 'Now click the shop to walk to.' : activeTool.hint}
+            <b className="text-[var(--adm-ink)]">{activeTool.label}.</b> {aligning ? 'Aligning the floor plan image: drag it to move, pull a corner to scale it (Shift = stretch freely). Press Done when it lines up.' : placing ? `Click a shop unit to place ${placing.name}.` : tool === 'route' && routeTest.start && !routeTest.legs.length ? 'Now click the shop to walk to.' : activeTool.hint}
           </div>
         </div>
 
@@ -428,7 +437,8 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
                     toast('ok', 'Version loaded. Save to make it live.');
                   } catch (e) { toast('error', e instanceof Error ? e.message : 'Could not load'); }
                 }}
-                onUnderlay={(u) => commit((d) => updateFloor(d, floorId, (f) => { const n = { ...f }; if (u) n.underlay = u; else delete n.underlay; return n; }))}
+                onUnderlay={(u) => { commit((d) => updateFloor(d, floorId, (f) => { const n = { ...f }; if (u) n.underlay = u; else delete n.underlay; return n; })); if (u) setShowUnderlay(true); else setAligning(false); }}
+                aligning={aligning} onAlign={(v) => { setAligning(v); if (v) { setShowUnderlay(true); setTool('select'); setSelection(null); } }}
               />
             ))}
             {tab === 'stores' && (

@@ -2,7 +2,7 @@
  * Field descriptions shared by the public site (block defaults) and the admin panel (editors).
  * One description drives the form, so adding a field to a block makes it editable immediately.
  */
-export type ImagePreset = 'logo' | 'cover' | 'content';
+export type ImagePreset = 'logo' | 'cover' | 'content' | 'plan';
 
 export type FieldType =
   | 'text' | 'textarea' | 'richtext' | 'url' | 'number' | 'select' | 'toggle' | 'tags'
