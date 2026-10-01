@@ -445,9 +445,12 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
               <button className="underline underline-offset-2 shrink-0" onClick={() => { setPlacing(null); setAligning(false); setTool('select'); setRouteTest(NO_ROUTE); }}>Done</button>
             </div>
           )}
-          <div className="hidden lg:block pointer-events-none absolute left-3 bottom-3 max-w-md px-3 py-2 rounded-lg bg-white/95 border border-[var(--adm-line)] shadow-sm text-[12.5px] text-[var(--adm-ink-2)]">
+          {/* Hint only while a tool or mode needs explaining; plain select mode needs none. */}
+          {(tool !== 'select' || placing || aligning) && (
+            <div className="hidden lg:block pointer-events-none absolute left-3 bottom-3 max-w-md px-3 py-2 rounded-lg bg-white/95 border border-[var(--adm-line)] shadow-sm text-[12.5px] text-[var(--adm-ink-2)]">
             <b className="text-[var(--adm-ink)]">{activeTool.label}.</b> {aligning ? 'Aligning the floor plan image: drag it to move, pull a corner to scale it (Shift = stretch freely). Press Done when it lines up.' : placing ? `Click a shop unit to place ${placing.name}.` : tool === 'route' && routeTest.start && !routeTest.legs.length ? 'Now click the shop to walk to.' : activeTool.hint}
           </div>
+          )}
         </div>
 
         {/* Side panel */}
