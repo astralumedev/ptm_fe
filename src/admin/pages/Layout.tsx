@@ -67,7 +67,7 @@ export function Shell({ username, onLogout, unread }: { username: string; onLogo
 
       <header className="lg:hidden sticky top-0 z-40 flex items-center justify-between h-14 px-4 bg-white border-b border-[var(--adm-line)]">
         <Logo className="h-7" />
-        <button className="adm-btn adm-btn-ghost adm-btn-sm !px-1.5" onClick={() => setOpen(true)} aria-label="Open menu"><Menu className="size-5" /></button>
+        <button className="adm-btn adm-btn-ghost adm-btn-sm !px-2.5" onClick={() => setOpen(true)} aria-label="Open menu"><Menu className="size-5" /></button>
       </header>
       {open && (
         <div className="lg:hidden fixed inset-0 z-50">

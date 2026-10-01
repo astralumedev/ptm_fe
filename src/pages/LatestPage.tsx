@@ -163,7 +163,7 @@ export const LatestPage: React.FC = () => {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 space-y-20">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 space-y-14 md:space-y-20">
 
         {/* ========================================================================= */}
         {/* SECTION 1: BLOGS & EDITORIAL STORIES */}
@@ -270,7 +270,7 @@ export const LatestPage: React.FC = () => {
                 )}
 
                 {/* Additional Blog Grid */}
-                {gridBlogs.length > 0 && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                {gridBlogs.length > 0 && <div className="m-rail grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                   {gridBlogs.map((blog, index) => (
                     <motion.article
                       key={blog.id}
@@ -321,7 +321,7 @@ export const LatestPage: React.FC = () => {
                         </span>
                         <Link
                           to={`/blogs/${blog.slug}`}
-                          className="font-bold text-[#801424] hover:underline flex items-center gap-1"
+                          className="py-2.5 -my-2.5 font-bold text-[#801424] hover:underline flex items-center gap-1"
                         >
                           {c.blogsReadMore}
                           <FaArrowRight className="w-2.5 h-2.5" />
@@ -361,7 +361,7 @@ export const LatestPage: React.FC = () => {
 
             {/* Events Grid */}
             {events.length === 0 && <EmptyState text={c.eventsEmpty} />}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+            <div className="m-rail grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
               {events.map((event, index) => {
                 const isRsvpd = rsvpDone.has(event.id);
                 return (
@@ -439,7 +439,7 @@ export const LatestPage: React.FC = () => {
                       <div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
                         <button
                           onClick={() => openEvent(event, false)}
-                          className="text-xs font-bold text-gray-700 hover:text-[#801424] transition-colors underline cursor-pointer"
+                          className="py-2.5 -my-2.5 text-xs font-bold text-gray-700 hover:text-[#801424] transition-colors underline cursor-pointer"
                         >
                           {c.eventsDetails}
                         </button>
@@ -496,7 +496,7 @@ export const LatestPage: React.FC = () => {
 
             {/* Offer Cards Grid */}
             {offers.length === 0 && <EmptyState text={c.offersEmpty} />}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div className="m-rail grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {offers.map((offer, index) => {
                 const isCopied = copiedCode === offer.promoCode;
                 return (
@@ -580,7 +580,7 @@ export const LatestPage: React.FC = () => {
                           <span className="text-rose-700 font-semibold">{offer.validUntil}</span>
                           <Link
                             to={offer.storeLink}
-                            className="font-bold text-gray-800 hover:text-[#801424] flex items-center gap-1 transition-colors"
+                            className="py-2.5 -my-2.5 font-bold text-gray-800 hover:text-[#801424] flex items-center gap-1 transition-colors"
                           >
                             {c.offersStoreLink}
                             <FaArrowRight className="w-2.5 h-2.5" />

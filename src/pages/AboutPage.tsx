@@ -89,7 +89,7 @@ export default function AboutPage() {
       />
 
       {/* SECTION 1: MALL INFORMATION & HERO OVERVIEW */}
-      <section id="overview" className="relative py-16 md:py-24 bg-white border-b border-gray-100 overflow-hidden">
+      <section id="overview" className="relative py-12 md:py-24 bg-white border-b border-gray-100 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
@@ -131,8 +131,8 @@ export default function AboutPage() {
               {pillars.length > 0 && (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
                   {pillars.map((pillar, idx) => (
-                    <div key={idx} className="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-red-200 hover:bg-red-50/30 transition-all duration-300">
-                      <div className="w-10 h-10 rounded-lg bg-[#801424]/10 flex items-center justify-center text-[#801424] mb-3">
+                    <div key={idx} className="flex sm:block gap-3.5 p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-red-200 hover:bg-red-50/30 transition-all duration-300">
+                      <div className="w-10 h-10 shrink-0 rounded-lg bg-[#801424]/10 flex items-center justify-center text-[#801424] sm:mb-3">
                         <CmsIcon name={pillar.icon} className="w-5 h-5" />
                       </div>
                       <h4 className="font-bold text-gray-900 text-sm mb-1">{pillar.title}</h4>
@@ -275,7 +275,7 @@ export default function AboutPage() {
 
       {/* SECTION 2: MALL HISTORY TIMELINE */}
       {!history.hidden && (
-      <section id="history" className="py-20 md:py-28 bg-gradient-to-b from-gray-50 via-white to-gray-50 border-b border-gray-200/80 relative overflow-hidden">
+      <section id="history" className="py-14 md:py-28 bg-gradient-to-b from-gray-50 via-white to-gray-50 border-b border-gray-200/80 relative overflow-hidden">
 
         {/* Background decorative elements */}
         <div className="absolute top-1/3 left-0 w-72 h-72 bg-red-100/40 rounded-full blur-3xl pointer-events-none" />
@@ -298,13 +298,15 @@ export default function AboutPage() {
           </div>
 
           {/* Timeline Tree */}
-          <div className="relative">
+          <div className="relative pl-7 md:pl-0">
+            {/* Phones: a line down the left with a dot per milestone */}
+            {timelineEvents.length > 0 && <div className="md:hidden absolute left-[7px] top-3 bottom-3 w-0.5 bg-gradient-to-b from-[#801424]/15 via-[#801424]/50 to-[#801424]/15" />}
             {/* Center Line */}
             {timelineEvents.length > 0 && (
               <div className="hidden md:block absolute left-1/2 top-8 bottom-8 w-0.5 bg-gradient-to-b from-[#801424]/20 via-[#801424] to-[#801424]/20 -translate-x-1/2" />
             )}
 
-            <div className="space-y-12 md:space-y-16">
+            <div className="space-y-8 md:space-y-16">
               {timelineEvents.map((event, index) => {
                 const isEven = index % 2 === 0;
 
@@ -317,8 +319,9 @@ export default function AboutPage() {
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     className={`relative flex flex-col md:flex-row items-center ${
                       isEven ? 'md:flex-row-reverse' : ''
-                    } gap-8 md:gap-12`}
+                    } gap-0 md:gap-12`}
                   >
+                    <div className="md:hidden absolute -left-[27px] top-5 w-3.5 h-3.5 rounded-full bg-[#801424] ring-4 ring-gray-50" />
 
                     {/* Center Node Dot */}
                     <div className="hidden md:flex absolute left-1/2 top-10 -translate-x-1/2 z-20 items-center justify-center w-8 h-8 rounded-full bg-white border-4 border-[#801424] shadow-md">
@@ -327,7 +330,7 @@ export default function AboutPage() {
 
                     {/* Timeline Image Card */}
                     <div className="w-full md:w-1/2">
-                      <div className="group relative rounded-2xl overflow-hidden shadow-lg border border-gray-200/80 bg-white aspect-[16/10]">
+                      <div className="group relative rounded-t-2xl md:rounded-2xl overflow-hidden md:shadow-lg border border-b-0 md:border-b border-gray-200/80 bg-white aspect-[16/9] md:aspect-[16/10]">
                         {event.image && (
                           <img loading="lazy" decoding="async"
                             src={event.image}
@@ -335,7 +338,7 @@ export default function AboutPage() {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                        <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
                         {event.category && (
                           <div className="absolute top-4 left-4">
@@ -345,7 +348,7 @@ export default function AboutPage() {
                           </div>
                         )}
 
-                        <div className="absolute bottom-4 left-4 right-4 text-white">
+                        <div className="hidden md:block absolute bottom-4 left-4 right-4 text-white">
                           <span className="text-xs font-semibold text-red-300 uppercase tracking-wider block">
                             {history.milestoneLabel}
                           </span>
@@ -356,7 +359,7 @@ export default function AboutPage() {
 
                     {/* Timeline Content Description Card */}
                     <div className="w-full md:w-1/2">
-                      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200/80 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="bg-white p-5 sm:p-8 rounded-b-2xl md:rounded-3xl border border-gray-200/80 shadow-sm hover:shadow-md transition-shadow">
 
                         {/* Year Badge */}
                         {event.year && (
@@ -401,7 +404,7 @@ export default function AboutPage() {
 
       {/* SECTION 3: MEDIA & PRESS MENTIONS */}
       {!media.hidden && (
-      <section id="media" className="py-20 md:py-28 bg-white border-b border-gray-200/80 relative">
+      <section id="media" className="py-14 md:py-28 bg-white border-b border-gray-200/80 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Section Header */}
@@ -433,7 +436,7 @@ export default function AboutPage() {
           </div>
 
           {/* Press Mentions Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="m-rail grid grid-cols-1 md:grid-cols-2 gap-8">
             {mediaMentions.map((item, idx) => (
               <motion.div
                 key={idx}
@@ -531,7 +534,7 @@ export default function AboutPage() {
 
       {/* SECTION 4: BOARD MEMBERS & EXECUTIVE LEADERSHIP */}
       {!leadership.hidden && (
-      <section id="leadership" className="py-20 md:py-28 bg-neutral-50/70 border-b border-gray-200/80 relative">
+      <section id="leadership" className="py-14 md:py-28 bg-neutral-50/70 border-b border-gray-200/80 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Section Header */}
@@ -549,7 +552,7 @@ export default function AboutPage() {
           </div>
 
           {/* Leadership Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="m-rail m-rail-sm grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {leadershipTeam.map((member, idx) => (
               <motion.div
                 key={idx}
@@ -663,7 +666,7 @@ export default function AboutPage() {
 
       {/* SECTION 5: ARCHITECTURAL FEATURES & COMMUNITY IMPACT */}
       {!features.hidden && (
-      <section id="features" className="py-20 md:py-28 bg-white border-b border-gray-200/80">
+      <section id="features" className="py-14 md:py-28 bg-white border-b border-gray-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -679,7 +682,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="m-rail grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {mallFeatures.map((feat, idx) => (
               <motion.div
                 key={idx}
@@ -744,7 +747,7 @@ export default function AboutPage() {
 
       {/* SECTION 6: VISITOR FAQ ACCORDION */}
       {!faq.hidden && faqs.length > 0 && (
-      <section id="faq" className="py-20 md:py-28 bg-neutral-50/70 border-b border-gray-200/80">
+      <section id="faq" className="py-14 md:py-28 bg-neutral-50/70 border-b border-gray-200/80">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="text-center max-w-2xl mx-auto mb-14">
@@ -810,7 +813,7 @@ export default function AboutPage() {
 
       {/* SECTION 7: INTERACTIVE CALL TO ACTION */}
       {!cta.hidden && (
-      <section className="py-20 bg-white relative overflow-hidden">
+      <section className="py-14 md:py-20 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="rounded-3xl bg-gradient-to-br from-[#801424] via-[#660e1c] to-[#400911] text-white p-8 sm:p-14 md:p-16 shadow-2xl relative overflow-hidden">
 

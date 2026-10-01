@@ -104,7 +104,7 @@ function SpotlightSection({ spot, flipped }: { spot: Spotlight; flipped: boolean
                   <span className="font-medium text-gray-500 flex items-center gap-1.5">
                     <FaPhoneAlt className="w-3.5 h-3.5 text-[#801424]" /> {spot.phoneLabel}
                   </span>
-                  <a href={`tel:${spot.phone.replace(/[^\d+]/g, '')}`} className="font-bold text-gray-900 hover:text-[#801424]">{spot.phone}</a>
+                  <a href={`tel:${spot.phone.replace(/[^\d+]/g, '')}`} className="py-2.5 -my-2.5 font-bold text-gray-900 hover:text-[#801424]">{spot.phone}</a>
                 </div>
               )}
             </div>
@@ -153,7 +153,7 @@ export default function EntertainPage() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 space-y-24">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 space-y-12 md:space-y-24">
 
         {spotlights.map((spot, idx) => (
           <SpotlightSection key={idx} spot={spot} flipped={idx % 2 === 1} />
@@ -161,7 +161,7 @@ export default function EntertainPage() {
 
         {/* LIVE EVENTS, PRIVATE SCREENINGS & GATHERINGS */}
         {!page.eventsHidden && (
-          <section className="bg-gradient-to-r from-gray-900 via-[#191114] to-gray-900 text-white rounded-3xl p-8 sm:p-10 md:p-12 relative overflow-hidden shadow-xl border border-gray-800">
+          <section className="bg-gradient-to-r from-gray-900 via-[#191114] to-gray-900 text-white rounded-2xl sm:rounded-3xl p-6 sm:p-10 md:p-12 relative overflow-hidden shadow-xl border border-gray-800">
             <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 max-w-3xl space-y-4">

@@ -70,7 +70,7 @@ const MobileNavigationDrawer: React.FC<MobileNavigationDrawerProps> = ({ isOpen,
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 26, stiffness: 260 }}
-            className="relative w-[85vw] max-w-sm sm:max-w-md h-full bg-white text-gray-900 shadow-2xl flex flex-col z-10 overflow-hidden"
+            className="relative w-[86vw] max-w-sm sm:max-w-md h-full h-[100dvh] bg-white text-gray-900 shadow-2xl flex flex-col z-10 overflow-hidden"
             style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
           >
             {/* Drawer Header */}
@@ -190,7 +190,7 @@ const MobileNavigationDrawer: React.FC<MobileNavigationDrawerProps> = ({ isOpen,
                                     key={subItem.label}
                                     href={subItem.href}
                                     onClick={onClose}
-                                    className="flex items-center px-3 py-2 text-xs sm:text-sm text-gray-700 hover:text-red-700 hover:bg-red-50/60 rounded-lg font-medium transition-colors no-underline"
+                                    className="flex items-center px-3 py-2.5 text-sm text-gray-700 hover:text-red-700 hover:bg-red-50/60 rounded-lg font-medium transition-colors no-underline"
                                   >
                                     <span className="w-1.5 h-1.5 rounded-full bg-red-600 mr-2 flex-shrink-0" />
                                     <span>{subItem.label}</span>
@@ -209,7 +209,7 @@ const MobileNavigationDrawer: React.FC<MobileNavigationDrawerProps> = ({ isOpen,
 
             {/* Bottom Quick Action Footer */}
             <div
-              className="p-4 border-t border-gray-200 bg-gray-50 flex flex-col gap-2 flex-shrink-0"
+              className="p-4 pb-[max(1rem,env(safe-area-inset-bottom))] border-t border-gray-200 bg-gray-50 flex flex-col gap-2 flex-shrink-0"
               style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
               <CmsLink

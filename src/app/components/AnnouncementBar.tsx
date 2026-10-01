@@ -21,7 +21,9 @@ export default function AnnouncementBar() {
   const { items } = useBlock(announcementsBlock);
   const [closed, setClosed] = useState<string | null>(null);
 
-  const item = liveOnly(items).find((a) => a.text?.trim() && (a.pages !== 'home' || pathname === '/'));
+  // The mall map fills the screen; a bar above it would push the map off the bottom.
+  const onMap = pathname.startsWith('/mall-map') || pathname.startsWith('/q/');
+  const item = onMap ? undefined : liveOnly(items).find((a) => a.text?.trim() && (a.pages !== 'home' || pathname === '/'));
   if (!item) return null;
   const key = 'ptm-notice:' + contentKey([item.text, item.link, item.linkLabel]);
   if (closed === key || (item.dismissible && read(key))) return null;
@@ -40,7 +42,7 @@ export default function AnnouncementBar() {
         <button
           type="button"
           onClick={() => { write(key); setClosed(key); }}
-          className="absolute right-2 top-1/2 -translate-y-1/2 grid place-items-center w-7 h-7 rounded-full hover:bg-black/10 cursor-pointer"
+          className="absolute right-1 top-1/2 -translate-y-1/2 grid place-items-center w-9 h-9 rounded-full hover:bg-black/10 cursor-pointer"
           aria-label="Close announcement"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>

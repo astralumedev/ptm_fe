@@ -74,12 +74,12 @@ const HeaderSection = () => {
             </p>
 
             {/* Direct Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3.5 pt-1">
+            <div className="w-full max-w-[320px] sm:max-w-none flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-3.5 pt-1">
               {(hero.buttons || []).filter((btn) => btn && btn.label).map((btn, i) => (
                 <CmsLink
                   key={i}
                   href={btn.href}
-                  className={btn.style === 'dark' ? 'btn-dark' : 'btn-primary'}
+                  className={`${btn.style === 'dark' ? 'btn-dark' : 'btn-primary'} justify-center`}
                 >
                   <span>{btn.label}</span>
                   {btn.style !== 'dark' && (
@@ -160,7 +160,7 @@ const HeaderSection = () => {
               </CmsLink>
 
               {/* Bottom Interactive Indicator Dots */}
-              <div className="flex items-center justify-center gap-2 sm:gap-2.5 pt-3">
+              <div className="flex items-center justify-center gap-0.5 pt-2">
                 {slides.map((item, idx) => {
                   const isActive = activeStoryIndex % slides.length === idx;
                   return (
@@ -168,12 +168,15 @@ const HeaderSection = () => {
                       key={idx}
                       onClick={() => setActiveStoryIndex(idx)}
                       aria-label={`Go to slide ${idx + 1}: ${item.title}`}
-                      className={`rounded-full transition-all duration-300 cursor-pointer ${
+                      aria-current={isActive}
+                      className="grid place-items-center w-6 h-6 cursor-pointer group/dot"
+                    >
+                      <span className={`block rounded-full transition-all duration-300 ${
                         isActive
-                          ? 'w-2 sm:w-2.5 h-2 sm:h-2.5 bg-white scale-110 shadow-[0_0_8px_rgba(255,255,255,0.7)]'
-                          : 'w-2 sm:w-2.5 h-2 sm:h-2.5 bg-white/30 hover:bg-white/60'
-                      }`}
-                    />
+                          ? 'w-5 h-2 sm:h-2.5 bg-white shadow-[0_0_8px_rgba(255,255,255,0.7)]'
+                          : 'w-2 sm:w-2.5 h-2 sm:h-2.5 bg-white/30 group-hover/dot:bg-white/60'
+                      }`} />
+                    </button>
                   );
                 })}
               </div>
@@ -202,7 +205,7 @@ const HeaderSection = () => {
             </div>
 
             {/* Navigation Items Centered (Exact Horizontal Center) */}
-            <div className="hidden md:flex items-center space-x-5 lg:space-x-8 text-gray-800 absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-20">
+            <div className="hidden lg:flex items-center space-x-5 xl:space-x-8 text-gray-800 absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-20">
               {menuItems.map((item, index) => {
                 const hasSub = !!item.subGroups;
                 const isDropdownOpen = activeDropdown === item.label;
@@ -290,7 +293,7 @@ const HeaderSection = () => {
             </div>
 
             {/* Persistent Right Section: Mall Timings & Mall Map (Identical to other pages) */}
-            <div className="hidden xl:flex items-center space-x-3.5 bg-gray-100/90 border border-gray-200/90 px-4 py-2 rounded-full text-gray-800 shadow-sm flex-shrink-0">
+            <div className="hidden min-[1360px]:flex items-center space-x-3.5 bg-gray-100/90 border border-gray-200/90 px-4 py-2 rounded-full text-gray-800 shadow-sm flex-shrink-0">
               {/* Mall Timings */}
               <div className="relative group cursor-pointer flex items-center space-x-1.5 text-xs font-semibold tracking-wide">
                 <svg className="w-3.5 h-3.5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -329,7 +332,7 @@ const HeaderSection = () => {
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <MobileMenuToggle onClick={() => setIsMenuOpen(true)} />
             </div>
           </div>

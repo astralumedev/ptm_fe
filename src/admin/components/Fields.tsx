@@ -166,7 +166,7 @@ function ListInput({ field: f, value, onChange, idPrefix }: { field: Field; valu
               </button>
               <button type="button" className="adm-btn adm-btn-ghost adm-btn-sm !px-1.5" disabled={i === 0} onClick={() => move(i, -1)} aria-label="Move up"><ArrowUp className="size-3.5" /></button>
               <button type="button" className="adm-btn adm-btn-ghost adm-btn-sm !px-1.5" disabled={i === value.length - 1} onClick={() => move(i, 1)} aria-label="Move down"><ArrowDown className="size-3.5" /></button>
-              <button type="button" className="adm-btn adm-btn-ghost adm-btn-sm !px-1.5 hidden sm:inline-flex" disabled={full} onClick={() => { const next = [...value]; next.splice(i + 1, 0, structuredClone(item)); onChange(next); setOpen(i + 1); }} aria-label="Duplicate"><Copy className="size-3.5" /></button>
+              <button type="button" className="adm-btn adm-btn-ghost adm-btn-sm !px-1.5 max-sm:!hidden" disabled={full} onClick={() => { const next = [...value]; next.splice(i + 1, 0, structuredClone(item)); onChange(next); setOpen(i + 1); }} aria-label="Duplicate"><Copy className="size-3.5" /></button>
               <button type="button" className="adm-btn adm-btn-ghost adm-btn-sm adm-btn-danger !px-1.5" onClick={() => { onChange(value.filter((_, j) => j !== i)); setOpen(null); }} aria-label={`Remove ${noun}`}><Trash2 className="size-3.5" /></button>
             </div>
             {expanded && (

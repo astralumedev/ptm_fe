@@ -41,7 +41,7 @@ export default function OpeningSoonSection() {
         </div>
 
         {/* Upcoming Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+        <div className="m-rail grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8" style={{ ['--rail-pad' as string]: '12px' }}>
           {upcoming.map((store, index) => {
             return (
               <motion.div

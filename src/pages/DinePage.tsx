@@ -108,7 +108,7 @@ export default function DinePage() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 space-y-20">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 space-y-14 md:space-y-20">
 
         {/* ========================================================================= */}
         {/* SECTION 1: FEATURED DINING SPOTS (5-8 HIGHLIGHTS) */}
@@ -137,7 +137,7 @@ export default function DinePage() {
               <div className="w-10 h-10 border-4 border-[#801424] border-t-transparent rounded-full animate-spin" />
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="m-rail grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredSpots.slice(0, 6).map((store, index) => (
                 <motion.div
                   key={store.id}
@@ -253,7 +253,7 @@ export default function DinePage() {
           </div>
 
           {/* Category Filter Switcher */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+          <div className="m-chips flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
             {dineCategories.map((cat) => {
               const isSelected = activeCategory === cat.id;
               return (
@@ -274,7 +274,7 @@ export default function DinePage() {
           </div>
 
           {/* Dining Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="m-rail grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayedStores.map((store, index) => (
               <motion.div
                 key={store.id}
@@ -347,7 +347,7 @@ export default function DinePage() {
                           <a
                             href={`tel:${store.contact_number}`}
                             onClick={(e) => e.stopPropagation()}
-                            className="text-gray-500 hover:text-[#801424] transition-colors p-1"
+                            className="text-gray-500 hover:text-[#801424] transition-colors p-2.5 -m-1.5"
                             title={`Call ${store.name}`}
                           >
                             <FaPhoneAlt className="w-3 h-3" />

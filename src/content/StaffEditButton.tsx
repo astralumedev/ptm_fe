@@ -3,6 +3,7 @@ import { ALL_BLOCKS } from './blocks';
 
 /** Where the admin edits what is on a given public page. */
 function editTarget(pathname: string) {
+  if (pathname.startsWith('/mall-map') || pathname.startsWith('/q/')) return '/admin/map';
   const store = pathname.match(/^\/(?:stores?|shops?\/details)\/([^/]+)/);
   if (store) return `/admin/stores?q=${encodeURIComponent(store[1])}`;
   const blog = pathname.match(/^\/blogs\/([^/]+)/);
@@ -22,14 +23,17 @@ export default function StaffEditButton() {
   let staff = false;
   try { staff = localStorage.getItem('ptm-staff') === '1'; } catch { /* storage blocked */ }
   if (!staff) return null;
+  // Pages with a bar along the bottom on phones (the map sheet, the store actions): sit above it.
+  const raised = /^\/(mall-map|q\/|stores?\/|shops?\/details\/)/.test(pathname);
   return (
     <a
       href={editTarget(pathname)}
-      className="fixed left-4 bottom-4 z-[90] inline-flex items-center gap-2 h-10 px-4 rounded-full bg-gray-900/90 text-white text-xs font-semibold tracking-wide shadow-xl hover:bg-black transition-colors"
+      aria-label="Edit this page"
+      className={`fixed left-3 sm:left-4 z-[90] inline-flex items-center justify-center gap-2 h-11 w-11 sm:w-auto sm:h-10 sm:px-4 rounded-full bg-gray-900/90 text-white text-xs font-semibold tracking-wide shadow-xl hover:bg-black transition-colors ${raised ? 'bottom-[96px] lg:bottom-4' : 'bottom-4'}`}
       style={{ fontFamily: "'Montserrat', sans-serif" }}
     >
       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" /></svg>
-      Edit this page
+      <span className="hidden sm:inline">Edit this page</span>
     </a>
   );
 }

@@ -280,6 +280,8 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
     if (tool === 'route') { e.stopPropagation(); p.onRouteClick(toMap(e), u); return; }
     if (p.placing) { e.stopPropagation(); p.onPlaceStore(u); return; }
     if (tool !== 'select') return;
+    // Touch: a drag that starts on an unselected unit pans the plan; tap first to pick it, then drag to move.
+    if (e.pointerType === 'touch' && !selectedIds.has(u.id)) return;
     e.stopPropagation();
     let ids = selection?.kind === 'units' ? selection.ids : [];
     if (e.shiftKey || e.metaKey || e.ctrlKey) {
@@ -302,7 +304,9 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
 
   const onTap = (m: MapPoint, e: PointerEvent) => {
     if ((e.target as Element)?.closest?.('[data-handle]')) return;
-    if (tool === 'select' && !(e.target as Element)?.closest?.('[data-unit]') && !e.shiftKey) p.onSelect(null);
+    const tapped = (e.target as Element)?.closest?.('[data-unit]') as HTMLElement | SVGElement | null;
+    if (tool === 'select' && tapped && e.pointerType === 'touch') p.onSelect({ kind: 'units', ids: [tapped.dataset.unit!] });
+    else if (tool === 'select' && !tapped && !e.shiftKey) p.onSelect(null);
     else if (tool === 'qr') p.onPlaceQr({ x: Math.round(m.x), y: Math.round(m.y) });
     else if (tool === 'route' && !(e.target as Element)?.closest?.('[data-unit]')) p.onRouteClick(m, null);
     else if (tool === 'outline') {
@@ -408,7 +412,9 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
                 const cur = { n: 'ns-resize', s: 'ns-resize', e: 'ew-resize', w: 'ew-resize', ne: 'nesw-resize', sw: 'nesw-resize', nw: 'nwse-resize', se: 'nwse-resize' }[h];
                 return (
                   <Fixed key={h} x={x} y={y}>
-                    <rect data-handle x={-5} y={-5} width={10} height={10} rx={2} fill="#fff" stroke={ACCENT} strokeWidth={2} style={{ cursor: cur }}
+                    <rect data-handle x={-14} y={-14} width={28} height={28} fill="transparent" style={{ cursor: cur }}
+                      onPointerDown={(e) => { if (e.button !== 0) return; e.stopPropagation(); setDrag({ mode: 'resize', id: single.id, handle: h, start: toMap(e), orig: { x: single.x, y: single.y, w: single.w, h: single.h }, rect: { x: single.x, y: single.y, w: single.w, h: single.h }, guides: [] }); }} />
+                    <rect data-handle x={-5} y={-5} width={10} height={10} rx={2} fill="#fff" stroke={ACCENT} strokeWidth={2} style={{ cursor: cur, pointerEvents: 'none' }}
                       onPointerDown={(e) => { if (e.button !== 0) return; e.stopPropagation(); setDrag({ mode: 'resize', id: single.id, handle: h, start: toMap(e), orig: { x: single.x, y: single.y, w: single.w, h: single.h }, rect: { x: single.x, y: single.y, w: single.w, h: single.h }, guides: [] }); }} />
                   </Fixed>
                 );

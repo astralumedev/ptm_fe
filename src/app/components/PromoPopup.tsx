@@ -31,7 +31,9 @@ export default function PromoPopup() {
   const [open, setOpen] = useState<Promotion | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
-  const promo = liveOnly(items).find((p) => p.title?.trim() && (p.pages !== 'home' || pathname === '/'));
+  // Never on the mall map: someone who just scanned a QR code in the mall wants directions, not an ad.
+  const onMap = pathname.startsWith('/mall-map') || pathname.startsWith('/q/');
+  const promo = onMap ? undefined : liveOnly(items).find((p) => p.title?.trim() && (p.pages !== 'home' || pathname === '/'));
   const key = promo ? 'ptm-promo:' + contentKey([promo.title, promo.text, promo.image, promo.buttonLink]) : '';
 
   useEffect(() => {
@@ -76,7 +78,7 @@ export default function PromoPopup() {
         >
           <motion.div
             role="dialog" aria-modal="true" aria-labelledby="promo-title"
-            className="relative w-full max-w-md bg-white rounded-3xl overflow-hidden shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)]"
+            className="relative w-full max-w-md max-h-[calc(100dvh-32px)] overflow-y-auto bg-white rounded-3xl shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)]"
             initial={{ opacity: 0, y: 24, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12, scale: 0.98 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           >
@@ -88,7 +90,7 @@ export default function PromoPopup() {
             </button>
             {open.image && (
               <button type="button" onClick={go} className="block w-full cursor-pointer" aria-label={open.buttonLabel || open.title}>
-                <img src={open.image} alt="" decoding="async" className="w-full max-h-[55vh] object-cover" />
+                <img src={open.image} alt="" decoding="async" className="w-full max-h-[45vh] sm:max-h-[55vh] object-cover" />
               </button>
             )}
             <div className="p-6 sm:p-7 text-center">
@@ -103,7 +105,7 @@ export default function PromoPopup() {
                 {open.buttonLabel && open.buttonLink && (
                   <button type="button" onClick={go} className="btn-primary"><span>{open.buttonLabel}</span></button>
                 )}
-                <button type="button" onClick={close} className="text-xs font-semibold text-gray-500 hover:text-gray-900 tracking-wide cursor-pointer" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                <button type="button" onClick={close} className="px-2 py-3 text-xs font-semibold text-gray-500 hover:text-gray-900 tracking-wide cursor-pointer" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                   No thanks
                 </button>
               </div>

@@ -62,7 +62,7 @@ export default function ShopPage() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 space-y-20">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 space-y-14 md:space-y-20">
 
         {/* ========================================================================= */}
         {/* SECTION 1: FEATURED SHOPS & BRANDS (5-10 CURATED STORES) */}
@@ -97,7 +97,7 @@ export default function ShopPage() {
           ) : featuredStores.length === 0 ? (
             t.featuredEmpty ? <p className="text-sm text-gray-500 text-center py-8">{t.featuredEmpty}</p> : null
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="m-rail grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {featuredStores.slice(0, 8).map((store, index) => (
                 <motion.div
                   key={store.id}

@@ -33,7 +33,6 @@ function rememberScan(code: string) {
   try { localStorage.setItem(HERE_KEY, JSON.stringify({ code, at: Date.now() })); } catch { /* private mode */ }
 }
 
-const isMobile = () => typeof window !== 'undefined' && window.innerWidth < 1024;
 
 /** /q/:code — the address printed in every map QR code. */
 export function QrScanRedirect() {
@@ -71,7 +70,9 @@ export const MallMapPage: React.FC = () => {
   const [continuing, setContinuing] = useState<string | null>(null);
   const [hereOpen, setHereOpen] = useState(false);
   const mapRef = useRef<MapCanvasHandle>(null);
-  const handledParams = useRef('');
+  const handledParams = useRef<string | null>(null);
+  // Directions were asked for before we knew where the visitor is: ask, then go.
+  const [pendingDirections, setPendingDirections] = useState(false);
 
   useEffect(() => {
     let live = true;
@@ -157,9 +158,9 @@ export const MallMapPage: React.FC = () => {
       const loc = f && u ? findUnit(f, u) : null;
       if (loc) here = { name: loc.name || u, floorId: f as FloorId, ...unitCenter(loc) };
     }
-    const startPoint = here || defaultStart();
-    setStart(startPoint);
-    if (startPoint) goToFloor(startPoint.floorId);
+    // Only mark "you are here" when we actually know it (a scanned code or a link that says so).
+    setStart(here);
+    if (here) goToFloor(here.floorId);
     if (floorParam && ALL_FLOORS.includes(floorParam as FloorId)) goToFloor(floorParam as FloorId);
     if (categoryParam) setActiveCategory(canonical(categoryParam));
 
@@ -191,18 +192,17 @@ export const MallMapPage: React.FC = () => {
   // Frame the active leg of the route (or the selected shop) when it changes.
   const leg = route?.legs[activeLeg] || null;
   const legOnFloor = leg && leg.floorId === currentFloor ? leg : null;
-  const mobileOffset = () => (isMobile() ? 110 : 0);
   useEffect(() => {
     if (!legOnFloor) return;
     const b = boundsOf(legOnFloor.points, 170);
-    if (b) window.setTimeout(() => mapRef.current?.flyToBox(b, { pad: 40, maxK: 0.9, ms: 700, offsetY: mobileOffset() }), 60);
+    if (b) window.setTimeout(() => mapRef.current?.flyToBox(b, { pad: 40, maxK: 0.9, ms: 700 }), 60);
   }, [legOnFloor, play.n]);
   useEffect(() => {
     if (!selectedLocation || route) return;
     const onFloor = floors?.[currentFloor]?.locations.some((l) => l.id === selectedLocation.id);
     if (!onFloor) return;
     const pad = Math.max(selectedLocation.w, selectedLocation.h) * 2.2;
-    mapRef.current?.flyToBox({ x: selectedLocation.x - pad, y: selectedLocation.y - pad, w: selectedLocation.w + pad * 2, h: selectedLocation.h + pad * 2 }, { maxK: 1.1, ms: 600, offsetY: isMobile() ? 220 : 0 });
+    mapRef.current?.flyToBox({ x: selectedLocation.x - pad, y: selectedLocation.y - pad, w: selectedLocation.w + pad * 2, h: selectedLocation.h + pad * 2 }, { maxK: 1.1, ms: 600 });
   }, [selectedLocation, currentFloor, floors, route]);
 
   const onLegFinished = useCallback(() => {
@@ -238,6 +238,7 @@ export const MallMapPage: React.FC = () => {
     if (!selectedLocation || !floors) return;
     const floorOfSel = (FLOOR_ORDER.find((f) => floors[f]?.locations.some((l) => l === selectedLocation)) || currentFloor) as FloorId;
     setContinuing(null);
+    if (!start && qrPoints.length) { setPendingDirections(true); setHereOpen(true); return; }
     navigate(start, floorOfSel, selectedLocation, selectedStore);
   };
 
@@ -253,7 +254,8 @@ export const MallMapPage: React.FC = () => {
     rememberScan(p.code);
     const here: StartPoint = { name: p.name, floorId: p.floorId, x: p.x, y: p.y, heading: p.heading, code: p.code };
     setStart(here);
-    if (route && selectedLocation) {
+    if ((route || pendingDirections) && selectedLocation) {
+      setPendingDirections(false);
       const f = (FLOOR_ORDER.find((fl) => floors?.[fl]?.locations.some((l) => l === selectedLocation)) || currentFloor) as FloorId;
       navigate(here, f, selectedLocation, selectedStore);
     } else {
@@ -383,7 +385,7 @@ export const MallMapPage: React.FC = () => {
             />
           </div>
 
-          <WhereAreYouModal isOpen={hereOpen} points={qrPoints} currentCode={start?.code} onClose={() => setHereOpen(false)} onPick={pickHere} />
+          <WhereAreYouModal isOpen={hereOpen} points={qrPoints} currentCode={start?.code} onClose={() => { setHereOpen(false); setPendingDirections(false); }} onPick={pickHere} />
         </div>
       </main>
     </div>

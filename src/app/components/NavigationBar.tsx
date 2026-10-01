@@ -32,7 +32,7 @@ const NavigationBar: React.FC = () => {
             </div>
 
             {/* Navigation Items Centered (Exact Horizontal Center) */}
-            <div className="hidden md:flex items-center space-x-5 lg:space-x-8 text-gray-800 absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-20">
+            <div className="hidden lg:flex items-center space-x-5 xl:space-x-8 text-gray-800 absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-20">
               {menuItems.map((item, index) => {
                 const hasSub = !!item.subGroups;
                 const isDropdownOpen = activeDropdown === item.label;
@@ -117,7 +117,7 @@ const NavigationBar: React.FC = () => {
             </div>
 
             {/* Persistent Right Section: Mall Timings & Mall Map */}
-            <div className="hidden xl:flex items-center space-x-3.5 bg-gray-100/90 border border-gray-200/90 px-4 py-2 rounded-full text-gray-800 shadow-sm flex-shrink-0">
+            <div className="hidden min-[1360px]:flex items-center space-x-3.5 bg-gray-100/90 border border-gray-200/90 px-4 py-2 rounded-full text-gray-800 shadow-sm flex-shrink-0">
               {/* Mall Timings */}
               <div className="relative group cursor-pointer flex items-center space-x-1.5 text-xs font-semibold tracking-wide">
                 <svg className="w-3.5 h-3.5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,7 +156,7 @@ const NavigationBar: React.FC = () => {
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <MobileMenuToggle onClick={() => setIsMenuOpen(true)} />
             </div>
           </div>

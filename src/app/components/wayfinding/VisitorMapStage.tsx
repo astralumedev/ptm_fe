@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useMemo } from 'react';
+import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import type { FloorData, FloorId, RouteLeg, WayfindingLocation, WayfindingStore } from '../../../types/wayfinding';
 import { hexRgb } from '../../../lib/color';
 import { silhouettePoints } from '../../../lib/mapRouter';
@@ -52,6 +52,13 @@ export const VisitorMapStage = forwardRef<MapCanvasHandle, Props>(function Visit
   ref,
 ) {
   const categories = useMapCategories();
+  // Floor buttons float over the top of the map, and on phones the store sheet over the bottom.
+  const [narrow, setNarrow] = useState(() => typeof window !== 'undefined' && window.innerWidth < 1024);
+  useEffect(() => {
+    const on = () => setNarrow(window.innerWidth < 1024);
+    window.addEventListener('resize', on);
+    return () => window.removeEventListener('resize', on);
+  }, []);
 
   // unit id (lowercase) -> the store in it, for this floor.
   const byUnit = useMemo(() => {
@@ -121,6 +128,7 @@ export const VisitorMapStage = forwardRef<MapCanvasHandle, Props>(function Visit
       maxK={3}
       defs={<MapDefs />}
       ariaLabel="Mall floor map"
+      insets={narrow ? { top: 60, bottom: 84 } : { top: 64, bottom: 0 }}
       onTap={(_, e) => { if (!(e.target as Element)?.closest?.('[data-unit]')) onSelectUnit(null, null); }}
     >
       {(k) => floor && (

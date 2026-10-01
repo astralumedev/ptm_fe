@@ -49,7 +49,7 @@ export default function FeaturedStoresSection() {
         </div>
 
         {/* 3-Row Grid Layout for SHOP: [1-span][2-span] / [1-span][1-span][1-span] / [2-span][1-span] */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+        <div className="m-rail grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8" style={{ ['--rail-pad' as string]: '12px' }}>
           {cards.map((store, index) => (
             <motion.div
               key={store.key}

@@ -149,7 +149,7 @@ export default function CollectionList() {
       </div>
       </>)}
       {items && !ordering && (
-        <button onClick={reload} className="mt-3 inline-flex items-center gap-1.5 text-[12.5px] text-[var(--adm-ink-3)] hover:text-[var(--adm-ink)] cursor-pointer">
+        <button onClick={reload} className="mt-1 py-2.5 inline-flex items-center gap-1.5 text-[12.5px] text-[var(--adm-ink-3)] hover:text-[var(--adm-ink)] cursor-pointer">
           <RotateCw className="size-3.5" /> Refresh
         </button>
       )}

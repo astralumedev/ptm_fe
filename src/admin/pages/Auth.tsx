@@ -26,7 +26,7 @@ function PasswordInput({ id, value, onChange, autoComplete, autoFocus, required 
   return (
     <div className="relative">
       <input id={id} type={show ? 'text' : 'password'} className="adm-input !pr-10" value={value} onChange={(e) => onChange(e.target.value)} autoComplete={autoComplete} autoFocus={autoFocus} required={required} />
-      <button type="button" onClick={() => setShow((s) => !s)} className="absolute right-1 top-1 grid place-items-center size-7 rounded-md text-[var(--adm-ink-3)] hover:text-[var(--adm-ink)] hover:bg-[var(--adm-panel)] cursor-pointer" aria-label={show ? 'Hide password' : 'Show password'}>
+      <button type="button" onClick={() => setShow((s) => !s)} className="absolute right-1 top-1/2 -translate-y-1/2 grid place-items-center size-9 rounded-md text-[var(--adm-ink-3)] hover:text-[var(--adm-ink)] hover:bg-[var(--adm-panel)] cursor-pointer" aria-label={show ? 'Hide password' : 'Show password'}>
         {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
       </button>
     </div>

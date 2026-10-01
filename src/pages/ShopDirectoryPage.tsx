@@ -45,7 +45,8 @@ export default function ShopDirectoryPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedFloor, setSelectedFloor] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'featured' | 'name-asc' | 'name-desc' | 'floor'>('featured');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  // Phones start with the compact list: thirty big cards is a lot of scrolling.
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => (typeof window !== 'undefined' && window.innerWidth < 768 ? 'list' : 'grid'));
 
   useEffect(() => {
     const categoryParam = searchParams.get('category');
@@ -202,12 +203,12 @@ export default function ShopDirectoryPage() {
       />
 
       {/* Main Directory Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 space-y-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-16 space-y-6 md:space-y-8">
 
         {/* Toolbar with Sector Pills, Search, Category, Floor & Sort */}
         <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm p-4 sm:p-6 space-y-4">
           {/* Sector Switcher Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-gray-100">
+          <div className="m-chips flex items-center gap-2 overflow-x-auto pb-3 scrollbar-none border-b border-gray-100">
             {sectorPills.map((pill) => {
               const isSelected = selectedSector === pill.id;
               return (
@@ -227,12 +228,13 @@ export default function ShopDirectoryPage() {
           </div>
 
           {/* Main Filter Inputs */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-12 gap-2.5 sm:gap-4">
             {/* Search Input */}
-            <div className="lg:col-span-5 relative">
+            <div className="col-span-2 lg:col-span-5 relative">
               <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
-                type="text"
+                type="search"
+                enterKeyHint="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t.searchPlaceholder}
@@ -241,7 +243,7 @@ export default function ShopDirectoryPage() {
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 cursor-pointer"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-2.5 cursor-pointer" aria-label="Clear search"
                 >
                   <FaTimes className="w-3.5 h-3.5" />
                 </button>
@@ -249,7 +251,7 @@ export default function ShopDirectoryPage() {
             </div>
 
             {/* Category Dropdown */}
-            <div className="lg:col-span-3">
+            <div className="col-span-2 lg:col-span-3">
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
@@ -264,7 +266,7 @@ export default function ShopDirectoryPage() {
             </div>
 
             {/* Floor Dropdown */}
-            <div className="lg:col-span-2">
+            <div className="col-span-1 lg:col-span-2">
               <select
                 value={selectedFloor}
                 onChange={(e) => setSelectedFloor(e.target.value)}
@@ -279,7 +281,7 @@ export default function ShopDirectoryPage() {
             </div>
 
             {/* Sort Dropdown */}
-            <div className="lg:col-span-2">
+            <div className="col-span-1 lg:col-span-2">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
@@ -361,7 +363,8 @@ export default function ShopDirectoryPage() {
               <div className="flex items-center space-x-1 bg-gray-100 p-1 rounded-xl">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                  aria-label="Grid view" aria-pressed={viewMode === 'grid'}
+                  className={`p-2.5 sm:p-1.5 rounded-lg transition-colors cursor-pointer ${
                     viewMode === 'grid' ? 'bg-white text-[#801424] shadow-xs' : 'text-gray-500 hover:text-gray-900'
                   }`}
                   title="Grid View"
@@ -370,7 +373,8 @@ export default function ShopDirectoryPage() {
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                  aria-label="List view" aria-pressed={viewMode === 'list'}
+                  className={`p-2.5 sm:p-1.5 rounded-lg transition-colors cursor-pointer ${
                     viewMode === 'list' ? 'bg-white text-[#801424] shadow-xs' : 'text-gray-500 hover:text-gray-900'
                   }`}
                   title="List View"
@@ -505,7 +509,7 @@ export default function ShopDirectoryPage() {
                           <a
                             href={`tel:${store.contact_number}`}
                             onClick={(e) => e.stopPropagation()}
-                            className="text-gray-500 hover:text-[#801424] transition-colors p-1"
+                            className="text-gray-500 hover:text-[#801424] transition-colors p-2.5 -m-1.5"
                             title={`Call ${store.name}`}
                           >
                             <FaPhoneAlt className="w-3 h-3" />
@@ -530,14 +534,14 @@ export default function ShopDirectoryPage() {
               <Link
                 key={store.id}
                 to={`/shops/details/${store.slug}`}
-                className="p-4 sm:p-5 hover:bg-gray-50/80 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 group block !no-underline text-inherit cursor-pointer"
+                className="p-4 sm:p-5 hover:bg-gray-50/80 active:bg-gray-50 transition-colors flex items-center justify-between gap-3 sm:gap-4 group !no-underline text-inherit cursor-pointer"
               >
-                <div className="flex items-start sm:items-center gap-4">
+                <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                   <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
                     <img loading="lazy" decoding="async" src={store.logo?.data?.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
                   </div>
-                  <div className="space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                       <span
                         className="text-base font-bold text-gray-900 group-hover:text-[#801424] transition-colors"
                         style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
@@ -545,22 +549,23 @@ export default function ShopDirectoryPage() {
                         {store.name}
                       </span>
                       {store.featured && (
-                        <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
+                        <span className="hidden sm:inline text-[10px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
                           {t.featuredBadge}
                         </span>
                       )}
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#801424] bg-red-50 px-2 py-0.5 rounded-md border border-red-200">
+                      <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-wider text-[#801424] bg-red-50 px-2 py-0.5 rounded-md border border-red-200">
                         {store.category || store.type}
                       </span>
                     </div>
-                    {store.subtitle && <p className="text-xs text-gray-600 line-clamp-1">{store.subtitle}</p>}
+                    <p className="sm:hidden text-[11px] font-bold uppercase tracking-wider text-[#801424] truncate">{store.category || store.type}</p>
+                    {store.subtitle && <p className="hidden sm:block text-xs text-gray-600 line-clamp-1">{store.subtitle}</p>}
                     <div className="flex flex-wrap items-center gap-3 text-[11px] text-gray-500 pt-0.5">
                       <span className="flex items-center gap-1 font-medium text-gray-700">
                         <FaMapMarkerAlt className="w-2.5 h-2.5 text-[#801424]" />
                         {store.floor} {store.unitNumber ? `(${store.unitNumber})` : ''}
                       </span>
                       {store.operation_hours && (
-                        <span className="flex items-center gap-1">
+                        <span className="hidden sm:flex items-center gap-1">
                           <FaClock className="w-2.5 h-2.5 text-gray-400" />
                           {store.operation_hours.split(';')[0]}
                         </span>
@@ -574,18 +579,19 @@ export default function ShopDirectoryPage() {
                     <a
                       href={`tel:${store.contact_number}`}
                       onClick={(e) => e.stopPropagation()}
-                      className="p-2 text-gray-500 hover:text-[#801424] hover:bg-red-50 rounded-lg transition-colors"
+                      className="hidden sm:inline-flex p-2 text-gray-500 hover:text-[#801424] hover:bg-red-50 rounded-lg transition-colors"
                       title={`Call ${store.name}`}
                     >
                       <FaPhoneAlt className="w-3.5 h-3.5" />
                     </a>
                   )}
-                  <span
-                    className="btn-primary-sm"
-                  >
-                    <span>{t.detailsLabel}</span>
-                    <FaArrowRight className="w-2.5 h-2.5" />
+                  <span className="hidden sm:inline-flex">
+                    <span className="btn-primary-sm">
+                      <span>{t.detailsLabel}</span>
+                      <FaArrowRight className="w-2.5 h-2.5" />
+                    </span>
                   </span>
+                  <FaArrowRight className="sm:hidden w-3.5 h-3.5 text-gray-400 group-active:text-[#801424]" aria-hidden />
                 </div>
               </Link>
             ))}

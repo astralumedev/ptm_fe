@@ -102,7 +102,7 @@ export default function ShopDetailPage() {
   ].filter((s): s is { url: string; icon: typeof FaGlobe; label: string } => Boolean(s.url && s.url.trim()));
 
   return (
-    <div className="min-h-screen font-montserrat bg-neutral-50/50 text-gray-900">
+    <div className="min-h-screen font-montserrat bg-neutral-50/50 text-gray-900 pb-[76px] lg:pb-0">
       <NavigationBar />
 
       <PageHeader
@@ -115,10 +115,10 @@ export default function ShopDetailPage() {
         ]}
       />
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-10 md:py-16">
         
         {/* Back Link */}
-        <div className="mb-8">
+        <div className="mb-5 md:mb-8">
           <Link
             to={t.directoryUrl || '/shops/directory'}
             className="btn-link"
@@ -128,14 +128,19 @@ export default function ShopDetailPage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        {/* Phones: the photo comes first, it's what people recognise the shop by. */}
+        <div className="lg:hidden mb-5 rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm aspect-[16/10] bg-gray-100">
+          <img decoding="async" src={shop.cover?.data?.full_url || shop.logo?.data?.full_url || '/mall_images/ptm_hero.webp'} alt={shop.name} className="w-full h-full object-cover" />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-start">
           
           {/* Left Column: Details & Description */}
-          <div className="lg:col-span-7 space-y-8">
+          <div className="lg:col-span-7 space-y-6 lg:space-y-8">
             
-            <div className="bg-white p-8 sm:p-10 rounded-3xl border border-gray-200/80 shadow-xs space-y-6">
+            <div className="bg-white p-5 sm:p-10 rounded-2xl sm:rounded-3xl border border-gray-200/80 shadow-xs space-y-5 sm:space-y-6">
               
-              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-6">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-5 sm:pb-6">
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 font-arizona-flare">
                     {shop.name}
@@ -161,7 +166,7 @@ export default function ShopDetailPage() {
               </div>
 
               {/* Description */}
-              <div className="prose prose-sm max-w-none text-gray-600 leading-relaxed">
+              <div className="cms-prose cms-prose-sm text-gray-600">
                 <div dangerouslySetInnerHTML={{ __html: shop.store_description || fill(t.descriptionFallback, { name: shop.name }) }} />
               </div>
 
@@ -200,7 +205,7 @@ export default function ShopDetailPage() {
             </div>
 
             {/* Practical Info Card */}
-            <div className="bg-white p-8 rounded-3xl border border-gray-200/80 shadow-xs space-y-4">
+            <div className="bg-white p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-gray-200/80 shadow-xs space-y-4">
               <h3 className="text-base font-bold text-gray-900 font-arizona-flare uppercase tracking-wider">
                 Store Information
               </h3>
@@ -260,7 +265,7 @@ export default function ShopDetailPage() {
           <div className="lg:col-span-5 space-y-6">
             
             {/* Primary Cover Image */}
-            <div className="bg-white p-3 rounded-3xl border border-gray-200/80 shadow-md overflow-hidden aspect-[4/3] group">
+            <div className="hidden lg:block bg-white p-3 rounded-3xl border border-gray-200/80 shadow-md overflow-hidden aspect-[4/3] group">
               <img loading="lazy" decoding="async"
                 src={shop.cover?.data?.full_url || shop.logo?.data?.full_url || '/mall_images/ptm_hero.webp'}
                 alt={shop.name}
@@ -270,7 +275,7 @@ export default function ShopDetailPage() {
 
             {/* Gallery Grid if available */}
             {gallery.length > 0 && (
-              <div className="bg-white p-6 rounded-3xl border border-gray-200/80 shadow-xs space-y-4">
+              <div className="bg-white p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-gray-200/80 shadow-xs space-y-4">
                 <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
                   {t.galleryHeading}
                 </h4>
@@ -292,7 +297,7 @@ export default function ShopDetailPage() {
             )}
 
             {/* Wayfinding Card */}
-            <div className="bg-gradient-to-br from-gray-900 to-gray-950 text-white p-8 rounded-3xl shadow-xl space-y-4">
+            <div className="bg-gradient-to-br from-gray-900 to-gray-950 text-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl space-y-4">
               <span className="text-[10px] font-bold uppercase tracking-widest text-red-400">{t.mapEyebrow}</span>
               <h3 className="text-xl font-bold font-arizona-flare">{t.mapHeading}</h3>
               <p className="text-xs text-gray-300 leading-relaxed">
@@ -311,6 +316,19 @@ export default function ShopDetailPage() {
         </div>
 
       </section>
+
+      {/* Phones: the two things a visitor in the mall wants, always in reach. */}
+      <div className="lg:hidden fixed inset-x-0 bottom-0 z-40 px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-[0_-6px_20px_rgba(0,0,0,0.06)] flex gap-2.5">
+        <Link to={mapHref} className="btn-primary flex-1 min-w-0 justify-center">
+          <FaMapMarkerAlt className="w-3.5 h-3.5 shrink-0" />
+          <span className="truncate">{t.mapButton}</span>
+        </Link>
+        {shop.contact_number && (
+          <a href={`tel:${shop.contact_number.replace(/\s+/g, '')}`} className="btn-secondary !px-4 justify-center" aria-label={t.callLabel}>
+            <FaPhoneAlt className="w-3.5 h-3.5" />
+          </a>
+        )}
+      </div>
 
       <Footer />
     </div>

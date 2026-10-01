@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { arizonaFlare } from '../fonts';
 
@@ -40,9 +40,18 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   className = '',
 }) => {
   const isLeft = align === 'left';
+  const tabsRef = useRef<HTMLDivElement>(null);
+
+  // On phones the tabs scroll sideways; keep the active one in view.
+  useEffect(() => {
+    const el = tabsRef.current?.querySelector<HTMLElement>('[aria-selected="true"]');
+    const row = tabsRef.current;
+    if (!el || !row || row.scrollWidth <= row.clientWidth) return;
+    row.scrollTo({ left: el.offsetLeft - (row.clientWidth - el.offsetWidth) / 2, behavior: 'smooth' });
+  }, [activeTab]);
 
   return (
-    <section className={`relative w-full overflow-hidden bg-gradient-to-b from-[#12132b]/5 via-white to-gray-50/60 border-b border-gray-200/80 pt-8 pb-10 md:pt-12 md:pb-14 ${className}`}>
+    <section className={`relative w-full overflow-hidden bg-gradient-to-b from-[#12132b]/5 via-white to-gray-50/60 border-b border-gray-200/80 pt-6 pb-8 md:pt-12 md:pb-14 ${className}`}>
       {/* Subtle Luxury Gradient Glows */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-500/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2" />
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2" />
@@ -51,22 +60,22 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         
         {/* Optional Breadcrumbs */}
         {breadcrumbs && breadcrumbs.length > 0 && (
-          <nav aria-label="Breadcrumb" className={`mb-4 flex items-center text-xs text-gray-600 ${isLeft ? 'justify-start' : 'justify-center'}`} style={{ fontFamily: "'Montserrat', sans-serif" }}>
-            <ol className="flex items-center space-x-2">
+          <nav aria-label="Breadcrumb" className={`mb-3 md:mb-4 flex items-center text-xs text-gray-600 ${isLeft ? 'justify-start' : 'justify-center'}`} style={{ fontFamily: "'Montserrat', sans-serif" }}>
+            <ol className="flex items-center gap-x-2 min-w-0 max-w-full">
               <li>
-                <Link to="/" className="hover:text-[#801424] transition-colors font-medium">
+                <Link to="/" className="inline-block py-2 hover:text-[#801424] transition-colors font-medium">
                   Home
                 </Link>
               </li>
               {breadcrumbs.map((crumb, idx) => (
-                <li key={idx} className="flex items-center space-x-2">
+                <li key={idx} className="flex items-center gap-x-2 min-w-0">
                   <span className="text-gray-300">/</span>
                   {crumb.href ? (
-                    <Link to={crumb.href} className="hover:text-[#801424] transition-colors font-medium">
+                    <Link to={crumb.href} className="inline-block py-2 whitespace-nowrap hover:text-[#801424] transition-colors font-medium">
                       {crumb.label}
                     </Link>
                   ) : (
-                    <span className="text-gray-700 font-semibold">{crumb.label}</span>
+                    <span className="text-gray-700 font-semibold truncate max-w-[46vw] sm:max-w-md" aria-current="page">{crumb.label}</span>
                   )}
                 </li>
               ))}
@@ -112,17 +121,19 @@ const PageHeader: React.FC<PageHeaderProps> = ({
 
           {/* Optional Tabs / Filter Navigation */}
           {tabs && tabs.length > 0 && (
-            <div className="mt-6 sm:mt-8 flex flex-wrap items-center justify-center gap-2 sm:gap-3 p-1.5 bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-sm">
+            <div ref={tabsRef} role="tablist" className="m-chips self-stretch sm:self-auto mt-5 sm:mt-8 sm:max-w-full flex flex-wrap items-center justify-center gap-2 sm:gap-3 sm:p-1.5 sm:bg-white/90 sm:backdrop-blur-md sm:rounded-2xl sm:border sm:border-gray-200 sm:shadow-sm">
               {tabs.map((tab) => {
                 const isActive = activeTab === tab.id;
                 return (
                   <button
                     key={tab.id}
+                    role="tab"
+                    aria-selected={isActive}
                     onClick={() => onTabChange && onTabChange(tab.id)}
-                    className={`flex items-center space-x-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold tracking-wider transition-all duration-300 cursor-pointer ${
+                    className={`flex items-center gap-2 h-10 px-4 sm:h-auto sm:px-5 sm:py-2.5 rounded-full sm:rounded-xl text-xs sm:text-sm font-semibold tracking-wider whitespace-nowrap border sm:border-0 transition-all duration-300 cursor-pointer ${
                       isActive
-                        ? 'bg-[#801424] text-white shadow-md shadow-red-900/20 scale-102'
-                        : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100/80'
+                        ? 'bg-[#801424] border-[#801424] text-white shadow-md shadow-red-900/20'
+                        : 'bg-white border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-100/80 sm:bg-transparent'
                     }`}
                     style={{ fontFamily: "'Montserrat', sans-serif" }}
                   >

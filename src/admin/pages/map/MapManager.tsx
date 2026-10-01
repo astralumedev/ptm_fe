@@ -29,6 +29,18 @@ const TOOLS: { id: Tool; label: string; key: string; icon: typeof Square; hint: 
 
 type Tab = 'edit' | 'stores' | 'qr' | 'checks';
 
+function useNarrow() {
+  const q = '(max-width: 1023.98px)';
+  const [narrow, setNarrow] = useState(() => typeof window !== 'undefined' && window.matchMedia(q).matches);
+  useEffect(() => {
+    const m = window.matchMedia(q);
+    const on = () => setNarrow(m.matches);
+    m.addEventListener('change', on);
+    return () => m.removeEventListener('change', on);
+  }, []);
+  return narrow;
+}
+
 const toMeta = (r: ItemRow): StoreMeta => ({
   id: r.id, name: String(r.data.name || r.slug), slug: r.slug, cat: String(r.data.categorySlug || r.data.category || 'shop'),
   logo: r.data.logo?.data?.full_url || (typeof r.data.logo === 'string' ? r.data.logo : undefined),
@@ -70,6 +82,10 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
   const [aligning, setAligning] = useState(false);
   const [selection, setSelection] = useState<Selection>(null);
   const [tab, setTab] = useState<Tab>('edit');
+  // Phones and small tablets: the side panel becomes a bottom sheet over the plan.
+  const narrow = useNarrow();
+  const [sheet, setSheet] = useState<'peek' | 'half' | 'full'>('peek');
+  const openSheet = (to: 'half' | 'full' = 'half') => setSheet((s) => (s === 'full' ? s : to));
   const [placing, setPlacing] = useState<StoreMeta | null>(null);
   const [saving, setSaving] = useState(false);
   const [versions, setVersions] = useState<{ floor: FloorId; items: MapVersion[] } | null>(null);
@@ -288,6 +304,22 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
     }, f !== floorId ? 120 : 0);
   };
 
+  // Phones: when the sheet opens over the plan, glide the picked unit into the part still visible.
+  useEffect(() => {
+    if (!narrow || sheet === 'peek' || selection?.kind !== 'units' || selection.ids.length !== 1) return;
+    const u = doc.floors[floorId]?.locations.find((l) => l.id === selection.ids[0]);
+    const svg = canvas.current?.svg();
+    if (!u || !svg) return;
+    const h = svg.getBoundingClientRect().height;
+    const visible = h * (sheet === 'half' ? 0.48 : 0.15);
+    const v = canvas.current!.view();
+    const top = u.y * v.k + v.y, bottom = (u.y + u.h) * v.k + v.y;
+    if (top > 64 && bottom < visible - 12) return;
+    const c = { x: u.x + u.w / 2, y: u.y + u.h / 2 };
+    canvas.current!.flyTo({ x: c.x, y: c.y + (h - visible) / 2 / v.k }, v.k, 420);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selection, sheet, narrow]);
+
   const shaftNames = useMemo(() => [...new Set(FLOOR_ORDER.flatMap((f) => (doc.floors[f]?.locations || []).filter((l) => isTransitCat(l.cat)).map((l) => l.link || l.id)))].sort(), [doc.floors]);
 
   if (!floor) return <div className="p-6"><ErrorNote>This floor has no plan yet.</ErrorNote></div>;
@@ -304,11 +336,17 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
   const activeTool = TOOLS.find((t) => t.id === tool)!;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-56px)] lg:h-screen bg-[var(--adm-panel)]">
+    <div className="flex flex-col h-[calc(100dvh-56px)] lg:h-screen bg-[var(--adm-panel)]">
       {/* Top bar */}
-      <div className="flex items-center gap-3 px-4 h-14 bg-white border-b border-[var(--adm-line)] shrink-0">
-        <h1 className="text-[15px] font-semibold whitespace-nowrap hidden sm:block">Map management</h1>
-        <div className="flex gap-0.5 p-0.5 rounded-lg bg-[var(--adm-panel)] overflow-x-auto adm-scroll min-w-0" role="tablist" aria-label="Floor">
+      <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 h-14 bg-white border-b border-[var(--adm-line)] shrink-0">
+        <h1 className="text-[15px] font-semibold whitespace-nowrap hidden xl:block">Map management</h1>
+        <select className="md:hidden adm-input h-9 w-auto min-w-0 flex-1 font-medium" value={floorId} onChange={(e) => setFloor(e.target.value as FloorId)} aria-label="Floor">
+          {FLOOR_ORDER.map((f) => {
+            const bad = problems.some((p) => p.floor === f && p.level === 'error');
+            return <option key={f} value={f}>{FLOOR_LABELS[f]}{changes.floors.includes(f) ? ' •' : ''}{bad ? ' ⚠' : ''}</option>;
+          })}
+        </select>
+        <div className="hidden md:flex gap-0.5 p-0.5 rounded-lg bg-[var(--adm-panel)] overflow-x-auto adm-scroll min-w-0" role="tablist" aria-label="Floor">
           {FLOOR_ORDER.map((f) => {
             const dirty = changes.floors.includes(f);
             const bad = problems.some((p) => p.floor === f && p.level === 'error');
@@ -321,27 +359,28 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
             );
           })}
         </div>
-        <div className="flex-1" />
+        <div className="hidden md:block flex-1" />
         <button className="adm-btn adm-btn-ghost adm-btn-sm !px-2" onClick={undo} disabled={!canUndo} title="Undo (Ctrl+Z)" aria-label="Undo"><Undo2 className="size-4" /></button>
         <button className="adm-btn adm-btn-ghost adm-btn-sm !px-2" onClick={redo} disabled={!canRedo} title="Redo (Ctrl+Shift+Z)" aria-label="Redo"><Redo2 className="size-4" /></button>
         <button className="adm-btn adm-btn-primary adm-btn-sm" onClick={save} disabled={!changes.count || saving} title="Save (Ctrl+S)">
           {saving ? <Spinner className="size-3.5" /> : <Save className="size-3.5" />}
-          {changes.count ? `Save ${changes.count} change${changes.count > 1 ? 's' : ''}` : 'Saved'}
+          <span className="sm:hidden">{changes.count ? `Save (${changes.count})` : 'Saved'}</span>
+          <span className="hidden sm:inline">{changes.count ? `Save ${changes.count} change${changes.count > 1 ? 's' : ''}` : 'Saved'}</span>
         </button>
       </div>
 
-      <div className="flex-1 min-h-0 flex">
-        {/* Tools */}
-        <div className="w-12 shrink-0 bg-white border-r border-[var(--adm-line)] flex flex-col items-center gap-1 py-2">
+      <div className="relative flex-1 min-h-0 flex">
+        {/* Tools: a rail on the left on desktop, a floating bar over the plan on phones */}
+        <div className="z-20 bg-white flex items-center gap-1 lg:w-12 lg:shrink-0 lg:border-r lg:border-[var(--adm-line)] lg:flex-col lg:py-2 max-lg:absolute max-lg:top-2.5 max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:p-1 max-lg:rounded-xl max-lg:border max-lg:border-[var(--adm-line)] max-lg:shadow-[0_4px_14px_rgb(22_24_29/0.12)]">
           {TOOLS.map((t) => (
             <button key={t.id} onClick={() => { setTool(t.id); if (t.id !== 'route') setRouteTest(NO_ROUTE); }} title={`${t.label} (${t.key})`} aria-label={t.label} aria-pressed={tool === t.id}
-              className={`grid place-items-center size-9 rounded-lg transition-colors cursor-pointer ${tool === t.id ? 'bg-[var(--adm-accent)] text-white' : 'text-[var(--adm-ink-2)] hover:bg-[var(--adm-panel)]'}`}>
+              className={`grid place-items-center size-10 lg:size-9 rounded-lg transition-colors cursor-pointer ${tool === t.id ? 'bg-[var(--adm-accent)] text-white' : 'text-[var(--adm-ink-2)] hover:bg-[var(--adm-panel)]'}`}>
               <t.icon className="size-[18px]" />
             </button>
           ))}
-          <div className="flex-1" />
-          <button onClick={() => canvas.current?.zoomBy(1.4)} className="grid place-items-center size-9 rounded-lg text-[var(--adm-ink-2)] hover:bg-[var(--adm-panel)]" title="Zoom in (+)" aria-label="Zoom in"><ZoomIn className="size-[18px]" /></button>
-          <button onClick={() => canvas.current?.zoomBy(1 / 1.4)} className="grid place-items-center size-9 rounded-lg text-[var(--adm-ink-2)] hover:bg-[var(--adm-panel)]" title="Zoom out (-)" aria-label="Zoom out"><ZoomOut className="size-[18px]" /></button>
+          <div className="lg:flex-1 max-lg:w-px max-lg:h-6 max-lg:bg-[var(--adm-line)] max-lg:mx-0.5" />
+          <button onClick={() => canvas.current?.zoomBy(1.4)} className="max-lg:hidden grid place-items-center size-9 rounded-lg text-[var(--adm-ink-2)] hover:bg-[var(--adm-panel)]" title="Zoom in (+)" aria-label="Zoom in"><ZoomIn className="size-[18px]" /></button>
+          <button onClick={() => canvas.current?.zoomBy(1 / 1.4)} className="max-lg:hidden grid place-items-center size-9 rounded-lg text-[var(--adm-ink-2)] hover:bg-[var(--adm-panel)]" title="Zoom out (-)" aria-label="Zoom out"><ZoomOut className="size-[18px]" /></button>
           {floor?.underlay && (
             <button onClick={() => { setShowUnderlay((v) => !v); setAligning(false); }} aria-pressed={showUnderlay} title={showUnderlay ? 'Hide floor plan image' : 'Show floor plan image'} aria-label="Toggle floor plan image"
               className={`grid place-items-center size-9 rounded-lg transition-colors cursor-pointer ${showUnderlay ? 'bg-[var(--adm-accent-soft)] text-[var(--adm-accent)]' : 'text-[var(--adm-ink-2)] hover:bg-[var(--adm-panel)]'}`}><ImageIcon className="size-[18px]" /></button>
@@ -360,7 +399,7 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
             colorOf={colorOf}
             tool={tool}
             selection={selection}
-            onSelect={(s) => { setSelection(s); if (s) setTab(s.kind === 'qr' ? 'qr' : 'edit'); }}
+            onSelect={(s) => { setSelection(s); if (s) { setTab(s.kind === 'qr' ? 'qr' : 'edit'); openSheet(); } else if (narrow) setSheet('peek'); }}
             onMoveUnits={onMoveUnits}
             onDrawn={onDrawn}
             onSilhouette={(pts) => commit((d) => updateFloor(d, floorId, (f) => ({ ...f, silhouette: pts })))}
@@ -383,18 +422,31 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
             aligning={aligning && showUnderlay && !!floor.underlay}
             onUnderlay={(u) => commit((d) => updateFloor(d, floorId, (f) => ({ ...f, underlay: u })))}
           />
+          {/* Phones: only show a hint when the next tap does something special. */}
+          {(placing || aligning || tool !== 'select') && (
+            <div className="lg:hidden absolute left-3 right-3 top-[64px] z-10 flex items-start gap-2 px-3 py-2 rounded-lg bg-[var(--adm-ink)]/90 text-white text-[12.5px] shadow-lg">
+              <span className="flex-1">{aligning ? 'Drag the image to move it, pull a corner to scale it.' : placing ? `Tap a shop unit to place ${placing.name}.` : tool === 'route' ? (routeTest.start && !routeTest.legs.length ? 'Now tap the shop to walk to.' : 'Tap a starting spot, then a shop.') : tool === 'draw' ? 'Drag on the plan to draw a unit.' : tool === 'qr' ? 'Tap where the QR sign will hang.' : 'Drag corners to reshape; tap the plan to add a corner.'}</span>
+              <button className="underline underline-offset-2 shrink-0" onClick={() => { setPlacing(null); setAligning(false); setTool('select'); setRouteTest(NO_ROUTE); }}>Done</button>
+            </div>
+          )}
           <div className="hidden lg:block pointer-events-none absolute left-3 bottom-3 max-w-md px-3 py-2 rounded-lg bg-white/95 border border-[var(--adm-line)] shadow-sm text-[12.5px] text-[var(--adm-ink-2)]">
             <b className="text-[var(--adm-ink)]">{activeTool.label}.</b> {aligning ? 'Aligning the floor plan image: drag it to move, pull a corner to scale it (Shift = stretch freely). Press Done when it lines up.' : placing ? `Click a shop unit to place ${placing.name}.` : tool === 'route' && routeTest.start && !routeTest.legs.length ? 'Now click the shop to walk to.' : activeTool.hint}
           </div>
         </div>
 
         {/* Side panel */}
-        <aside className="w-[300px] xl:w-[340px] shrink-0 bg-white border-l border-[var(--adm-line)] flex flex-col min-h-0">
+        <aside
+          className="bg-white flex flex-col min-h-0 max-lg:overflow-hidden lg:w-[300px] xl:w-[340px] lg:shrink-0 lg:border-l lg:border-[var(--adm-line)] max-lg:absolute max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-30 max-lg:rounded-t-2xl max-lg:border-t max-lg:border-[var(--adm-line)] max-lg:shadow-[0_-10px_30px_rgb(22_24_29/0.14)] max-lg:transition-[height] max-lg:duration-300 max-lg:ease-[cubic-bezier(0.22,1,0.36,1)]"
+          style={narrow ? { height: sheet === 'peek' ? 64 : sheet === 'half' ? '52%' : 'calc(100% - 8px)' } : undefined}
+        >
+          <button type="button" className="lg:hidden shrink-0 h-4 grid place-items-center cursor-pointer" onClick={() => setSheet((v) => (v === 'peek' ? 'half' : v === 'half' ? 'full' : 'peek'))} aria-label={sheet === 'peek' ? 'Open panel' : sheet === 'half' ? 'Expand panel' : 'Collapse panel'}>
+            <span className="block w-10 h-1 rounded-full bg-[var(--adm-line-strong)]" />
+          </button>
           <div className="flex border-b border-[var(--adm-line)] shrink-0" role="tablist">
             {([['edit', 'Edit', SlidersHorizontal], ['stores', 'Stores', StoreIcon], ['qr', 'QR codes', QrCode], ['checks', 'Checks', AlertTriangle]] as const).map(([k, l, Icon]) => (
-              <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}
+              <button key={k} role="tab" aria-selected={tab === k} onClick={() => { setTab(k); if (narrow) setSheet((v) => (v === 'peek' || tab === k ? (v === 'peek' ? 'half' : 'peek') : v)); }}
                 className={`flex-1 flex items-center justify-center gap-1.5 h-11 text-[12.5px] font-medium border-b-2 -mb-px transition-colors cursor-pointer ${tab === k ? 'border-[var(--adm-accent)] text-[var(--adm-accent)]' : 'border-transparent text-[var(--adm-ink-2)] hover:text-[var(--adm-ink)]'}`}>
-                <Icon className="size-3.5" /> {l}
+                <Icon className="size-4 lg:size-3.5" /> <span className="max-[359px]:sr-only">{l}</span>
                 {k === 'checks' && errorCount > 0 && <span className="min-w-4 h-4 px-1 rounded-full bg-[var(--adm-danger)] text-white text-[10.5px] grid place-items-center">{errorCount}</span>}
               </button>
             ))}
@@ -445,7 +497,7 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
               <StoresPanel stores={stores} doc={doc} floorName={floorName} placing={placing}
                 unitExists={(f, u) => !!doc.floors[f as FloorId]?.locations.some((l) => l.id.toLowerCase() === u.toLowerCase())}
                 onFocus={(s) => { const pl = doc.place[s.id]; if (pl?.floor) focusUnits(pl.floor as FloorId, pl.units); setTab('edit'); }}
-                onPlace={(s) => { setPlacing(s); setTool('select'); }} />
+                onPlace={(s) => { setPlacing(s); setTool('select'); if (s && narrow) setSheet('peek'); }} />
             )}
             {tab === 'qr' && (qrSel && selection?.kind === 'qr' ? (
               <>
@@ -457,7 +509,7 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
               </>
             ) : (
               <QrListPanel doc={doc} scans={scans} floorName={floorName} dirty={changes.qr.length > 0}
-                onAdd={() => { setTool('qr'); toast('ok', 'Click on the map where the QR sign will hang.'); }}
+                onAdd={() => { setTool('qr'); if (narrow) setSheet('peek'); toast('ok', narrow ? 'Tap the plan where the QR sign will hang.' : 'Click on the map where the QR sign will hang.'); }}
                 onFocus={(key) => {
                   const q = doc.qr[key];
                   if (q.floorId !== floorId) setFloor(q.floorId);
@@ -472,7 +524,7 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
               }} />
             )}
           </div>
-          <div className="shrink-0 border-t border-[var(--adm-line)] px-4 py-2 text-[11.5px] text-[var(--adm-ink-3)] flex items-center gap-1.5">
+          <div className="max-lg:hidden shrink-0 border-t border-[var(--adm-line)] px-4 py-2 text-[11.5px] text-[var(--adm-ink-3)] flex items-center gap-1.5">
             <Layers className="size-3.5" /> {floor.locations.length} units on {floorName(floorId)} · changes go live when you save
           </div>
         </aside>

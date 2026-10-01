@@ -49,7 +49,7 @@ export default function DineSection() {
         </div>
 
         {/* Requested 3-Row Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+        <div className="m-rail grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8" style={{ ['--rail-pad' as string]: '12px' }}>
           {cards.map((spot, index) => (
             <motion.div
               key={spot.key}
@@ -100,7 +100,7 @@ export default function DineSection() {
                     </h3>
 
                     {/* Explore Link on Hover */}
-                    <div className="mt-2.5 flex items-center gap-1.5 text-xs font-medium text-amber-300/90 group-hover:text-amber-300 transition-all transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 duration-300">
+                    <div className="mt-2.5 flex items-center gap-1.5 text-xs font-medium text-amber-300/90 group-hover:text-amber-300 transition-all transform duration-300 md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100">
                       <span>{content.cardCta}</span>
                       <FaArrowRight className="w-3 h-3 text-amber-400 group-hover:translate-x-1 transition-transform" />
                     </div>

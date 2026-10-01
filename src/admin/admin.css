@@ -94,3 +94,11 @@ select.adm-input { padding-right: 28px; appearance: none; background-image: url(
 @media (prefers-reduced-motion: reduce) {
   .adm *, .adm *::before { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* Touch screens: finger-sized controls (the desktop sizes stay compact). */
+@media (pointer: coarse) {
+  .adm-btn { height: 42px; }
+  .adm-btn-sm { height: 38px; }
+  .adm-input { height: 42px; }
+  textarea.adm-input { height: auto; }
+}

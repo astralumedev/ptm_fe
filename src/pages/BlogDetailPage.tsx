@@ -116,11 +116,11 @@ export default function BlogDetailPage() {
         ]}
       />
 
-      <section className="w-full px-4 sm:px-6 lg:px-8 py-14">
+      <section className="w-full px-4 sm:px-6 lg:px-8 py-6 md:py-14">
         <div className="max-w-4xl mx-auto">
           
           {/* Back Button */}
-          <div className="mb-8 flex items-center justify-between">
+          <div className="mb-5 md:mb-8 flex items-center justify-between">
             <Link
               to="/latest#blogs"
               className="btn-link"
@@ -129,16 +129,16 @@ export default function BlogDetailPage() {
               <span>{c.backLink}</span>
             </Link>
 
-            <span className="text-xs font-semibold text-gray-400">
+            <span className="hidden sm:inline text-xs font-semibold text-gray-400">
               {c.sideLabel}
             </span>
           </div>
 
           {/* Article Header Card */}
-          <div className="bg-white rounded-3xl border border-gray-200/80 p-8 sm:p-12 shadow-sm space-y-8">
+          <div className="bg-white rounded-2xl sm:rounded-3xl border border-gray-200/80 p-5 sm:p-12 shadow-sm space-y-6 sm:space-y-8">
             
             {/* Meta tags */}
-            <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-gray-500 pb-4 border-b border-gray-100">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-gray-500 pb-4 border-b border-gray-100">
               <span className="inline-flex items-center gap-1.5 text-[#801424] font-bold">
                 <FaTag className="w-3 h-3" />
                 <span>{c.tagLabel}</span>
@@ -155,7 +155,7 @@ export default function BlogDetailPage() {
 
             {/* Featured Image */}
             {blog.cover_image?.data?.full_url && (
-              <div className="rounded-2xl overflow-hidden aspect-[16/9] shadow-md border border-gray-100 bg-gray-100">
+              <div className="-mx-5 sm:mx-0 sm:rounded-2xl overflow-hidden aspect-[16/9] sm:shadow-md border-y sm:border border-gray-100 bg-gray-100">
                 <img loading="lazy" decoding="async"
                   src={blog.cover_image.data.full_url}
                   alt={blog.title}
@@ -165,12 +165,12 @@ export default function BlogDetailPage() {
             )}
 
             {/* Blog Content */}
-            <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed prose-headings:font-bold prose-headings:text-gray-900 prose-headings:font-arizona-flare prose-a:text-[#801424] prose-a:font-semibold hover:prose-a:underline">
+            <div className="cms-prose">
               <div dangerouslySetInnerHTML={{ __html: blog.content }} />
             </div>
 
             {/* Article Footer */}
-            <div className="pt-8 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
+            <div className="pt-6 sm:pt-8 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{c.shareLabel}</span>
                 <button

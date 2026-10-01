@@ -231,7 +231,7 @@ export default function ServicesPage() {
     stores.length === 0 ? (
       <p className="py-8 text-center text-sm text-gray-500 bg-white rounded-2xl border border-dashed border-gray-200">{page.emptyText}</p>
     ) : (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="m-rail grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {stores.map((store, index) => (
         <motion.div
           key={store.id}
@@ -314,7 +314,7 @@ export default function ServicesPage() {
                     <a
                       href={`tel:${store.contact_number}`}
                       onClick={(e) => e.stopPropagation()}
-                      className="text-gray-500 hover:text-[#801424] transition-colors p-1"
+                      className="text-gray-500 hover:text-[#801424] transition-colors p-2.5 -m-1.5"
                       title={`Call ${store.name}`}
                     >
                       <FaPhoneAlt className="w-3 h-3" />
@@ -353,7 +353,7 @@ export default function ServicesPage() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 space-y-24">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 space-y-14 md:space-y-24">
 
         {/* One section per "Services" category */}
         {groups.map((group) => (
@@ -411,7 +411,7 @@ export default function ServicesPage() {
 
           {/* Amenities Breakdown */}
           {cards.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="m-rail grid grid-cols-1 md:grid-cols-3 gap-6">
               {cards.map((card, idx) => {
                 const bullets = card.bullets || [];
                 const hasDetails = card.showHotline || card.hours;
@@ -439,7 +439,7 @@ export default function ServicesPage() {
                       <div className="pt-2 border-t border-gray-100">
                         <CmsLink
                           href={card.linkHref}
-                          className="inline-flex items-center gap-2 text-xs font-bold text-[#801424] hover:text-[#5a0c18] no-underline"
+                          className="inline-flex items-center gap-2 py-2.5 -my-2.5 text-xs font-bold text-[#801424] hover:text-[#5a0c18] no-underline"
                         >
                           <span>{card.linkLabel}</span>
                           <FaArrowRight className="w-3 h-3" />

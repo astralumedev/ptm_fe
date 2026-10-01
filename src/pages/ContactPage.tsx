@@ -64,54 +64,60 @@ const ContactPage: React.FC = () => {
         ]}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-16">
 
         {/* Top Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          <div className="bg-white p-8 rounded-3xl border border-gray-200/80 shadow-xs hover:shadow-lg transition-all">
-            <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#801424] flex items-center justify-center text-xl mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 mb-8 md:mb-16">
+          <div className="flex md:block gap-4 bg-white p-5 md:p-8 rounded-2xl md:rounded-3xl border border-gray-200/80 shadow-xs hover:shadow-lg transition-all">
+            <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#801424] flex items-center justify-center text-xl shrink-0 md:mb-4">
               <FaPhoneAlt />
             </div>
+            <div className="min-w-0">
             <h3 className="text-lg font-bold text-gray-900 mb-1 font-arizona-flare">{c.phoneTitle}</h3>
-            <p className="text-xs text-gray-500 mb-4">{c.phoneText}</p>
+            <p className="text-xs text-gray-500 mb-2 md:mb-4">{c.phoneText}</p>
             {phone && <a
               href={telHref(phone)}
               className="text-sm font-bold text-[#801424] hover:text-[#600f1b] transition-colors block"
             >
               {phone}
             </a>}
+            </div>
           </div>
 
-          <div className="bg-white p-8 rounded-3xl border border-gray-200/80 shadow-xs hover:shadow-lg transition-all">
-            <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#801424] flex items-center justify-center text-xl mb-4">
+          <div className="flex md:block gap-4 bg-white p-5 md:p-8 rounded-2xl md:rounded-3xl border border-gray-200/80 shadow-xs hover:shadow-lg transition-all">
+            <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#801424] flex items-center justify-center text-xl shrink-0 md:mb-4">
               <FaEnvelope />
             </div>
+            <div className="min-w-0">
             <h3 className="text-lg font-bold text-gray-900 mb-1 font-arizona-flare">{c.emailTitle}</h3>
-            <p className="text-xs text-gray-500 mb-4">{c.emailText}</p>
+            <p className="text-xs text-gray-500 mb-2 md:mb-4">{c.emailText}</p>
             {email && <a
               href={`mailto:${email}`}
               className="text-sm font-bold text-[#801424] hover:text-[#600f1b] transition-colors block"
             >
               {email}
             </a>}
+            </div>
           </div>
 
-          <div className="bg-white p-8 rounded-3xl border border-gray-200/80 shadow-xs hover:shadow-lg transition-all">
-            <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#801424] flex items-center justify-center text-xl mb-4">
+          <div className="flex md:block gap-4 bg-white p-5 md:p-8 rounded-2xl md:rounded-3xl border border-gray-200/80 shadow-xs hover:shadow-lg transition-all">
+            <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#801424] flex items-center justify-center text-xl shrink-0 md:mb-4">
               <FaClock />
             </div>
+            <div className="min-w-0">
             <h3 className="text-lg font-bold text-gray-900 mb-1 font-arizona-flare">{c.hoursTitle}</h3>
             {hours.rows.map((row, idx, all) => (
               <p key={idx} className={`text-xs text-gray-500${idx < all.length - 1 ? ' mb-1' : ''}`}>{row.label}: {row.hours}</p>
             ))}
+            </div>
           </div>
         </div>
 
         {/* Main Grid: Form & Map */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-start">
 
           {/* Inquiry Form */}
-          <div className="lg:col-span-6 bg-white p-8 sm:p-10 rounded-3xl border border-gray-200/80 shadow-sm">
+          <div className="lg:col-span-6 bg-white p-5 sm:p-10 rounded-2xl sm:rounded-3xl border border-gray-200/80 shadow-sm">
             <div className="mb-6">
               <span className="text-xs font-bold uppercase tracking-widest text-[#801424]">{c.formEyebrow}</span>
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 font-arizona-flare mt-1">

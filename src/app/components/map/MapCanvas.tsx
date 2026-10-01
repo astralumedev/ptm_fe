@@ -32,6 +32,8 @@ interface Props {
   defs?: ReactNode;
   cursor?: string;
   ariaLabel?: string;
+  /** Screen pixels covered by floating UI at the top/bottom (floor buttons, bottom sheet); framing avoids them. */
+  insets?: { top?: number; bottom?: number };
 }
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
@@ -45,7 +47,7 @@ const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.
  * size use `style={{ transform: 'scale(var(--ik))' }}`.
  */
 export const MapCanvas = forwardRef<MapCanvasHandle, Props>(function MapCanvas(
-  { children, fit, fitKey, fitPad = 32, minK = 0.08, maxK = 4, className, panWithLeft = true, onTap, onViewChange, defs, cursor, ariaLabel },
+  { children, fit, fitKey, fitPad = 32, minK = 0.08, maxK = 4, className, panWithLeft = true, onTap, onViewChange, defs, cursor, ariaLabel, insets },
   ref,
 ) {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -98,12 +100,15 @@ export const MapCanvas = forwardRef<MapCanvasHandle, Props>(function MapCanvas(
     anim.current = requestAnimationFrame(step);
   }, [apply, settle]);
 
+  const insetTop = insets?.top || 0, insetBottom = insets?.bottom || 0;
   const boxView = useCallback((b: Box, pad = fitPad, cap = maxK, offsetY = 0): View | null => {
     const rect = svgRef.current?.getBoundingClientRect();
     if (!rect || !rect.width || !rect.height) return null;
-    const kk = clamp(Math.min((rect.width - pad * 2) / Math.max(1, b.w), (rect.height - pad * 2 - Math.abs(offsetY)) / Math.max(1, b.h)), minK, cap);
-    return { k: kk, x: rect.width / 2 - (b.x + b.w / 2) * kk, y: (rect.height - offsetY) / 2 - (b.y + b.h / 2) * kk };
-  }, [fitPad, maxK, minK]);
+    const top = insetTop, bottom = insetBottom + Math.max(0, offsetY);
+    const availH = rect.height - top - bottom;
+    const kk = clamp(Math.min((rect.width - pad * 2) / Math.max(1, b.w), (availH - pad * 2) / Math.max(1, b.h)), minK, cap);
+    return { k: kk, x: rect.width / 2 - (b.x + b.w / 2) * kk, y: top + availH / 2 - (b.y + b.h / 2) * kk };
+  }, [fitPad, maxK, minK, insetTop, insetBottom]);
 
   useImperativeHandle(ref, () => ({
     flyToBox(b, o = {}) { const v = boxView(b, o.pad, o.maxK, o.offsetY); if (v) animateTo(v, o.ms); },
