@@ -1,6 +1,7 @@
 import { createHash } from 'crypto';
 import { sql } from './_lib/db';
 import { route, body } from './_lib/http';
+import { publicMedia } from './_lib/media';
 import { cleanFloor, isQrCode } from './_lib/map';
 import mapSeed from './_lib/mapSeed.json';
 
@@ -40,7 +41,7 @@ export default route(async (req, res) => {
     floors = Object.fromEntries(Object.entries(mapSeed as Record<string, unknown>).map(([id, d]) => [id, cleanFloor(d)]));
   }
 
-  const json = JSON.stringify({ floors, qr });
+  const json = publicMedia(JSON.stringify({ floors, qr }));
   const etag = '"' + createHash('sha1').update(json).digest('base64url') + '"';
   res.setHeader('ETag', etag);
   res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');

@@ -3,6 +3,7 @@ import { route, noStore } from '../_lib/http';
 import { currentAdmin, hashPassword } from '../_lib/auth';
 import seed from '../_lib/seed.json';
 import { seedMap } from '../_lib/map';
+import { PRIVATE_BLOB_SQL } from '../_lib/media';
 
 type SeedItem = Record<string, unknown>;
 
@@ -70,5 +71,13 @@ export default route(async (req, res) => {
 
   const map = await seedMap();
 
-  res.json({ ok: true, createdAdmin, seeded, removed: removed.length, map });
+  // Images uploaded while the site linked straight to the private Blob store: point them at /media/….
+  const fixed = await db`UPDATE content SET data = regexp_replace(data::text, ${PRIVATE_BLOB_SQL}, '/media/', 'g')::jsonb
+    WHERE data::text ~ ${PRIVATE_BLOB_SQL} RETURNING id`;
+  await db`UPDATE media SET url = regexp_replace(url, ${PRIVATE_BLOB_SQL}, '/media/'),
+    thumb_url = regexp_replace(thumb_url, ${PRIVATE_BLOB_SQL}, '/media/') WHERE url ~ ${PRIVATE_BLOB_SQL} OR thumb_url ~ ${PRIVATE_BLOB_SQL}`;
+  await db`UPDATE map_floors SET data = regexp_replace(data::text, ${PRIVATE_BLOB_SQL}, '/media/', 'g')::jsonb
+    WHERE data::text ~ ${PRIVATE_BLOB_SQL}`;
+
+  res.json({ ok: true, createdAdmin, seeded, removed: removed.length, map, mediaLinksFixed: fixed.length });
 });

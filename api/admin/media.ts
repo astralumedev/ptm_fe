@@ -1,7 +1,8 @@
 import { handleUploadPresigned, type HandleUploadPresignedBody } from '@vercel/blob/client';
 import { del, issueSignedToken } from '@vercel/blob';
 import { sql } from '../_lib/db';
-import { route, body, noStore } from '../_lib/http';
+import { route, body, noStore, sendJson } from '../_lib/http';
+import { publicMedia, MEDIA_PATH } from '../_lib/media';
 import { currentAdmin, requireAdmin } from '../_lib/auth';
 
 const ALLOWED = ['image/webp', 'image/jpeg', 'image/avif'];
@@ -27,7 +28,7 @@ export default route(async (req, res) => {
         request: req,
         getSignedToken: async (pathname) => {
           if (!(await currentAdmin(req))) throw new Error('Not signed in');
-          if (!/^media\/[a-f0-9]{32}(-t)?\.(webp|jpg|avif)$/.test(pathname)) throw new Error('Invalid path');
+          if (!MEDIA_PATH.test(pathname)) throw new Error('Invalid path');
           const limits = { allowedContentTypes: ALLOWED, maximumSizeInBytes: MAX_BYTES };
           const token = await issueSignedToken({ pathname, operations: ['put'], validUntil: Date.now() + 10 * 60_000, ...limits });
           return {
@@ -49,12 +50,15 @@ export default route(async (req, res) => {
     if (!/^[a-f0-9]{16,64}$/.test(hash) || typeof b.url !== 'string' || typeof b.pathname !== 'string') {
       return res.status(400).json({ error: 'Invalid media record' });
     }
+    // The store is private: keep the /media/… address that the site can actually load.
+    const url = publicMedia(b.url);
+    const thumbUrl = b.thumb_url ? publicMedia(String(b.thumb_url)) : null;
     const rows = await db`INSERT INTO media (hash, url, pathname, thumb_url, thumb_pathname, width, height, size, name)
-      VALUES (${hash}, ${b.url}, ${b.pathname}, ${(b.thumb_url as string) || null}, ${(b.thumb_pathname as string) || null},
+      VALUES (${hash}, ${url}, ${b.pathname}, ${thumbUrl}, ${(b.thumb_pathname as string) || null},
         ${Number(b.width) || null}, ${Number(b.height) || null}, ${Number(b.size) || null}, ${String(b.name || '').slice(0, 200)})
       ON CONFLICT (hash) DO UPDATE SET name = COALESCE(NULLIF(EXCLUDED.name, ''), media.name)
       RETURNING *`;
-    return res.json({ media: rows[0] });
+    return sendJson(res, { media: rows[0] });
   }
 
   if (!(await requireAdmin(req, res))) return;
@@ -62,16 +66,16 @@ export default route(async (req, res) => {
   if (req.method === 'GET') {
     if (typeof req.query.hash === 'string') {
       const rows = await db`SELECT * FROM media WHERE hash = ${req.query.hash}`;
-      return res.json({ media: rows[0] || null });
+      return sendJson(res, { media: rows[0] || null });
     }
-    return res.json({ items: await db`SELECT * FROM media ORDER BY created_at DESC LIMIT 500` });
+    return sendJson(res, { items: await db`SELECT * FROM media ORDER BY created_at DESC LIMIT 500` });
   }
 
   if (req.method === 'DELETE') {
     const id = Number(req.query.id);
-    const rows = (await db`DELETE FROM media WHERE id = ${id} RETURNING url, thumb_url`) as { url: string; thumb_url: string | null }[];
+    const rows = (await db`DELETE FROM media WHERE id = ${id} RETURNING pathname, thumb_pathname`) as { pathname: string; thumb_pathname: string | null }[];
     if (rows[0]) {
-      const urls = [rows[0].url, rows[0].thumb_url].filter(Boolean) as string[];
+      const urls = [rows[0].pathname, rows[0].thumb_pathname].filter(Boolean) as string[];
       await del(urls).catch((e) => console.error('blob delete failed', e));
     }
     return res.json({ ok: true });

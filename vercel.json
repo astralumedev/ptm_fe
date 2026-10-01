@@ -10,6 +10,10 @@
   },
   "rewrites": [
     {
+      "source": "/media/:file",
+      "destination": "/api/media?p=media/:file"
+    },
+    {
       "source": "/sitemap.xml",
       "destination": "/api/sitemap"
     },
@@ -18,7 +22,7 @@
       "destination": "/api/sitemap?type=robots"
     },
     {
-      "source": "/((?!api/|assets/).*)",
+      "source": "/((?!api/|assets/|media/).*)",
       "destination": "/index.html"
     }
   ],

@@ -1,5 +1,5 @@
 import { sql, ensureSchema } from '../_lib/db';
-import { route, body, noStore } from '../_lib/http';
+import { route, body, noStore, sendJson } from '../_lib/http';
 import { requireAdmin } from '../_lib/auth';
 import { cleanFloor, cleanQr, isFloorId, isQrCode, seedMap } from '../_lib/map';
 
@@ -36,7 +36,7 @@ export default route(async (req, res) => {
     if (req.query.version) {
       const rows = (await db`SELECT id, floor_id, data, note, created_at FROM map_history WHERE id = ${Number(req.query.version)}`) as unknown[];
       if (!rows[0]) return res.status(404).json({ error: 'Version not found' });
-      return res.json({ version: rows[0] });
+      return sendJson(res, { version: rows[0] });
     }
     let floors = (await db`SELECT id, data, updated_at FROM map_floors`.catch(() => null)) as { id: string }[] | null;
     if (!floors || !floors.length) {
@@ -45,7 +45,7 @@ export default route(async (req, res) => {
       floors = (await db`SELECT id, data, updated_at FROM map_floors`) as { id: string }[];
     }
     const qr = await db`SELECT code, data, scans, last_scan_at, created_at FROM map_qr ORDER BY code`;
-    return res.json({ floors, qr });
+    return sendJson(res, { floors, qr });
   }
 
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });

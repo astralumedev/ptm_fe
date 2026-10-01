@@ -1,6 +1,7 @@
 import { createHash } from 'crypto';
 import { sql, COLLECTIONS } from './_lib/db';
 import { route } from './_lib/http';
+import { publicMedia } from './_lib/media';
 
 interface Row { id: number; collection: string; slug: string; status: string; data: Record<string, unknown> }
 
@@ -24,7 +25,7 @@ export default route(async (req, res) => {
     bundle[r.collection]?.push(item);
   }
 
-  const json = JSON.stringify(bundle);
+  const json = publicMedia(JSON.stringify(bundle));
   const etag = '"' + createHash('sha1').update(json).digest('base64url') + '"';
   res.setHeader('ETag', etag);
   // Browser revalidates; the edge serves for 60s and keeps serving stale for a day while refreshing.

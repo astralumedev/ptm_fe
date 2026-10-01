@@ -1,5 +1,6 @@
 import { sql } from './db';
 import mapSeed from './mapSeed.json';
+import { publicMedia } from './media';
 
 export const FLOOR_IDS = [
   'lower_ground_floor', 'ground_floor', 'first_floor', 'second_floor', 'third_floor', 'fourth_floor', 'fifth_floor',
@@ -37,8 +38,9 @@ export function cleanFloor(raw: any) {
     .map((p: any) => (Array.isArray(p) ? [num(p[0]), num(p[1])] : [num(p?.x), num(p?.y)]))
     .slice(0, 400);
   const yah = raw?.youAreHere && Number.isFinite(Number(raw.youAreHere.x)) ? { x: num(raw.youAreHere.x), y: num(raw.youAreHere.y) } : null;
-  const underlay = raw?.underlay && str(raw.underlay.url, 600).startsWith('http')
-    ? { url: str(raw.underlay.url, 600), x: num(raw.underlay.x), y: num(raw.underlay.y), w: Math.max(10, num(raw.underlay.w, 0)), h: Math.max(10, num(raw.underlay.h, 0)), opacity: Math.max(0, Math.min(1, Number(raw.underlay.opacity) || 0.5)) }
+  const underlayUrl = publicMedia(str(raw?.underlay?.url, 600));
+  const underlay = underlayUrl && /^(https:\/\/|\/media\/)/.test(underlayUrl)
+    ? { url: underlayUrl, x: num(raw.underlay.x), y: num(raw.underlay.y), w: Math.max(10, num(raw.underlay.w, 0)), h: Math.max(10, num(raw.underlay.h, 0)), opacity: Math.max(0, Math.min(1, Number(raw.underlay.opacity) || 0.5)) }
     : null;
   return {
     imageSize: { w: Math.max(100, num(raw?.imageSize?.w, 0)) || 3508, h: Math.max(100, num(raw?.imageSize?.h, 0)) || 4962 },

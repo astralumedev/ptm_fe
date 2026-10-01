@@ -1,5 +1,6 @@
 import { sql, isCollection, ensureSchema } from '../_lib/db';
-import { route, body, noStore } from '../_lib/http';
+import { publicMedia } from '../_lib/media';
+import { route, body, noStore, sendJson } from '../_lib/http';
 import { requireAdmin } from '../_lib/auth';
 
 const SLUG = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/;
@@ -62,7 +63,7 @@ export default route(async (req, res) => {
     if (!isCollection(collection)) return res.status(400).json({ error: 'Unknown collection' });
     const items = await db`SELECT id, slug, status, sort, data, updated_at FROM content
       WHERE collection = ${collection} ORDER BY sort ASC, id ASC`;
-    return res.json({ items });
+    return sendJson(res, { items });
   }
 
   if (req.method === 'POST') {
@@ -83,7 +84,8 @@ export default route(async (req, res) => {
     if (!SLUG.test(slug)) return res.status(400).json({ error: 'The web address may only use lowercase letters, numbers, hyphens and underscores' });
     const status = b.status === 'draft' ? 'draft' : 'published';
     if (!b.data || typeof b.data !== 'object') return res.status(400).json({ error: 'Missing data' });
-    const data = JSON.stringify(b.data);
+    // Store the browser-loadable /media/… address, never a private Blob URL.
+    const data = publicMedia(JSON.stringify(b.data));
     if (data.length > 900_000) return res.status(413).json({ error: 'This item is too large to save' });
 
     const clash = (await db`SELECT id FROM content WHERE collection = ${b.collection} AND slug = ${slug}`) as { id: number }[];
@@ -101,7 +103,7 @@ export default route(async (req, res) => {
             (SELECT COALESCE(MIN(sort), 0) - 1 FROM content WHERE collection = ${b.collection}), ${data}::jsonb)
           RETURNING id, slug, status, sort, data, updated_at`;
     if (!rows[0]) return res.status(404).json({ error: 'Item not found' });
-    return res.json({ item: rows[0] });
+    return sendJson(res, { item: rows[0] });
   }
 
   if (req.method === 'DELETE') {
