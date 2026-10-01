@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
-  MousePointer2, Square, Hexagon, QrCode, Route, Undo2, Redo2, Save, ZoomIn, ZoomOut, Maximize, Layers, Image as ImageIcon, AlertTriangle, Store as StoreIcon, SlidersHorizontal,
+  MousePointer2, Square, Hexagon, PenTool, QrCode, Route, Undo2, Redo2, Save, ZoomIn, ZoomOut, Maximize, Layers, Image as ImageIcon, AlertTriangle, Store as StoreIcon, SlidersHorizontal,
 } from 'lucide-react';
 import type { FloorData, FloorId, MapPoint, QrPoint, RouteLeg, WayfindingLocation } from '../../../types/wayfinding';
 import { CATEGORIES, FLOOR_LABELS } from '../../../types/wayfinding';
@@ -16,12 +16,14 @@ import {
   MapDoc, Placement, Rect, addUnit, assignStore, deleteUnits, mergeUnits, nextUnitId, patchUnits, renameUnit, splitNames, splitUnit,
   unmergeUnit, updateFloor, useMapDoc, vacate,
 } from './mapDoc';
+import { withBox, withPoints } from '../../../lib/unitShape';
 import { ChecksPanel, FloorPanel, MultiPanel, Problem, QrDetail, QrListPanel, StoresPanel, UnitPanel } from './Panels';
 import { loadMap } from '../../../services/mapData';
 
 const TOOLS: { id: Tool; label: string; key: string; icon: typeof Square; hint: string }[] = [
   { id: 'select', label: 'Select & move', key: 'V', icon: MousePointer2, hint: 'Drag the empty plan to move around. Click a unit to edit it, drag it to move, pull its corners to resize. Shift-click or Shift-drag to pick several.' },
-  { id: 'draw', label: 'Draw unit', key: 'R', icon: Square, hint: 'Drag on the plan to draw a new unit. Edges snap to neighbours (hold Alt to stop snapping).' },
+  { id: 'draw', label: 'Draw rectangle', key: 'R', icon: Square, hint: 'Drag on the plan to draw a new unit. Edges snap to neighbours (hold Alt to stop snapping).' },
+  { id: 'shape', label: 'Draw shape', key: 'P', icon: PenTool, hint: 'Click each corner of the unit. Click the first corner, double-click or press Enter to finish; Backspace removes the last corner, Esc cancels.' },
   { id: 'outline', label: 'Building outline', key: 'O', icon: Hexagon, hint: 'Drag corners to reshape. Click the plan to add a corner, double-click a corner to remove it.' },
   { id: 'qr', label: 'Place QR code', key: 'Q', icon: QrCode, hint: 'Click where a QR sign will hang. Drag it to move; drag the round handle to set which way people face.' },
   { id: 'route', label: 'Test directions', key: 'T', icon: Route, hint: 'Click a starting spot, then click a shop, to see the route visitors get.' },
@@ -135,7 +137,19 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
   const selUnits = selection?.kind === 'units' ? selection.ids : [];
   const selectedUnit = selUnits.length === 1 && floor ? floor.locations.find((u) => u.id === selUnits[0]) || null : null;
 
-  const onMoveUnits = (moves: { id: string; rect: Rect }[]) => commit((d) => updateFloor(d, floorId, (f) => ({ ...f, locations: f.locations.map((u) => { const m = moves.find((x) => x.id === u.id); return m ? { ...u, ...m.rect } : u; }) })));
+  const onMoveUnits = (moves: { id: string; rect: Rect }[]) => commit((d) => updateFloor(d, floorId, (f) => ({ ...f, locations: f.locations.map((u) => { const m = moves.find((x) => x.id === u.id); return m ? withBox(u, m.rect) : u; }) })));
+
+  const onShapeDrawn = (pts: [number, number][]) => {
+    if (!floor) return;
+    const id = nextUnitId(floor, 'U');
+    commit((d) => addUnit(d, floorId, withPoints({ id, cat: 'shop', x: 0, y: 0, w: 0, h: 0 }, pts)));
+    setSelection({ kind: 'units', ids: [id] });
+    setTool('select');
+    setTab('edit');
+    openSheet();
+  };
+
+  const onUnitPoints = (id: string, pts: [number, number][]) => commit((d) => patchUnits(d, floorId, [id], (u) => withPoints(u, pts)));
 
   const onDrawn = (r: Rect) => {
     if (!floor) return;
@@ -181,7 +195,7 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
   };
 
   const nudge = (dx: number, dy: number) => {
-    if (selection?.kind === 'units') commit((d) => patchUnits(d, floorId, selection.ids, (u) => ({ ...u, x: u.x + dx, y: u.y + dy })));
+    if (selection?.kind === 'units') commit((d) => patchUnits(d, floorId, selection.ids, (u) => withBox(u, { x: u.x + dx, y: u.y + dy, w: u.w, h: u.h })));
     if (selection?.kind === 'qr') commit((d) => ({ ...d, qr: { ...d.qr, [selection.key]: { ...d.qr[selection.key], x: d.qr[selection.key].x + dx, y: d.qr[selection.key].y + dy } } }));
   };
 
@@ -195,7 +209,7 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
         if (!u) continue;
         const nid = nextUnitId(next.floors[floorId]!, 'U');
         const { mergedFrom: _m, ...rest } = u;
-        next = addUnit(next, floorId, { ...rest, id: nid, x: u.x + 30, y: u.y + 30 });
+        next = addUnit(next, floorId, withBox({ ...rest, id: nid }, { x: u.x + 30, y: u.y + 30, w: u.w, h: u.h }));
         ids.push(nid);
       }
       return next;
@@ -402,6 +416,8 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
             onSelect={(s) => { setSelection(s); if (s) { setTab(s.kind === 'qr' ? 'qr' : 'edit'); openSheet(); } else if (narrow) setSheet('peek'); }}
             onMoveUnits={onMoveUnits}
             onDrawn={onDrawn}
+            onShapeDrawn={onShapeDrawn}
+            onUnitPoints={onUnitPoints}
             onSilhouette={(pts) => commit((d) => updateFloor(d, floorId, (f) => ({ ...f, silhouette: pts })))}
             onPlaceQr={onPlaceQr}
             onMoveQr={(key, patch) => commit((d) => ({ ...d, qr: { ...d.qr, [key]: { ...d.qr[key], ...patch } } }))}
@@ -425,7 +441,7 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
           {/* Phones: only show a hint when the next tap does something special. */}
           {(placing || aligning || tool !== 'select') && (
             <div className="lg:hidden absolute left-3 right-3 top-[64px] z-10 flex items-start gap-2 px-3 py-2 rounded-lg bg-[var(--adm-ink)]/90 text-white text-[12.5px] shadow-lg">
-              <span className="flex-1">{aligning ? 'Drag the image to move it, pull a corner to scale it.' : placing ? `Tap a shop unit to place ${placing.name}.` : tool === 'route' ? (routeTest.start && !routeTest.legs.length ? 'Now tap the shop to walk to.' : 'Tap a starting spot, then a shop.') : tool === 'draw' ? 'Drag on the plan to draw a unit.' : tool === 'qr' ? 'Tap where the QR sign will hang.' : 'Drag corners to reshape; tap the plan to add a corner.'}</span>
+              <span className="flex-1">{aligning ? 'Drag the image to move it, pull a corner to scale it.' : placing ? `Tap a shop unit to place ${placing.name}.` : tool === 'route' ? (routeTest.start && !routeTest.legs.length ? 'Now tap the shop to walk to.' : 'Tap a starting spot, then a shop.') : tool === 'draw' ? 'Drag on the plan to draw a unit.' : tool === 'shape' ? 'Tap each corner, then tap the first corner to finish.' : tool === 'qr' ? 'Tap where the QR sign will hang.' : 'Drag corners to reshape; tap the plan to add a corner.'}</span>
               <button className="underline underline-offset-2 shrink-0" onClick={() => { setPlacing(null); setAligning(false); setTool('select'); setRouteTest(NO_ROUTE); }}>Done</button>
             </div>
           )}
@@ -455,12 +471,21 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
             {tab === 'edit' && (selectedUnit ? (
               <UnitPanel
                 floorId={floorId} floor={floor} unit={selectedUnit} doc={doc} stores={stores} storeById={storeById} floorName={floorName} shaftNames={shaftNames}
-                onPatch={(patch) => commit((d) => patchUnits(d, floorId, [selectedUnit.id], (u) => ({ ...u, ...patch })))}
+                onPatch={(patch) => commit((d) => patchUnits(d, floorId, [selectedUnit.id], (u) => {
+                  // Position/size edits on a free-form unit move and scale its corners too.
+                  const { x = u.x, y = u.y, w = u.w, h = u.h, ...rest } = patch;
+                  const moved = x !== u.x || y !== u.y || w !== u.w || h !== u.h ? withBox(u, { x, y, w, h }) : u;
+                  return { ...moved, ...rest };
+                }))}
                 onRename={(to) => { commit((d) => renameUnit(d, floorId, selectedUnit.id, to)); setSelection({ kind: 'units', ids: [to] }); }}
                 onAssign={(sid) => assignTo(sid, [selectedUnit.id])}
                 onVacate={() => commit((d) => vacate(d, floorId, [selectedUnit.id]))}
                 onSplit={(dir, ratio) => { const r = splitUnit(doc, floorId, selectedUnit.id, dir, ratio, splitNames(floor, selectedUnit.id)); if (r) { commit(r.doc); setSelection({ kind: 'units', ids: [r.ids[0]] }); toast('ok', `Split into ${r.ids.join(' and ')}`); } }}
                 onSplitPreview={setSplitPreview}
+                onFreeform={(on) => commit((d) => patchUnits(d, floorId, [selectedUnit.id], (u) => {
+                  if (!on) { const { points: _p, ...rect } = u; return rect; }
+                  return withPoints(u, [[u.x, u.y], [u.x + u.w, u.y], [u.x + u.w, u.y + u.h], [u.x, u.y + u.h]]);
+                }))}
                 onUnmerge={() => { const r = unmergeUnit(doc, floorId, selectedUnit.id); if (r) { commit(r.doc); setSelection({ kind: 'units', ids: r.ids }); } }}
                 onDuplicate={duplicate}
                 onDelete={deleteSelection}

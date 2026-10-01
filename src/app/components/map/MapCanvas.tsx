@@ -34,6 +34,8 @@ interface Props {
   ariaLabel?: string;
   /** Screen pixels covered by floating UI at the top/bottom (floor buttons, bottom sheet); framing avoids them. */
   insets?: { top?: number; bottom?: number };
+  /** Double-tap / double-click zooms in (visitor map). */
+  doubleTapZoom?: boolean;
 }
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
@@ -47,7 +49,7 @@ const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.
  * size use `style={{ transform: 'scale(var(--ik))' }}`.
  */
 export const MapCanvas = forwardRef<MapCanvasHandle, Props>(function MapCanvas(
-  { children, fit, fitKey, fitPad = 32, minK = 0.08, maxK = 4, className, panWithLeft = true, onTap, onViewChange, defs, cursor, ariaLabel, insets },
+  { children, fit, fitKey, fitPad = 32, minK = 0.08, maxK = 4, className, panWithLeft = true, onTap, onViewChange, defs, cursor, ariaLabel, insets, doubleTapZoom = true },
   ref,
 ) {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -269,7 +271,7 @@ export const MapCanvas = forwardRef<MapCanvasHandle, Props>(function MapCanvas(
       lastTap.current = { t: isDouble ? 0 : now, x: e.clientX, y: e.clientY };
       const rect = svgRef.current!.getBoundingClientRect();
       const v = view.current;
-      if (isDouble && panWithLeft) {
+      if (isDouble && panWithLeft && doubleTapZoom) {
         const k2 = clamp(v.k * 1.8, minK, maxK);
         const mx = e.clientX - rect.left, my = e.clientY - rect.top;
         animateTo({ k: k2, x: mx - ((mx - v.x) * k2) / v.k, y: my - ((my - v.y) * k2) / v.k }, 300);

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { RouteLeg, WayfindingLocation } from '../../../types/wayfinding';
 import { roundedPath } from '../../../lib/mapRouter';
+import { isFreeform, unitPath } from '../../../lib/unitShape';
 import { Fixed } from './MapCanvas';
 import './map.css';
 
@@ -51,7 +52,7 @@ export function Shutter({ unit, open }: { unit: WayfindingLocation; open: boolea
   return (
     <g style={{ pointerEvents: 'none' }}>
       <defs>
-        <clipPath id={id}><rect x={unit.x} y={unit.y} width={unit.w} height={unit.h} rx={7} /></clipPath>
+        <clipPath id={id}>{isFreeform(unit) ? <path d={unitPath(unit)} /> : <rect x={unit.x} y={unit.y} width={unit.w} height={unit.h} rx={7} />}</clipPath>
         <linearGradient id={`${id}-g`} x1="0" x2="0" y1="0" y2="1">
           <stop offset="0" stopColor="#dfe3ea" />
           <stop offset="1" stopColor="#9aa3b2" />
@@ -152,7 +153,9 @@ export function RouteLayer({ leg, playKey, animate, destUnit, transitUnit, fromT
     <g style={{ pointerEvents: 'none' }}>
       {destUnit && !atTransit && <Shutter unit={destUnit} open={!walking} />}
       {destUnit && !atTransit && !walking && (
-        <rect className="pm-dest-glow" x={destUnit.x - 4} y={destUnit.y - 4} width={destUnit.w + 8} height={destUnit.h + 8} rx={10} fill="none" stroke={accent} strokeWidth={3} vectorEffect="non-scaling-stroke" />
+        isFreeform(destUnit)
+          ? <path className="pm-dest-glow" d={unitPath(destUnit)} fill="none" stroke={accent} strokeWidth={4} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+          : <rect className="pm-dest-glow" x={destUnit.x - 4} y={destUnit.y - 4} width={destUnit.w + 8} height={destUnit.h + 8} rx={10} fill="none" stroke={accent} strokeWidth={3} vectorEffect="non-scaling-stroke" />
       )}
 
       {/* Route ahead (dotted) and travelled (solid, drawn in behind the walker). */}

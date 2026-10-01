@@ -26,6 +26,8 @@ export interface WayfindingLocation {
   block?: string;
   /** Lifts/stairs: shaft name linking this unit to the same lift/stair on other floors. */
   link?: string;
+  /** Free-form outline; when set, x/y/w/h is its bounding box. */
+  points?: [number, number][];
   /** Units combined into this one by a merge, kept so the merge can be undone. */
   mergedFrom?: WayfindingLocation[];
 }

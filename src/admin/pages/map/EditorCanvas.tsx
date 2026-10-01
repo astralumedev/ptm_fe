@@ -4,10 +4,11 @@ import { MapCanvas, MapCanvasHandle, Fixed, boundsOf } from '../../../app/compon
 import { FloorPlan, UnitOccupant, UnitStyle } from '../../../app/components/map/FloorPlan';
 import { MapDefs, RouteLayer, YouAreHere } from '../../../app/components/map/RouteLayer';
 import { silhouettePoints } from '../../../lib/mapRouter';
+import { isFreeform, withBox, withPoints } from '../../../lib/unitShape';
 import { hexRgb } from '../../../lib/color';
 import type { MapDoc, Rect } from './mapDoc';
 
-export type Tool = 'select' | 'draw' | 'outline' | 'qr' | 'route';
+export type Tool = 'select' | 'draw' | 'shape' | 'outline' | 'qr' | 'route';
 export type Selection = { kind: 'units'; ids: string[] } | { kind: 'qr'; key: string } | null;
 
 export interface StoreMeta { id: number; name: string; cat: string; slug: string; logo?: string }
@@ -23,6 +24,10 @@ interface Props {
   onSelect: (s: Selection) => void;
   onMoveUnits: (moves: { id: string; rect: Rect }[]) => void;
   onDrawn: (r: Rect) => void;
+  /** A free-form unit was drawn with the shape tool. */
+  onShapeDrawn: (pts: [number, number][]) => void;
+  /** New outline for a free-form unit (corner dragged, added or removed). */
+  onUnitPoints: (id: string, pts: [number, number][]) => void;
   onSilhouette: (pts: [number, number][]) => void;
   onPlaceQr: (p: MapPoint) => void;
   onMoveQr: (key: string, p: Partial<QrPoint>) => void;
@@ -54,6 +59,7 @@ type Drag =
   | { mode: 'draw'; start: MapPoint; rect: Rect; guides: Guide[] }
   | { mode: 'marquee'; start: MapPoint; rect: Rect; additive: boolean }
   | { mode: 'vertex'; index: number; pts: [number, number][] }
+  | { mode: 'uvertex'; id: string; index: number; pts: [number, number][]; guides: Guide[] }
   | { mode: 'qr'; key: string; start: MapPoint; orig: MapPoint; dx: number; dy: number }
   | { mode: 'heading'; key: string; center: MapPoint; heading: number }
   | { mode: 'ulmove'; start: MapPoint; orig: Rect; rect: Rect }
@@ -114,9 +120,10 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
   const shown = useMemo<FloorData>(() => {
     if (!drag) return floor;
     if (drag.mode === 'move') {
-      return { ...floor, locations: floor.locations.map((u) => { const o = drag.orig.get(u.id); return o ? { ...u, x: o.x + drag.dx, y: o.y + drag.dy } : u; }) };
+      return { ...floor, locations: floor.locations.map((u) => { const o = drag.orig.get(u.id); return o ? withBox(u, { ...o, x: o.x + drag.dx, y: o.y + drag.dy }) : u; }) };
     }
-    if (drag.mode === 'resize') return { ...floor, locations: floor.locations.map((u) => (u.id === drag.id ? { ...u, ...drag.rect } : u)) };
+    if (drag.mode === 'resize') return { ...floor, locations: floor.locations.map((u) => (u.id === drag.id ? withBox(u, drag.rect) : u)) };
+    if (drag.mode === 'uvertex') return { ...floor, locations: floor.locations.map((u) => (u.id === drag.id ? withPoints(u, drag.pts) : u)) };
     if (drag.mode === 'vertex') return { ...floor, silhouette: drag.pts };
     if ((drag.mode === 'ulmove' || drag.mode === 'ulsize') && floor.underlay) return { ...floor, underlay: { ...floor.underlay, ...drag.rect } };
     return floor;
@@ -142,7 +149,10 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
   // ---- snapping: edges of other units + the building outline's corners
   const edges = useMemo(() => {
     const xs: number[] = [], ys: number[] = [];
-    for (const u of floor.locations) { xs.push(u.x, u.x + u.w); ys.push(u.y, u.y + u.h); }
+    for (const u of floor.locations) {
+      xs.push(u.x, u.x + u.w); ys.push(u.y, u.y + u.h);
+      if (isFreeform(u)) for (const [x, y] of u.points!) { xs.push(x); ys.push(y); }
+    }
     for (const q of silhouettePoints(floor.silhouette)) { xs.push(q.x); ys.push(q.y); }
     return { xs, ys };
   }, [floor]);
@@ -175,6 +185,45 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
   };
 
   const toMap = (e: { clientX: number; clientY: number }) => canvas.current!.toMap(e.clientX, e.clientY);
+
+  /** Snaps a corner to the x / y of other corners and unit edges (each axis on its own). */
+  const snapPoint = (m: MapPoint, own: [number, number][] = [], index = -1) => {
+    const tol = snapTol();
+    let x = Math.round(m.x), y = Math.round(m.y);
+    const guides: Guide[] = [];
+    const xs = [...edges.xs], ys = [...edges.ys];
+    own.forEach((q, i) => { if (i !== index) { xs.push(q[0]); ys.push(q[1]); } });
+    const nx = xs.reduce((b, v) => (Math.abs(v - x) < Math.abs(b - x) ? v : b), Infinity);
+    const ny = ys.reduce((b, v) => (Math.abs(v - y) < Math.abs(b - y) ? v : b), Infinity);
+    if (Math.abs(nx - x) <= tol) { x = nx; guides.push({ axis: 'x', at: x }); }
+    if (Math.abs(ny - y) <= tol) { y = ny; guides.push({ axis: 'y', at: y }); }
+    return { pt: [x, y] as [number, number], guides };
+  };
+
+  // ---- free-form drawing: click corners; click the first one, double-click or press Enter to finish
+  const [draft, setDraft] = useState<[number, number][]>([]);
+  const [hover, setHover] = useState<MapPoint | null>(null);
+  useEffect(() => { setDraft([]); setHover(null); }, [tool, floorId]);
+  const finishDraft = useCallback((pts: [number, number][]) => {
+    setDraft([]);
+    setHover(null);
+    if (pts.length >= 3) props.current.onShapeDrawn(pts);
+  }, []);
+  const draftRef = useRef(draft);
+  draftRef.current = draft;
+  useEffect(() => {
+    if (tool !== 'shape') return;
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.target as HTMLElement)?.closest?.('input,textarea,select')) return;
+      const d = draftRef.current;
+      if (!d.length) return;
+      if (e.key === 'Enter') { e.preventDefault(); e.stopImmediatePropagation(); finishDraft(d); }
+      if (e.key === 'Backspace') { e.preventDefault(); e.stopImmediatePropagation(); setDraft(d.slice(0, -1)); }
+      if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); setDraft([]); }
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [tool, finishDraft]);
 
   // ---- global move/up while a drag is active
   useEffect(() => {
@@ -217,6 +266,11 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
         }
         pts[d.index] = [x, y];
         setDrag({ ...d, pts });
+      } else if (d.mode === 'uvertex') {
+        const pts = d.pts.slice();
+        const s = e.altKey ? { pt: [Math.round(m.x), Math.round(m.y)] as [number, number], guides: [] as Guide[] } : snapPoint(m, pts, d.index);
+        pts[d.index] = s.pt;
+        setDrag({ ...d, pts, guides: s.guides });
       } else if (d.mode === 'qr') {
         setDrag({ ...d, dx: m.x - d.start.x, dy: m.y - d.start.y });
       } else if (d.mode === 'ulmove') {
@@ -252,6 +306,7 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
         else if (!d.additive) P.onSelect(null);
       }
       if (d.mode === 'vertex') P.onSilhouette(d.pts);
+      if (d.mode === 'uvertex') P.onUnitPoints(d.id, d.pts);
       if (d.mode === 'qr' && (Math.abs(d.dx) > 1 || Math.abs(d.dy) > 1)) P.onMoveQr(d.key, { x: Math.round(d.orig.x + d.dx), y: Math.round(d.orig.y + d.dy) });
       if (d.mode === 'heading') P.onMoveQr(d.key, { heading: d.heading });
       if ((d.mode === 'ulmove' || d.mode === 'ulsize') && P.floor.underlay) P.onUnderlay({ ...P.floor.underlay, ...d.rect });
@@ -302,11 +357,21 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
     if (tool === 'select' && e.shiftKey) { e.stopPropagation(); setDrag({ mode: 'marquee', start: m, rect: { x: m.x, y: m.y, w: 0, h: 0 }, additive: true }); return; }
   };
 
+  const lastShapeTap = useRef(0);
   const onTap = (m: MapPoint, e: PointerEvent) => {
     if ((e.target as Element)?.closest?.('[data-handle]')) return;
     const tapped = (e.target as Element)?.closest?.('[data-unit]') as HTMLElement | SVGElement | null;
     if (tool === 'select' && tapped && e.pointerType === 'touch') p.onSelect({ kind: 'units', ids: [tapped.dataset.unit!] });
     else if (tool === 'select' && !tapped && !e.shiftKey) p.onSelect(null);
+    else if (tool === 'shape') {
+      const first = draft[0];
+      const k = canvas.current?.view().k || 1;
+      if (first && draft.length >= 3 && Math.hypot(first[0] - m.x, first[1] - m.y) * k < 14) { finishDraft(draft); return; }
+      const now = performance.now();
+      if (draft.length >= 3 && now - lastShapeTap.current < 320) { finishDraft(draft); return; }
+      lastShapeTap.current = now;
+      setDraft([...draft, e.altKey ? [Math.round(m.x), Math.round(m.y)] : snapPoint(m, draft).pt]);
+    }
     else if (tool === 'qr') p.onPlaceQr({ x: Math.round(m.x), y: Math.round(m.y) });
     else if (tool === 'route' && !(e.target as Element)?.closest?.('[data-unit]')) p.onRouteClick(m, null);
     else if (tool === 'outline') {
@@ -333,7 +398,7 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
   const guides = drag && 'guides' in drag ? drag.guides : [];
   const sil = drag?.mode === 'vertex' ? drag.pts.map(([x, y]) => ({ x, y })) : silhouettePoints(floor.silhouette);
   const qrs = Object.entries(doc.qr).filter(([, q]) => q.floorId === floorId);
-  const cursor = tool === 'draw' ? 'crosshair' : tool === 'qr' ? 'copy' : tool === 'route' ? 'pointer' : tool === 'outline' ? 'cell' : 'grab';
+  const cursor = tool === 'draw' || tool === 'shape' ? 'crosshair' : tool === 'qr' ? 'copy' : tool === 'route' ? 'pointer' : tool === 'outline' ? 'cell' : 'grab';
 
   return (
     <MapCanvas
@@ -344,6 +409,7 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
       minK={0.04}
       maxK={6}
       panWithLeft
+      doubleTapZoom={false}
       cursor={cursor}
       defs={<>
         <MapDefs />
@@ -353,7 +419,7 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
       ariaLabel="Floor plan editor"
     >
       {(k) => (
-        <g>
+        <g onPointerMove={tool === 'shape' && draft.length ? (e) => { if (e.pointerType === 'mouse') setHover(toMap(e)); } : undefined}>
           <rect x={-6000} y={-6000} width={16000} height={18000} fill="url(#ed-dots)" onPointerDown={onBackgroundDown} />
           <g onPointerDown={(e) => { if ((e.target as Element).closest('[data-unit]')) return; onBackgroundDown(e); }}>
             <FloorPlan floor={shown} k={k} occupantOf={occupantOf} styleOf={styleOf} theme={THEME} onUnitDown={p.aligning ? undefined : onUnitDown} showIds showUnderlay={p.showUnderlay} />
@@ -393,6 +459,61 @@ export const EditorCanvas = forwardRef<EditorCanvasHandle, Props>(function Edito
                       setDrag({ mode: 'vertex', index: i, pts });
                     }}
                     onDoubleClick={(e) => { e.stopPropagation(); const pts = sil.map((s) => [s.x, s.y] as [number, number]); if (pts.length > 3) { pts.splice(i, 1); p.onSilhouette(pts); } }} />
+                </Fixed>
+              ))}
+            </g>
+          )}
+
+          {/* Free-form unit being drawn */}
+          {tool === 'shape' && draft.length > 0 && (
+            <g style={{ pointerEvents: 'none' }}>
+              {draft.length >= 3 && <polygon points={draft.map((q) => q.join(',')).join(' ')} fill="rgba(46,48,148,0.10)" />}
+              <polyline points={[...draft, ...(hover ? [[hover.x, hover.y] as [number, number]] : [])].map((q) => q.join(',')).join(' ')} fill="none" stroke={ACCENT} strokeWidth={2} strokeDasharray="6 5" vectorEffect="non-scaling-stroke" />
+              {draft.map((q, i) => (
+                <Fixed key={i} x={q[0]} y={q[1]}>
+                  <circle r={i === 0 && draft.length >= 3 ? 8 : 5} fill={i === 0 && draft.length >= 3 ? ACCENT : '#fff'} stroke={ACCENT} strokeWidth={2.5} />
+                </Fixed>
+              ))}
+            </g>
+          )}
+
+          {/* Corners of the selected free-form unit: drag to reshape, drag a + to add one, double-click to remove */}
+          {tool === 'select' && single && isFreeform(single) && drag?.mode !== 'move' && drag?.mode !== 'resize' && (
+            <g>
+              {single.points!.map((q, i) => {
+                const n = single.points![(i + 1) % single.points!.length];
+                const mid: [number, number] = [(q[0] + n[0]) / 2, (q[1] + n[1]) / 2];
+                return (
+                  <Fixed key={`m${i}`} x={mid[0]} y={mid[1]}>
+                    <g data-handle style={{ cursor: 'copy' }}
+                      onPointerDown={(e) => {
+                        if (e.button !== 0) return;
+                        e.stopPropagation();
+                        const pts = single.points!.slice();
+                        pts.splice(i + 1, 0, [Math.round(mid[0]), Math.round(mid[1])]);
+                        setDrag({ mode: 'uvertex', id: single.id, index: i + 1, pts, guides: [] });
+                      }}>
+                      <circle r={12} fill="transparent" />
+                      <circle r={5.5} fill="#fff" stroke={ACCENT} strokeWidth={1.5} opacity={0.9} />
+                      <path d="M-2.5 0H2.5M0 -2.5V2.5" stroke={ACCENT} strokeWidth={1.5} />
+                    </g>
+                  </Fixed>
+                );
+              })}
+              {single.points!.map((q, i) => (
+                <Fixed key={`v${i}`} x={q[0]} y={q[1]}>
+                  <g data-handle style={{ cursor: 'move' }}
+                    onPointerDown={(e) => {
+                      if (e.button !== 0) return;
+                      e.stopPropagation();
+                      const pts = single.points!.slice();
+                      if (e.altKey && pts.length > 3) { pts.splice(i, 1); p.onUnitPoints(single.id, pts); return; }
+                      setDrag({ mode: 'uvertex', id: single.id, index: i, pts, guides: [] });
+                    }}
+                    onDoubleClick={(e) => { e.stopPropagation(); const pts = single.points!.slice(); if (pts.length > 3) { pts.splice(i, 1); p.onUnitPoints(single.id, pts); } }}>
+                    <circle r={14} fill="transparent" />
+                    <circle r={6.5} fill={ACCENT} stroke="#fff" strokeWidth={2} />
+                  </g>
                 </Fixed>
               ))}
             </g>

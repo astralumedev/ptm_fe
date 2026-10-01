@@ -1,5 +1,6 @@
 import type { FloorData, FloorId, MapPoint, PathResult, RouteLeg, RouteStep, WayfindingLocation } from '../types/wayfinding';
 import { FLOOR_LABELS } from '../types/wayfinding';
+import { distanceToOutline, isFreeform, labelCenter, nearestOnOutline, pointInPolygon } from './unitShape';
 
 /**
  * Walking directions straight from the floor plan.
@@ -29,7 +30,7 @@ export function silhouettePoints(sil?: FloorData['silhouette']): MapPoint[] {
     .filter((p) => Number.isFinite(p.x) && Number.isFinite(p.y));
 }
 
-export const unitCenter = (u: { x: number; y: number; w: number; h: number }): MapPoint => ({ x: u.x + u.w / 2, y: u.y + u.h / 2 });
+export const unitCenter = (u: { x: number; y: number; w: number; h: number; points?: [number, number][] }): MapPoint => labelCenter(u);
 
 // ---------------------------------------------------------------------------------------------
 // Grid
@@ -85,6 +86,7 @@ function buildGrid(data: FloorData): Grid {
 
   units.forEach((u, i) => {
     if (WALKABLE_CATS.has(u.cat)) return;
+    const poly = isFreeform(u) ? u.points! : null;
     const c0 = Math.max(0, Math.ceil((u.x - INFLATE) / CELL - 0.5));
     const c1 = Math.min(cols - 1, Math.floor((u.x + u.w + INFLATE) / CELL - 0.5));
     const r0 = Math.max(0, Math.ceil((u.y - INFLATE) / CELL - 0.5));
@@ -92,9 +94,11 @@ function buildGrid(data: FloorData): Grid {
     for (let r = r0; r <= r1; r++) {
       for (let c = c0; c <= c1; c++) {
         const k = r * cols + c;
-        walk[k] = 0;
         const cx = (c + 0.5) * CELL, cy = (r + 0.5) * CELL;
-        const inside = cx >= u.x && cx <= u.x + u.w && cy >= u.y && cy <= u.y + u.h;
+        // Free-form units block what's inside the outline (plus the same small margin as rectangles).
+        const inside = poly ? pointInPolygon(poly, cx, cy) : cx >= u.x && cx <= u.x + u.w && cy >= u.y && cy <= u.y + u.h;
+        if (poly && !inside && distanceToOutline(poly, cx, cy) > INFLATE) continue;
+        walk[k] = 0;
         if (inside || owner[k] < 0) owner[k] = i;
       }
     }
@@ -326,7 +330,7 @@ function walkBack(prev: Int32Array, end: number): number[] {
 function toDoor(pts: MapPoint[], u: WayfindingLocation): MapPoint[] {
   if (pts.length < 2) return pts;
   const before = pts[pts.length - 2];
-  const door = { x: Math.max(u.x, Math.min(u.x + u.w, before.x)), y: Math.max(u.y, Math.min(u.y + u.h, before.y)) };
+  const door = nearestOnOutline(u, before);
   // If the approach point is itself inside the unit, step back to the last point outside it.
   return [...pts.slice(0, -1), door];
 }
@@ -557,7 +561,7 @@ export function planRoute(
       // Leave the lift from its door rather than its middle.
       const from = legs[i - 1];
       const shaftUnit = g.units[g.owner[leg.cells[0]]] || from.endUnit;
-      if (pts.length > 1) pts[0] = { x: Math.max(shaftUnit.x, Math.min(shaftUnit.x + shaftUnit.w, pts[1].x)), y: Math.max(shaftUnit.y, Math.min(shaftUnit.y + shaftUnit.h, pts[1].y)) };
+      if (pts.length > 1) pts[0] = nearestOnOutline(shaftUnit, pts[1]);
     }
     pts = toDoor(pts, leg.endUnit);
     const end = leg.end.kind === 'destination' ? { ...leg.end, side: sideOf(pts, leg.endUnit) } : leg.end;

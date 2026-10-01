@@ -1,6 +1,7 @@
 import { memo, ReactNode, useMemo } from 'react';
 import type { FloorData, WayfindingLocation } from '../../../types/wayfinding';
 import { silhouettePoints } from '../../../lib/mapRouter';
+import { isFreeform, labelCenter, unitPath } from '../../../lib/unitShape';
 import { CategoryIcon } from '../wayfinding/CategoryIcon';
 
 export interface UnitOccupant {
@@ -135,6 +136,14 @@ function FloorPlanImpl({ floor, k, occupantOf, styleOf, theme, onUnitDown, onUni
       {groups.list.map((g) => {
         const rects = floor.locations.filter((l) => g.occ.units.some((x) => x.toLowerCase() === l.id.toLowerCase()));
         const s = styleOf(rects[0], g.occ);
+        // Free-form parts can't be joined as boxes: draw each outline in the shop's colour instead.
+        if (rects.some(isFreeform)) {
+          return (
+            <g key={g.key} style={{ pointerEvents: 'none', opacity: s.opacity ?? 1, transition: 'opacity 260ms ease' }}>
+              {rects.map((r) => <path key={r.id} d={unitPath(r)} fill={s.fill} stroke={s.stroke} strokeWidth={s.strokeWidth ?? 1.3} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />)}
+            </g>
+          );
+        }
         const shape = unionShape(rects);
         return (
           <g key={g.key} style={{ pointerEvents: 'none', opacity: s.opacity ?? 1, transition: 'opacity 260ms ease' }}>
@@ -153,7 +162,11 @@ function FloorPlanImpl({ floor, k, occupantOf, styleOf, theme, onUnitDown, onUni
             onPointerDown={onUnitDown ? (e) => onUnitDown(u, e) : undefined}
             onClick={onUnitClick ? (e) => onUnitClick(u, e) : undefined}>
             {merged
-              ? <rect x={u.x} y={u.y} width={Math.max(1, u.w)} height={Math.max(1, u.h)} fill="transparent" />
+              ? <path d={unitPath(u)} fill="transparent" />
+              : isFreeform(u)
+              ? <path d={unitPath(u)} strokeLinejoin="round"
+                  fill={s.fill} stroke={s.stroke} strokeWidth={s.strokeWidth ?? 1.3} vectorEffect="non-scaling-stroke"
+                  style={{ transition: 'fill 220ms ease, stroke 220ms ease', filter: s.glow ? `drop-shadow(0 0 10px ${s.stroke})` : undefined }} />
               : <rect x={u.x} y={u.y} width={Math.max(1, u.w)} height={Math.max(1, u.h)} rx={7}
                   fill={s.fill} stroke={s.stroke} strokeWidth={s.strokeWidth ?? 1.3} vectorEffect="non-scaling-stroke"
                   style={{ transition: 'fill 220ms ease, stroke 220ms ease', filter: s.glow ? `drop-shadow(0 0 10px ${s.stroke})` : undefined }} />}
@@ -166,7 +179,9 @@ function FloorPlanImpl({ floor, k, occupantOf, styleOf, theme, onUnitDown, onUni
         const occ = occupantOf(u.id);
         const s = styleOf(u, occ);
         const cat = occ?.cat || u.cat;
-        const cx = u.x + u.w / 2, cy = u.y + u.h / 2;
+        const { x: cx, y: cy } = labelCenter(u);
+        // Odd shapes: fit the label in a box around the centroid rather than the whole bounding box.
+        const box = isFreeform(u) ? { x: cx - u.w * 0.34, y: cy - u.h * 0.3, w: u.w * 0.68, h: u.h * 0.6 } : u;
         if (!occ && AMENITY.has(u.cat)) {
           if (!ICON_ONLY.has(u.cat) && u.cat !== 'service') return null;
           const size = Math.min(u.w, u.h) * 0.5;
@@ -184,7 +199,7 @@ function FloorPlanImpl({ floor, k, occupantOf, styleOf, theme, onUnitDown, onUni
         if (!name) return null;
         return (
           <g key={u.id} style={{ opacity: s.opacity ?? 1, transition: 'opacity 260ms ease' }}>
-            <Label box={u} text={name} k={k} color={s.labelColor || theme.label} halo={theme.labelHalo} sub={showIds && occ ? u.id : undefined}
+            <Label box={box} text={name} k={k} color={s.labelColor || theme.label} halo={theme.labelHalo} sub={showIds && occ ? u.id : undefined}
               {...(!occ && !u.name ? { max: 20, weight: 500 } : {})} />
           </g>
         );

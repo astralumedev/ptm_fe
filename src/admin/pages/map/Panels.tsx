@@ -2,7 +2,7 @@ import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle, ArrowRightLeft, Combine, Copy, Download, ExternalLink, Link2, MapPin, Printer, QrCode,
-  RotateCcw, RotateCw, Scissors, Search, Split, Store, Trash2, Ungroup, X, History, Check, Move,
+  RotateCcw, RotateCw, Scissors, Search, Split, Store, Trash2, Ungroup, X, History, Check, Move, Square, PenTool,
 } from 'lucide-react';
 import type { FloorData, FloorId, QrPoint, WayfindingLocation } from '../../../types/wayfinding';
 import { isTransitCat } from '../../../lib/mapRouter';
@@ -139,6 +139,7 @@ interface UnitPanelProps {
   onSplit: (dir: 'vertical' | 'horizontal', ratio: number) => void;
   onSplitPreview: (p: { dir: 'vertical' | 'horizontal'; ratio: number } | null) => void;
   onUnmerge: () => void;
+  onFreeform: (on: boolean) => void;
   onDuplicate: () => void;
   onDelete: () => void;
 }
@@ -256,11 +257,24 @@ export function UnitPanel(p: UnitPanelProps) {
             </div>
           </div>
         ) : (
+          <div className="flex flex-col gap-2.5">
+          {unit.points && unit.points.length >= 3 ? (
+            <div className="flex flex-col gap-1.5">
+              <p className="text-[12.5px] text-[var(--adm-ink-3)] leading-relaxed">Free-form shape, {unit.points.length} corners. Drag a corner to move it, drag a <b>+</b> on an edge to add one, double-click a corner to remove it.</p>
+              <button className="adm-btn adm-btn-sm self-start" onClick={() => p.onFreeform(false)}><Square className="size-3.5" /> Make it a rectangle</button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-1.5">
+              <p className="text-[12.5px] text-[var(--adm-ink-3)] leading-relaxed">Rectangle. For an L-shaped, angled or curved shop, switch to a free-form shape and move its corners.</p>
+              <button className="adm-btn adm-btn-sm self-start" onClick={() => p.onFreeform(true)}><PenTool className="size-3.5" /> Make it free-form</button>
+            </div>
+          )}
           <div className="flex flex-wrap gap-1.5">
-            <button className="adm-btn adm-btn-sm" onClick={() => setSplit({ dir: unit.w >= unit.h ? 'vertical' : 'horizontal', ratio: 0.5 })}><Scissors className="size-3.5" /> Split in two</button>
+            {!(unit.points && unit.points.length >= 3) && <button className="adm-btn adm-btn-sm" onClick={() => setSplit({ dir: unit.w >= unit.h ? 'vertical' : 'horizontal', ratio: 0.5 })}><Scissors className="size-3.5" /> Split in two</button>}
             {unit.mergedFrom?.length ? <button className="adm-btn adm-btn-sm" onClick={p.onUnmerge}><Ungroup className="size-3.5" /> Undo merge ({unit.mergedFrom.length})</button> : null}
             <button className="adm-btn adm-btn-sm" onClick={p.onDuplicate}><Copy className="size-3.5" /> Duplicate</button>
             <button className="adm-btn adm-btn-sm adm-btn-danger" onClick={p.onDelete}><Trash2 className="size-3.5" /> Delete</button>
+          </div>
           </div>
         )}
       </Section>

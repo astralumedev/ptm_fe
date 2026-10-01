@@ -30,6 +30,14 @@ export function cleanFloor(raw: any) {
       x: num(l.x), y: num(l.y), w: Math.max(4, num(l.w, 0)), h: Math.max(4, num(l.h, 0)),
     };
     for (const k of ['name', 'dims', 'area', 'block', 'link']) if (str(l[k])) out[k] = str(l[k]);
+    // Free-form outline: 3–80 corners; the box is recomputed from them so the two always agree.
+    if (Array.isArray(l.points) && l.points.length >= 3) {
+      const pts = l.points.slice(0, 80).map((p: any) => [num(p?.[0]), num(p?.[1])]);
+      const xs = pts.map((p: number[]) => p[0]), ys = pts.map((p: number[]) => p[1]);
+      out.points = pts;
+      out.x = Math.min(...xs); out.y = Math.min(...ys);
+      out.w = Math.max(4, Math.max(...xs) - (out.x as number)); out.h = Math.max(4, Math.max(...ys) - (out.y as number));
+    }
     // Original units behind a merge, so it can be undone later.
     if (Array.isArray(l.mergedFrom) && l.mergedFrom.length) out.mergedFrom = cleanFloor({ locations: l.mergedFrom }).locations;
     locations.push(out);
