@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { CmsIcon } from '@/content/icons';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle, ArrowRightLeft, Combine, Copy, Download, ExternalLink, Link2, MapPin, Printer, QrCode,
@@ -14,7 +15,7 @@ import { relativeTime, Spinner } from '../../components/ui';
 import { ImageInput } from '../../components/media';
 
 export const UNIT_TYPES: { value: string; label: string; hint?: string }[] = [
-  { value: 'shop', label: 'Shop unit' },
+  { value: 'shop', label: 'Shop or place unit', hint: 'For a store, or a named space like a food court or ticket counter.' },
   { value: 'restroom', label: 'Restroom' },
   { value: 'elevator', label: 'Lift' },
   { value: 'stairs', label: 'Stairs' },
@@ -88,7 +89,7 @@ function LazyNum({ value, onCommit }: { value: number; onCommit: (v: number) => 
 }
 
 /** Searchable store picker. */
-export function StorePicker({ stores, onPick, placeholder = 'Find a store…', exclude, autoFocus }: { stores: StoreMeta[]; onPick: (s: StoreMeta) => void; placeholder?: string; exclude?: number[]; autoFocus?: boolean }) {
+export function StorePicker({ stores, onPick, placeholder = 'Find a store or place…', exclude, autoFocus }: { stores: StoreMeta[]; onPick: (s: StoreMeta) => void; placeholder?: string; exclude?: number[]; autoFocus?: boolean }) {
   const [q, setQ] = useState('');
   const list = useMemo(() => {
     const t = q.trim().toLowerCase();
@@ -102,11 +103,12 @@ export function StorePicker({ stores, onPick, placeholder = 'Find a store…', e
           onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { e.stopPropagation(); if (e.key === 'Enter' && list[0]) onPick(list[0]); }} aria-label="Find a store" />
       </div>
       <div className="max-h-56 overflow-y-auto adm-scroll p-1">
-        {list.length === 0 && <p className="p-2 text-[13px] text-[var(--adm-ink-3)]">No stores match.</p>}
+        {list.length === 0 && <p className="p-2 text-[13px] text-[var(--adm-ink-3)]">Nothing matches.</p>}
         {list.map((s) => (
           <button key={s.id} type="button" onClick={() => onPick(s)} className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md text-left text-[13px] hover:bg-[var(--adm-panel)] cursor-pointer">
             <StoreBadge s={s} />
-            <span className="truncate">{s.name}</span>
+            <span className="truncate flex-1">{s.name}</span>
+            {s.kind === 'place' && <span className="text-[11px] text-[var(--adm-ink-3)]">Place</span>}
           </button>
         ))}
       </div>
@@ -115,6 +117,9 @@ export function StorePicker({ stores, onPick, placeholder = 'Find a store…', e
 }
 
 export function StoreBadge({ s, size = 24 }: { s: StoreMeta; size?: number }) {
+  if (s.kind === 'place') {
+    return <span className="grid place-items-center rounded-md shrink-0" style={{ width: size, height: size, background: `${s.color}1f`, color: s.color }}><CmsIcon name={s.icon} className="size-3.5" /></span>;
+  }
   return s.logo
     ? <img src={s.logo} alt="" className="rounded-md object-contain bg-white border border-[var(--adm-line)] shrink-0" style={{ width: size, height: size }} />
     : <span className="grid place-items-center rounded-md bg-[var(--adm-accent-soft)] text-[var(--adm-accent)] shrink-0" style={{ width: size, height: size }}><Store className="size-3.5" /></span>;
@@ -201,7 +206,7 @@ export function UnitPanel(p: UnitPanelProps) {
       {unit.cat === 'shop' && (
         <Section title="Shutter" actions={owners.length > 0 && !picking ? <button className="adm-btn adm-btn-ghost adm-btn-sm" onClick={() => setPicking(true)}><ArrowRightLeft className="size-3.5" /> Change</button> : undefined}>
           {owners.length > 1 && (
-            <p className="mb-2 flex gap-1.5 text-[12.5px] text-[var(--adm-danger)]"><AlertTriangle className="size-4 shrink-0" /> {owners.length} stores are assigned here. Keep one.</p>
+            <p className="mb-2 flex gap-1.5 text-[12.5px] text-[var(--adm-danger)]"><AlertTriangle className="size-4 shrink-0" /> {owners.length} stores or places are assigned here. Keep one.</p>
           )}
           {owners.map((s) => {
             const pl = p.doc.place[s.id];
@@ -212,14 +217,14 @@ export function UnitPanel(p: UnitPanelProps) {
                   <p className="text-[13.5px] font-semibold truncate">{s.name}</p>
                   <p className="text-[12px] text-[var(--adm-ink-3)] truncate">{pl.units.length > 1 ? `Occupies ${pl.units.join(' + ')}` : 'Open'}</p>
                 </div>
-                <Link to={`/admin/stores/${s.id}`} className="adm-btn adm-btn-ghost adm-btn-sm !px-1.5" title="Edit store"><ExternalLink className="size-3.5" /></Link>
+                <Link to={`/admin/${s.kind === 'place' ? 'places' : 'stores'}/${s.id}`} className="adm-btn adm-btn-ghost adm-btn-sm !px-1.5" title={s.kind === 'place' ? 'Edit place' : 'Edit store'}><ExternalLink className="size-3.5" /></Link>
               </div>
             );
           })}
           {owners.length === 0 && !picking && (
             <div className="flex flex-col items-start gap-2">
-              <p className="text-[13px] text-[var(--adm-ink-3)]">Vacant. Assign a store to this shutter.</p>
-              <button className="adm-btn adm-btn-sm adm-btn-primary" onClick={() => setPicking(true)}><Store className="size-3.5" /> Assign a store</button>
+              <p className="text-[13px] text-[var(--adm-ink-3)]">Vacant. Assign a store, or a place like a food court or ticket counter.</p>
+              <button className="adm-btn adm-btn-sm adm-btn-primary" onClick={() => setPicking(true)}><Store className="size-3.5" /> Assign</button>
             </div>
           )}
           {picking && (
@@ -382,7 +387,7 @@ export function StoresPanel({ stores, doc, floorName, unitExists, onFocus, onPla
   onFocus: (s: StoreMeta) => void; onPlace: (s: StoreMeta | null) => void; placing: StoreMeta | null;
 }) {
   const [q, setQ] = useState('');
-  const [filter, setFilter] = useState<'all' | 'unplaced' | 'broken'>('all');
+  const [filter, setFilter] = useState<'all' | 'places' | 'unplaced' | 'broken'>('all');
   const rows = useMemo(() => stores.map((s) => {
     const pl = doc.place[s.id] || { floor: '', units: [] };
     const missing = pl.floor ? pl.units.filter((u) => !unitExists(pl.floor, u)) : [];
@@ -390,7 +395,7 @@ export function StoresPanel({ stores, doc, floorName, unitExists, onFocus, onPla
     return { s, pl, missing, state };
   }), [stores, doc.place, unitExists]);
   const counts = { unplaced: rows.filter((r) => r.state === 'unplaced').length, broken: rows.filter((r) => r.state === 'broken').length };
-  const list = rows.filter((r) => (filter === 'all' || r.state === filter) && (!q.trim() || r.s.name.toLowerCase().includes(q.trim().toLowerCase())));
+  const list = rows.filter((r) => (filter === 'all' || r.state === filter || (filter === 'places' && r.s.kind === 'place')) && (!q.trim() || r.s.name.toLowerCase().includes(q.trim().toLowerCase())));
 
   return (
     <div>
@@ -404,10 +409,10 @@ export function StoresPanel({ stores, doc, floorName, unitExists, onFocus, onPla
       <div className="p-3 flex flex-col gap-2 border-b border-[var(--adm-line)]">
         <div className="relative">
           <Search className="absolute left-2.5 top-2.5 size-4 text-[var(--adm-ink-3)] pointer-events-none" />
-          <input className="adm-input h-9 pl-8 text-[13px]" placeholder="Find a store" value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />
+          <input className="adm-input h-9 pl-8 text-[13px]" placeholder="Find a store or place" value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />
         </div>
-        <div className="flex gap-1">
-          {([['all', `All ${stores.length}`], ['unplaced', `Not on map ${counts.unplaced}`], ['broken', `Missing unit ${counts.broken}`]] as const).map(([k, l]) => (
+        <div className="flex flex-wrap gap-1">
+          {([['all', `All ${stores.length}`], ['places', `Places ${stores.filter((s) => s.kind === 'place').length}`], ['unplaced', `Not on map ${counts.unplaced}`], ['broken', `Missing unit ${counts.broken}`]] as const).map(([k, l]) => (
             <button key={k} onClick={() => setFilter(k)} className={`h-7 px-2.5 rounded-full text-[12px] font-medium transition-colors ${filter === k ? 'bg-[var(--adm-ink)] text-white' : 'bg-[var(--adm-panel)] text-[var(--adm-ink-2)] hover:bg-[#eceef2]'}`}>{l}</button>
           ))}
         </div>

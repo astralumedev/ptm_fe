@@ -208,7 +208,7 @@ export const LatestPage: React.FC = () => {
                   >
                     <div className="lg:col-span-7 relative h-72 sm:h-96 lg:h-full overflow-hidden bg-gray-900">
                       <img loading="lazy" decoding="async"
-                        src={featuredBlog.cover_image?.data?.full_url || '/placeholder.jpg'}
+                        src={featuredBlog.cover_image?.data?.full_url || '/mall_images/ptm_hero.webp'}
                         alt={featuredBlog.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-95"
                       />
@@ -284,7 +284,7 @@ export const LatestPage: React.FC = () => {
                         {/* Image */}
                         <Link to={`/blogs/${blog.slug}`} className="block relative aspect-16/10 overflow-hidden bg-gray-100">
                           <img loading="lazy" decoding="async"
-                            src={blog.cover_image?.data?.full_url || '/placeholder.jpg'}
+                            src={blog.cover_image?.data?.full_url || '/mall_images/ptm_hero.webp'}
                             alt={blog.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />

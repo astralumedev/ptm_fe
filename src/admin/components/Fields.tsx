@@ -88,7 +88,8 @@ function FieldInput({ field: f, value, data, onChange, error, idPrefix }: {
       return shell(<input id={id} type="datetime-local" className="adm-input" value={local} onChange={(e) => onChange(e.target.value ? new Date(e.target.value).toISOString() : '')} />);
     }
     case 'asset':
-      return shell(<ImageInput id={id} preset={f.preset || 'content'} value={imageUrlOf(value)} onChange={(url, m) => onChange(url ? toAsset(url, m?.thumb_url) : toAsset(''))} />);
+      return shell(<ImageInput id={id} preset={f.preset || 'content'} value={imageUrlOf(value)} onChange={(url, m) => onChange(url ? toAsset(url, m?.thumb_url) : toAsset(''))}
+        fallback={f.categoryFallback ? <CategoryFallback slug={data?.categorySlug} wide={f.preset !== 'logo'} /> : undefined} />);
     case 'imageUrl':
       return shell(<ImageInput id={id} preset={f.preset || 'content'} value={value || ''} onChange={(url) => onChange(url)} />);
     case 'gallery': {
@@ -111,6 +112,23 @@ function FieldInput({ field: f, value, data, onChange, error, idPrefix }: {
     default:
       return shell(<input id={id} type="text" className="adm-input" value={value ?? ''} placeholder={f.placeholder} onChange={(e) => onChange(e.target.value)} aria-invalid={!!error} />);
   }
+}
+
+/** What visitors see when a store has no photo: its category's icon on the category colour. */
+function CategoryFallback({ slug, wide }: { slug?: string; wide: boolean }) {
+  const { find } = useAdminCategories();
+  const cat = find(slug);
+  const color = cat?.color || '#801424';
+  return (
+    <span className="flex items-center gap-3 text-left">
+      <span className={`grid place-items-center shrink-0 rounded-xl ${wide ? 'size-12' : 'size-10'}`} style={{ background: `${color}1f`, color }}>
+        <CmsIcon name={cat?.icon} className="size-5" />
+      </span>
+      <span className="text-[12.5px] leading-snug text-[var(--adm-ink-3)]">
+        {cat ? <>No photo? Visitors see the <strong className="font-semibold text-[var(--adm-ink-2)]">{cat.shortName || cat.name}</strong> icon instead.</> : 'No photo? Pick a category and visitors see its icon instead.'}
+      </span>
+    </span>
+  );
 }
 
 /** Repeatable items (slides, FAQs, menu links…): collapsible cards with reorder, duplicate and remove. */
@@ -231,7 +249,9 @@ function loadFloorUnits(floor: string): Promise<MapUnit[]> {
 function MapUnitsInput({ id, floor, value, onChange, ownSlug }: { id: string; floor?: string; value: string[]; onChange: (v: string[]) => void; ownSlug?: string }) {
   const [units, setUnits] = useState<MapUnit[] | null>(null);
   const [q, setQ] = useState('');
-  const { items: stores } = useCollection('stores');
+  const { items: storeItems } = useCollection('stores');
+  const { items: placeItems } = useCollection('places');
+  const stores = useMemo(() => [...(storeItems || []), ...(placeItems || [])], [storeItems, placeItems]);
 
   useEffect(() => {
     setUnits(null);
@@ -240,7 +260,7 @@ function MapUnitsInput({ id, floor, value, onChange, ownSlug }: { id: string; fl
 
   const takenBy = useMemo(() => {
     const m = new Map<string, string>();
-    for (const s of stores || []) {
+    for (const s of stores) {
       if (s.slug === ownSlug || s.data.mapFloor !== floor) continue;
       for (const u of s.data.mapUnits || []) m.set(u, s.data.name);
     }

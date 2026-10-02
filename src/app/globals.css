@@ -354,3 +354,17 @@ button[class*="btn-"]:hover {
 @media (pointer: coarse) {
   .btn-link { padding-block: 0.65rem; margin-block: -0.65rem; }
 }
+
+/* Footer colour picked in Site content -> Footer. Light is the original; dark tones remap its greys. */
+.ptm-footer[data-tone='navy'] { background: linear-gradient(180deg, #1b1d5c, #12143f); border-color: rgb(255 255 255 / 0.08); }
+.ptm-footer[data-tone='maroon'] { background: linear-gradient(180deg, #5a0f1b, #3b0911); border-color: rgb(255 255 255 / 0.08); }
+.ptm-footer:is([data-tone='navy'], [data-tone='maroon']) { color: #eef0fb; }
+.ptm-footer:is([data-tone='navy'], [data-tone='maroon']) :is(.text-gray-900, .text-gray-800) { color: #ffffff; }
+.ptm-footer:is([data-tone='navy'], [data-tone='maroon']) .text-gray-700 { color: rgb(255 255 255 / 0.86); }
+.ptm-footer:is([data-tone='navy'], [data-tone='maroon']) :is(.text-gray-600, .text-gray-500) { color: rgb(255 255 255 / 0.72); }
+.ptm-footer:is([data-tone='navy'], [data-tone='maroon']) .bg-white { background-color: rgb(255 255 255 / 0.08); }
+.ptm-footer:is([data-tone='navy'], [data-tone='maroon']) :is(.border-gray-200, .border-gray-300) { border-color: rgb(255 255 255 / 0.16); }
+.ptm-footer:is([data-tone='navy'], [data-tone='maroon']) :is(.hover\:text-\[\#801424\], .hover\:text-\[\#2e3094\]):hover { color: #ffd9de; }
+.ptm-footer[data-tone='maroon'] .text-\[\#801424\] { color: #ffc2cb; }
+.ptm-footer[data-tone='navy'] .text-\[\#2e3094\] { color: #c7cbff; }
+.ptm-footer[data-tone='navy'] .text-\[\#801424\] { color: #ffb3bf; }

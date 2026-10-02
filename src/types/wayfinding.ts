@@ -45,6 +45,14 @@ export interface WayfindingStore {
   shutters?: string[];
   logo?: string;
   image?: string;
+  /** 'place' is a named non-store space (food court, ticket counter…); it has no store page. */
+  kind?: 'store' | 'place';
+  subtitle?: string;
+  /** Places: icon key from src/content/icons.tsx and their own map colour. */
+  icon?: string;
+  color?: string;
+  /** Places that belong to a store, e.g. the QFX ticket counter. */
+  partOf?: { name: string; slug: string };
 }
 
 export interface FloorData {
@@ -164,6 +172,8 @@ export const CATEGORIES: Record<string, CategoryInfo> = {
   void: { label: "Void", color: "#d6604d" },
   atrium: { label: "Central Atrium", color: "#e8a13a" },
   parking: { label: "Underground Parking", color: "#475569" },
+  // Named non-store spaces from the Places list (food court, ticket counters…)
+  place: { label: "Places & facilities", color: "#2e3094" },
 };
 
 export const FLOOR_LABELS: Record<FloorId, string> = {

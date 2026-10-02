@@ -38,6 +38,8 @@ export interface Field {
   max?: number;
   /** mapUnits: sibling key that holds the floor id */
   floorKey?: string;
+  /** asset: when empty, preview the store category's icon that the site shows instead */
+  categoryFallback?: boolean;
   /** category: limit choices to a sector */
   sector?: string;
 }

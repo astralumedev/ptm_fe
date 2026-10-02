@@ -72,7 +72,7 @@ export default route(async (req, res) => {
       const floor = isFloorId(s.mapFloor) ? s.mapFloor : '';
       const units = floor && Array.isArray(s.mapUnits) ? s.mapUnits.map((u) => String(u).slice(0, 40)).filter(Boolean).slice(0, 20) : [];
       const patch = JSON.stringify({ mapFloor: floor, mapUnits: units });
-      queries.push(db`UPDATE content SET data = data || ${patch}::jsonb, updated_at = now() WHERE id = ${id} AND collection = 'stores'`);
+      queries.push(db`UPDATE content SET data = data || ${patch}::jsonb, updated_at = now() WHERE id = ${id} AND collection IN ('stores', 'places')`);
     }
     if (!queries.length) return res.json({ ok: true, saved });
     await db.transaction(queries);

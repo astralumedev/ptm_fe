@@ -7,6 +7,8 @@ import { CategoryIcon } from '../wayfinding/CategoryIcon';
 export interface UnitOccupant {
   name: string;
   cat: string;
+  /** Places carry their own colour instead of a category's. */
+  color?: string;
   /** Every unit the store occupies on this floor (a store over two units is drawn as one shop). */
   units: string[];
 }

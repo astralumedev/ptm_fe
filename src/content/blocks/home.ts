@@ -21,6 +21,8 @@ export interface HeroSlide extends Schedulable { title: string; category: string
 export interface HeroContent {
   backgroundUrl: string;
   backgroundAlt: string;
+  /** Colour of the banner behind the photo. */
+  tone?: 'maroon' | 'navy' | 'charcoal';
   title: string;
   intro: string;
   buttons: HeroButton[];
@@ -40,6 +42,11 @@ export const homeHeroBlock = defineBlock<HeroContent>({
     { key: 'intro', label: 'Text under the headline', type: 'textarea' },
     { key: 'backgroundUrl', label: 'Background photo', type: 'imageUrl', half: true, help: 'Shown faintly behind the banner. Wide landscape photo, at least 1600px wide.' },
     { key: 'backgroundAlt', label: 'Background photo description', type: 'text', half: true },
+    {
+      key: 'tone', label: 'Banner colour', type: 'select', half: true,
+      help: 'The colour behind the photo. Every option keeps the white text readable.',
+      options: [{ value: 'maroon', label: 'Maroon night (original)' }, { value: 'navy', label: 'PTM navy' }, { value: 'charcoal', label: 'Charcoal' }],
+    },
     {
       key: 'buttons', label: 'Buttons', type: 'list', itemTitle: 'label', itemName: 'button', max: 3,
       itemDefaults: { label: '', href: '/', style: 'primary' },
@@ -69,6 +76,7 @@ export const homeHeroBlock = defineBlock<HeroContent>({
   defaults: {
     backgroundUrl: '/mall_images/ptm_hero.webp',
     backgroundAlt: 'Pokhara Trade Mall Building',
+    tone: 'maroon',
     title: 'ELEVATE YOUR SHOPPING EXPERIENCE',
     intro: 'Your premier lifestyle destination for global fashion brands, gourmet Thakali dining, QFX cinemas, and everyday essentials in Pokhara.',
     buttons: [
@@ -203,7 +211,9 @@ export const homeDiningBlock = defineBlock<StoreShowcaseContent>({
   },
 });
 
-export interface ResolvedStoreCard { key: string; name: string; category: string; floor: string; imageUrl: string; href: string; wide: boolean; tall: boolean }
+export interface ResolvedStoreCard { key: string; name: string; category: string; floor: string; imageUrl: string; href: string; wide: boolean; tall: boolean;
+  /** Store category code, for the icon shown when there is no photo. */
+  categorySlug?: string }
 
 /**
  * Live showcase items merged with the store they point to. Overrides win; missing values fall back
@@ -232,6 +242,7 @@ export function useStoreCards(items: StoreCardItem[] | undefined): ResolvedStore
         floor: item.floor || s?.floor || '',
         imageUrl: item.imageUrl || s?.cover?.data?.full_url || s?.logo?.data?.full_url || '',
         href: item.href || (s ? `/shops/details/${s.slug}` : ''),
+        categorySlug: s?.categorySlug || s?.category,
         wide,
         tall: row % 2 === 0,
       });

@@ -51,6 +51,8 @@ export interface PageResponse {
 
 export interface ContentBundle {
   stores: Store[];
+  /** Non-store spaces on the mall map (food court, ticket counters…). */
+  places?: Array<Record<string, any>>;
   blogs: Blog[];
   pages: PageData[];
   events: MallEvent[];

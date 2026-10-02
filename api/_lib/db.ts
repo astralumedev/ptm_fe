@@ -13,7 +13,8 @@ export function sql() {
 }
 
 // 'blocks' holds one document per editable site section (hero, menus, page copy…), keyed by slug.
-export const COLLECTIONS = ['stores', 'blogs', 'pages', 'events', 'offers', 'settings', 'blocks'] as const;
+// 'places' are named non-store spaces on the mall map (food court, ticket counters…).
+export const COLLECTIONS = ['stores', 'places', 'blogs', 'pages', 'events', 'offers', 'settings', 'blocks'] as const;
 export type Collection = (typeof COLLECTIONS)[number];
 
 export function isCollection(v: unknown): v is Collection {

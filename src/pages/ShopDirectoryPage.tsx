@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { StoreVisual } from '@/app/components/StoreVisual';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -427,11 +428,7 @@ export default function ShopDirectoryPage() {
                 >
                   {/* Cover Header */}
                   <div className="relative h-48 w-full overflow-hidden bg-gray-100">
-                    <img loading="lazy" decoding="async"
-                      src={store.cover?.data?.full_url}
-                      alt={store.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+                    <StoreVisual src={store.cover?.data?.full_url} alt={store.name} category={store.categorySlug || store.category} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80" />
 
                     <span className="absolute top-3 right-3 text-[11px] font-semibold text-gray-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/80 flex items-center gap-1">
@@ -456,11 +453,7 @@ export default function ShopDirectoryPage() {
                     <div>
                       <div className="flex items-start gap-3 mb-2">
                         <div className="w-11 h-11 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
-                          <img loading="lazy" decoding="async"
-                            src={store.logo?.data?.full_url}
-                            alt={`${store.name} logo`}
-                            className="w-full h-full object-cover"
-                          />
+                          <StoreVisual variant="logo" src={store.logo?.data?.full_url} alt={`${store.name} logo`} category={store.categorySlug || store.category} className="w-full h-full object-cover" />
                         </div>
                         <div className="flex-1">
                           <h3
@@ -538,7 +531,7 @@ export default function ShopDirectoryPage() {
               >
                 <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                   <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
-                    <img loading="lazy" decoding="async" src={store.logo?.data?.full_url} alt={`${store.name} logo`} className="w-full h-full object-cover" />
+                    <StoreVisual variant="logo" src={store.logo?.data?.full_url} alt={`${store.name} logo`} category={store.categorySlug || store.category} className="w-full h-full object-cover" />
                   </div>
                   <div className="space-y-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">

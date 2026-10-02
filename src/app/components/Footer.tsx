@@ -9,6 +9,8 @@ import { siteFooterBlock, useMallHours } from '@/content/blocks/site';
 import { CmsLink } from '@/content/CmsLink';
 
 const Footer: React.FC = () => {
+  // Dark tones are restyled in globals.css (.ptm-footer[data-tone]) so the markup stays one version.
+
   const footer = useBlock(siteFooterBlock);
   const hours = useMallHours();
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
@@ -36,7 +38,7 @@ const Footer: React.FC = () => {
 
   if (loading) {
     return (
-      <footer className="relative bg-gray-100 text-gray-800 py-14 border-t border-gray-200" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+      <footer data-tone={footer.tone || 'light'} className="ptm-footer relative bg-gray-100 text-gray-800 py-14 border-t border-gray-200" style={{ fontFamily: "'Montserrat', sans-serif" }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col items-start">
             <img loading="lazy" decoding="async"
@@ -51,7 +53,7 @@ const Footer: React.FC = () => {
   }
 
   return (
-    <footer className="relative bg-gray-100 text-gray-800 pt-12 pb-[max(2rem,env(safe-area-inset-bottom))] md:py-16 px-5 md:px-12 lg:px-16 border-t border-gray-200" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+    <footer data-tone={footer.tone || 'light'} className="ptm-footer relative bg-gray-100 text-gray-800 pt-12 pb-[max(2rem,env(safe-area-inset-bottom))] md:py-16 px-5 md:px-12 lg:px-16 border-t border-gray-200" style={{ fontFamily: "'Montserrat', sans-serif" }}>
       <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-10 md:gap-12 lg:gap-14">
         
         {/* Column 1: Logo & Overview */}
