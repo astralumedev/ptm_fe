@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, X, MapPin, Store } from 'lucide-react';
+import { Search, X, MapPin } from 'lucide-react';
 import { WayfindingStore, FloorId } from '../../../types/wayfinding';
 import { fill, firstUnit, useFloorTexts, useMapCategories, useMapCopy } from './useMapContent';
 import styles from './Wayfinding.module.css';
+import { EntryMark, entryColor, entryKindLabel, searchEntries } from './mapEntries';
+import { PLACE_CAT } from '../../../services/wayfindingService';
 
 interface WayfindingHeaderProps {
   stores: WayfindingStore[];
@@ -29,20 +31,8 @@ export const WayfindingHeader: React.FC<WayfindingHeaderProps> = ({
   const { names: floorNames } = useFloorTexts();
   const categories = useMapCategories();
 
-  // Filter search suggestions
-  const suggestions = searchQuery.trim()
-    ? stores
-        .filter((store) => {
-          const q = searchQuery.toLowerCase();
-          const matchName = store.name.toLowerCase().includes(q);
-          const matchCat =
-            (store.cat || '').toLowerCase().includes(q) ||
-            categories.info(store.cat).label.toLowerCase().includes(q);
-          const matchShutter = store.shutters?.some((s) => s.toLowerCase().includes(q));
-          return matchName || matchCat || matchShutter;
-        })
-        .slice(0, 8)
-    : [];
+  const suggestions = searchEntries(stores, searchQuery, categories);
+  const hasPlaces = stores.some((s) => s.kind === 'place');
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -93,7 +83,7 @@ export const WayfindingHeader: React.FC<WayfindingHeaderProps> = ({
         {isPopoverOpen && suggestions.length > 0 && (
           <div className={styles.suggestionsPopover}>
             {suggestions.map((store) => {
-              const catInfo = categories.info(store.cat);
+              const color = entryColor(store, categories);
               const unit = firstUnit(store.shutters);
 
               return (
@@ -102,18 +92,7 @@ export const WayfindingHeader: React.FC<WayfindingHeaderProps> = ({
                   className={styles.suggestionItem}
                   onClick={() => handleSelectSuggestion(store)}
                 >
-                  {/* Thumbnail / Logo */}
-                  {store.logo ? (
-                    <img loading="lazy" decoding="async"
-                      src={store.logo}
-                      alt={store.name}
-                      className={styles.suggestionLogo}
-                    />
-                  ) : (
-                    <div className={styles.suggestionLogoFallback}>
-                      <Store size={14} />
-                    </div>
-                  )}
+                  <EntryMark entry={store} size={32} radius={8} />
 
                   <div className={styles.suggestionDetails}>
                     <div className={styles.suggestionName}>{store.name}</div>
@@ -133,9 +112,9 @@ export const WayfindingHeader: React.FC<WayfindingHeaderProps> = ({
 
                   <span
                     className={styles.suggestionCategoryBadge}
-                    style={{ backgroundColor: `${catInfo.color}25`, color: catInfo.color, borderColor: `${catInfo.color}50` }}
+                    style={{ backgroundColor: `${color}25`, color, borderColor: `${color}50` }}
                   >
-                    {catInfo.label}
+                    {entryKindLabel(store, categories)}
                   </span>
                 </div>
               );
@@ -157,6 +136,7 @@ export const WayfindingHeader: React.FC<WayfindingHeaderProps> = ({
               {cat.shortName || cat.name}
             </option>
           ))}
+          {hasPlaces && <option value={PLACE_CAT}>{categories.info(PLACE_CAT).label}</option>}
           {AMENITY_KEYS.map((key) => (
             <option key={key} value={key}>
               {categories.info(key).label}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { ImagePlus, Upload, Trash2, Images, ArrowLeft, ArrowRight } from 'lucide-react';
 import { adminApi, MediaRecord } from '../lib/http';
 import { uploadImage, ImagePreset, formatBytes } from '../lib/images';
@@ -134,7 +134,7 @@ export function MediaPicker({ open, onClose, onPick, preset, selected }: {
 }
 
 /** Single image field: preview, replace from library/upload, remove. */
-export function ImageInput({ value, onChange, preset, id }: { value: string; onChange: (url: string, media?: MediaRecord) => void; preset: ImagePreset; id?: string }) {
+export function ImageInput({ value, onChange, preset, id, fallback }: { value: string; onChange: (url: string, media?: MediaRecord) => void; preset: ImagePreset; id?: string; fallback?: ReactNode }) {
   const [picking, setPicking] = useState(false);
   const { run, progress } = useUploader(preset);
   const input = useRef<HTMLInputElement>(null);
@@ -170,6 +170,7 @@ export function ImageInput({ value, onChange, preset, id }: { value: string; onC
           )}
         </button>
       )}
+      {!value && fallback && <div className="mt-2 px-3 py-2.5 rounded-lg bg-[var(--adm-panel)] border border-[var(--adm-line)]">{fallback}</div>}
       <input ref={input} type="file" accept="image/*" className="sr-only" onChange={async (e) => {
         const f = e.target.files?.[0];
         e.target.value = '';

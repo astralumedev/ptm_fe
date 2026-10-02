@@ -11,6 +11,13 @@ import { useBlock } from '@/content/block';
 import { liveOnly } from '@/content/visibility';
 import { homeHeroBlock } from '@/content/blocks/home';
 
+/** Banner colours staff can pick; each stays dark enough for the white headline. */
+const HERO_TONES: Record<string, { bg: string; glowA: string; glowB: string }> = {
+  maroon: { bg: 'linear-gradient(to right, #111827, #1e1316, #111827)', glowA: 'rgb(220 38 38 / 0.1)', glowB: 'rgb(128 20 36 / 0.2)' },
+  navy: { bg: 'linear-gradient(to right, #0b0d24, #191b52, #0b0d24)', glowA: 'rgb(99 102 241 / 0.12)', glowB: 'rgb(46 48 148 / 0.3)' },
+  charcoal: { bg: 'linear-gradient(to right, #0f1115, #1c1f26, #0f1115)', glowA: 'rgb(255 255 255 / 0.04)', glowB: 'rgb(128 20 36 / 0.12)' },
+};
+
 const HeaderSection = () => {
   const menuItems = useMenuItems();
   const nav = useSiteNav();
@@ -31,15 +38,16 @@ const HeaderSection = () => {
     return () => clearInterval(timer);
   }, [slides.length, intervalMs]);
 
+  const tone = HERO_TONES[hero.tone || 'maroon'] || HERO_TONES.maroon;
   const activeStory = slides.length ? slides[activeStoryIndex % slides.length] : null;
 
   return (
     <header className="relative w-full" style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}>
       {/* Hero Section with Dine Terrace Style Dark Gradient & Subtle Image Blend */}
-      <div className="relative w-full min-h-[580px] md:min-h-[620px] lg:min-h-[660px] overflow-hidden bg-gradient-to-r from-gray-900 via-[#1e1316] to-gray-900 text-white flex items-center shadow-xl border-b border-gray-800">
+      <div className="relative w-full min-h-[580px] md:min-h-[620px] lg:min-h-[660px] overflow-hidden text-white flex items-center shadow-xl border-b border-gray-800" style={{ backgroundImage: tone.bg }}>
         {/* Ambient Red Glow Highlights (Matching Dine Terrace) */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#801424]/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl pointer-events-none" style={{ background: tone.glowA }} />
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full blur-3xl pointer-events-none" style={{ background: tone.glowB }} />
 
         {/* Subtle Background Image Overlay */}
         <img fetchPriority="high" decoding="async"

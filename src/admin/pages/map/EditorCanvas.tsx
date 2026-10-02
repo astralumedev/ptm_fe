@@ -11,7 +11,11 @@ import type { MapDoc, Rect } from './mapDoc';
 export type Tool = 'select' | 'draw' | 'shape' | 'outline' | 'qr' | 'route';
 export type Selection = { kind: 'units'; ids: string[] } | { kind: 'qr'; key: string } | null;
 
-export interface StoreMeta { id: number; name: string; cat: string; slug: string; logo?: string }
+export interface StoreMeta {
+  id: number; name: string; cat: string; slug: string; logo?: string;
+  /** Places are non-store spaces (food court, ticket counter) placed on the map like stores. */
+  kind: 'store' | 'place'; icon?: string; color?: string;
+}
 
 interface Props {
   floorId: FloorId;

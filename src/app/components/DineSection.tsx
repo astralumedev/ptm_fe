@@ -1,4 +1,5 @@
 import { useBlock } from '@/content/block';
+import { StoreVisual } from '@/app/components/StoreVisual';
 import { CmsLink } from '@/content/CmsLink';
 import { homeDiningBlock, useStoreCards } from '@/content/blocks/home';
 import { motion } from 'framer-motion';
@@ -66,11 +67,8 @@ export default function DineSection() {
               >
                 <div className={`relative w-full ${spot.tall ? 'h-64 sm:h-72 lg:h-80' : 'h-56 sm:h-64 lg:h-72'} overflow-hidden bg-gray-900`}>
                   {/* Cover Image */}
-                  <img loading="lazy" decoding="async"
-                    src={spot.imageUrl}
-                    alt={spot.name}
-                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ease-out opacity-90 group-hover:opacity-100"
-                  />
+                  <StoreVisual src={spot.imageUrl} alt={spot.name} category={spot.categorySlug} tone="dark"
+                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ease-out opacity-90 group-hover:opacity-100" />
 
                   {/* Gradient Overlay for Text Readability */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent transition-opacity duration-300 group-hover:from-black/90 group-hover:via-black/40" />

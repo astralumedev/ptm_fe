@@ -1,4 +1,5 @@
 import { useBlock } from '@/content/block';
+import { StoreVisual } from '@/app/components/StoreVisual';
 import { CmsLink } from '@/content/CmsLink';
 import { homeFeaturedBlock, useStoreCards } from '@/content/blocks/home';
 import { motion } from 'framer-motion';
@@ -66,11 +67,8 @@ export default function FeaturedStoresSection() {
               >
                 {/* Cover Image Container */}
                 <div className={`relative w-full ${store.tall ? 'h-64 sm:h-72 lg:h-80' : 'h-56 sm:h-64 lg:h-72'} overflow-hidden bg-gray-100`}>
-                  <img loading="lazy" decoding="async"
-                    src={store.imageUrl}
-                    alt={store.name}
-                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ease-out"
-                  />
+                  <StoreVisual src={store.imageUrl} alt={store.name} category={store.categorySlug}
+                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ease-out" />
 
                   {/* Top-Right Location Badge */}
                   <span className="absolute top-3 right-3 text-[10px] font-semibold text-gray-800 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full shadow-xs border border-gray-200/60 flex items-center">

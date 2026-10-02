@@ -1,11 +1,12 @@
 import type { LucideIcon } from 'lucide-react';
-import { Store, Newspaper, FileText, CalendarDays, BadgePercent } from 'lucide-react';
+import { Store, MapPin, Newspaper, FileText, CalendarDays, BadgePercent } from 'lucide-react';
 import { Field, SCHEDULE_FIELDS } from '@/content/fields';
+import { ICON_OPTIONS } from '@/content/icons';
 
 export type { Field, FieldType } from '@/content/fields';
 
 export interface CollectionDef {
-  key: 'stores' | 'blogs' | 'pages' | 'events' | 'offers';
+  key: 'stores' | 'places' | 'blogs' | 'pages' | 'events' | 'offers';
   label: string;
   singular: string;
   icon: LucideIcon;
@@ -66,8 +67,8 @@ export const COLLECTIONS: CollectionDef[] = [
       {
         title: 'Images',
         fields: [
-          { key: 'logo', label: 'Logo', type: 'asset', preset: 'logo', half: true },
-          { key: 'cover', label: 'Cover photo', type: 'asset', preset: 'cover', half: true },
+          { key: 'logo', label: 'Logo', type: 'asset', preset: 'logo', half: true, categoryFallback: true },
+          { key: 'cover', label: 'Cover photo', type: 'asset', preset: 'cover', half: true, categoryFallback: true },
           { key: 'store_gallery', label: 'Gallery', type: 'gallery', preset: 'content', help: 'Up to 4 photos show on the store page.' },
         ],
       },
@@ -89,6 +90,47 @@ export const COLLECTIONS: CollectionDef[] = [
           { key: 'instagram', label: 'Instagram', type: 'url', half: true },
           { key: 'facebook', label: 'Facebook', type: 'url', half: true },
           { key: 'tiktok', label: 'TikTok', type: 'url', half: true },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'places',
+    label: 'Places',
+    singular: 'place',
+    icon: MapPin,
+    titleKey: 'name',
+    subtitleKey: 'subtitle',
+    imageKey: 'cover',
+    slugKey: 'slug',
+    publicUrl: (s) => `/mall-map?place=${s}`,
+    blank: () => ({
+      name: '', subtitle: '', icon: 'pin', color: '#2e3094', storeSlug: '', store_description: '', cover: emptyAsset(),
+      mapFloor: '', mapUnits: [], operation_hours: '', contact_number: '', created_on: new Date().toISOString(),
+    }),
+    sections: [
+      {
+        title: 'Basics',
+        fields: [
+          { key: 'name', label: 'Name', type: 'text', required: true, placeholder: 'e.g. Food Court, QFX Ticket Counter' },
+          { key: 'subtitle', label: 'Short description', type: 'text', placeholder: 'e.g. 12 counters, seating for 300' },
+          { key: 'icon', label: 'Icon', type: 'icon', half: true, options: ICON_OPTIONS, help: 'Shown on the map and in search.' },
+          { key: 'color', label: 'Map colour', type: 'color', half: true },
+          { key: 'storeSlug', label: 'Part of a store', type: 'store', help: 'Optional. Links this place to a store, e.g. the QFX ticket counter to QFX Cinemas.' },
+          { key: 'store_description', label: 'Description', type: 'textarea' },
+        ],
+      },
+      {
+        title: 'Photo',
+        fields: [{ key: 'cover', label: 'Photo', type: 'asset', preset: 'cover', help: 'Optional. Without one, the icon is shown.' }],
+      },
+      {
+        title: 'Location & hours',
+        fields: [
+          { key: 'mapFloor', label: 'Mall map floor', type: 'select', options: MAP_FLOORS, half: true },
+          { key: 'operation_hours', label: 'Opening hours', type: 'text', half: true },
+          { key: 'mapUnits', label: 'Mall map units', type: 'mapUnits', floorKey: 'mapFloor', help: 'Pick the area it covers. Visitors can search for it and get directions, just like a store. You can also place it by clicking on the plan in Map management.' },
+          { key: 'contact_number', label: 'Phone', type: 'text', half: true },
         ],
       },
     ],

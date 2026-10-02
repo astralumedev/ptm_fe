@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { StoreVisual } from '@/app/components/StoreVisual';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FaPhoneAlt, FaGlobe, FaFacebook, FaInstagram, FaTiktok, FaMapMarkerAlt, FaArrowLeft, FaStore } from 'react-icons/fa';
 import NavigationBar from '../app/components/NavigationBar';
@@ -130,7 +131,7 @@ export default function ShopDetailPage() {
 
         {/* Phones: the photo comes first, it's what people recognise the shop by. */}
         <div className="lg:hidden mb-5 rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm aspect-[16/10] bg-gray-100">
-          <img decoding="async" src={shop.cover?.data?.full_url || shop.logo?.data?.full_url || '/mall_images/ptm_hero.webp'} alt={shop.name} className="w-full h-full object-cover" />
+          <StoreVisual eager src={shop.cover?.data?.full_url || shop.logo?.data?.full_url} alt={shop.name} category={shop.categorySlug || shop.category} className="w-full h-full object-cover" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-start">
@@ -266,11 +267,7 @@ export default function ShopDetailPage() {
             
             {/* Primary Cover Image */}
             <div className="hidden lg:block bg-white p-3 rounded-3xl border border-gray-200/80 shadow-md overflow-hidden aspect-[4/3] group">
-              <img loading="lazy" decoding="async"
-                src={shop.cover?.data?.full_url || shop.logo?.data?.full_url || '/mall_images/ptm_hero.webp'}
-                alt={shop.name}
-                className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
-              />
+              <StoreVisual src={shop.cover?.data?.full_url || shop.logo?.data?.full_url} alt={shop.name} category={shop.categorySlug || shop.category} className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500" />
             </div>
 
             {/* Gallery Grid if available */}

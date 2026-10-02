@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { StoreVisual } from '@/app/components/StoreVisual';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaMapMarkerAlt, FaClock, FaArrowRight, FaShoppingBag, FaGem, FaSearch, FaCompass } from 'react-icons/fa';
@@ -113,11 +114,7 @@ export default function ShopPage() {
                   >
                     {/* Image Cover */}
                     <div className="relative h-48 w-full overflow-hidden bg-gray-100">
-                      <img loading="lazy" decoding="async"
-                        src={store.cover?.data?.full_url}
-                        alt={store.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
+                      <StoreVisual src={store.cover?.data?.full_url} alt={store.name} category={store.categorySlug || store.category} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80" />
 
                       {/* Floor Badge */}
@@ -138,11 +135,7 @@ export default function ShopPage() {
                         {/* Logo + Store Title */}
                         <div className="flex items-start gap-3 mb-2">
                           <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0 shadow-xs">
-                            <img loading="lazy" decoding="async"
-                              src={store.logo?.data?.full_url}
-                              alt={`${store.name} logo`}
-                              className="w-full h-full object-cover"
-                            />
+                            <StoreVisual variant="logo" src={store.logo?.data?.full_url} alt={`${store.name} logo`} category={store.categorySlug || store.category} className="w-full h-full object-cover" />
                           </div>
                           <div className="flex-1">
                             <h3

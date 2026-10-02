@@ -45,11 +45,17 @@ function useNarrow() {
 
 const toMeta = (r: ItemRow): StoreMeta => ({
   id: r.id, name: String(r.data.name || r.slug), slug: r.slug, cat: String(r.data.categorySlug || r.data.category || 'shop'),
-  logo: r.data.logo?.data?.full_url || (typeof r.data.logo === 'string' ? r.data.logo : undefined),
+  logo: r.data.logo?.data?.full_url || (typeof r.data.logo === 'string' ? r.data.logo : undefined), kind: 'store',
+});
+// A place's own colour travels with its map code, so the plan can tint it without a category.
+const placeMeta = (r: ItemRow): StoreMeta => ({
+  id: r.id, name: String(r.data.name || r.slug), slug: r.slug, cat: `place:${r.id}`, kind: 'place',
+  icon: String(r.data.icon || 'pin'), color: String(r.data.color || '#2e3094'), logo: r.data.cover?.data?.full_url || undefined,
 });
 
 export default function MapManager() {
   const { items: storeRows, error: storeError, replaceAll } = useCollection('stores');
+  const { items: placeRows, error: placeError, replaceAll: replacePlaces } = useCollection('places');
   const [loaded, setLoaded] = useState<{ floors: Partial<Record<FloorId, FloorData>>; qr: Record<string, QrPoint>; scans: Record<string, number> } | null>(null);
   const [error, setError] = useState('');
 
@@ -64,15 +70,18 @@ export default function MapManager() {
     }).catch((e) => setError(e.message));
   }, []);
 
-  if (error || storeError) return <div className="p-6"><ErrorNote>{error || storeError}</ErrorNote></div>;
-  if (!loaded || !storeRows) return <div className="h-[calc(100vh-56px)] lg:h-screen grid place-items-center"><Spinner className="size-5" /></div>;
+  if (error || storeError || placeError) return <div className="p-6"><ErrorNote>{error || storeError || placeError}</ErrorNote></div>;
+  if (!loaded || !storeRows || !placeRows) return <div className="h-[calc(100vh-56px)] lg:h-screen grid place-items-center"><Spinner className="size-5" /></div>;
 
   const place: Record<number, Placement> = {};
-  for (const r of storeRows) place[r.id] = { floor: String(r.data.mapFloor || ''), units: Array.isArray(r.data.mapUnits) ? r.data.mapUnits.map(String) : [] };
-  return <Editor initial={{ floors: loaded.floors, place, qr: loaded.qr }} scans={loaded.scans} storeRows={storeRows} onStoresSaved={replaceAll} />;
+  for (const r of [...storeRows, ...placeRows]) place[r.id] = { floor: String(r.data.mapFloor || ''), units: Array.isArray(r.data.mapUnits) ? r.data.mapUnits.map(String) : [] };
+  return <Editor initial={{ floors: loaded.floors, place, qr: loaded.qr }} scans={loaded.scans} storeRows={storeRows} placeRows={placeRows} onStoresSaved={replaceAll} onPlacesSaved={replacePlaces} />;
 }
 
-function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc; scans: Record<string, number>; storeRows: ItemRow[]; onStoresSaved: (rows: ItemRow[]) => void }) {
+function Editor({ initial, scans, storeRows, placeRows, onStoresSaved, onPlacesSaved }: {
+  initial: MapDoc; scans: Record<string, number>; storeRows: ItemRow[]; placeRows: ItemRow[];
+  onStoresSaved: (rows: ItemRow[]) => void; onPlacesSaved: (rows: ItemRow[]) => void;
+}) {
   const toast = useToast();
   const [params, setParams] = useSearchParams();
   const { doc, saved, commit, undo, redo, canUndo, canRedo, changes, markSaved, reset } = useMapDoc(initial);
@@ -98,9 +107,10 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
   const canvas = useRef<EditorCanvasHandle>(null);
   const cats = useAdminCategories();
 
-  const stores = useMemo(() => storeRows.map(toMeta).sort((a, b) => a.name.localeCompare(b.name)), [storeRows]);
+  const stores = useMemo(() => [...storeRows.map(toMeta), ...placeRows.map(placeMeta)].sort((a, b) => a.name.localeCompare(b.name)), [storeRows, placeRows]);
   const storeById = useMemo(() => new Map(stores.map((s) => [s.id, s])), [stores]);
-  const colorOf = useCallback((cat: string) => cats.find(cat)?.color || CATEGORIES[cat]?.color || '#6b7280', [cats]);
+  const placeColor = useMemo(() => new Map(stores.filter((s) => s.kind === 'place').map((s) => [s.cat, s.color!])), [stores]);
+  const colorOf = useCallback((cat: string) => placeColor.get(cat) || cats.find(cat)?.color || CATEGORIES[cat]?.color || '#6b7280', [cats, placeColor]);
   const floorName = useCallback((f: string) => FLOOR_LABELS[f as FloorId] || f, []);
 
   // ---- problems
@@ -127,7 +137,7 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
       if (fl && (fl.silhouette?.length || 0) < 3) out.push({ level: 'warn', text: `${floorName(f)} has no building outline. Draw one with the outline tool so routes stay inside the building.`, floor: f });
     }
     const unplaced = stores.filter((s) => !doc.place[s.id]?.floor || !doc.place[s.id].units.length).length;
-    if (unplaced) out.push({ level: 'warn', text: `${unplaced} store${unplaced > 1 ? 's are' : ' is'} not on the map yet. Open Stores to place them.` });
+    if (unplaced) out.push({ level: 'warn', text: `${unplaced} store${unplaced > 1 ? 's or places are' : ' or place is'} not on the map yet. Open Stores to place them.` });
     return out;
   }, [doc, stores, storeById, floorName]);
   const problemUnits = useMemo(() => new Set(problems.filter((p) => p.floor === floorId).flatMap((p) => p.units || []).map((u) => u.toLowerCase())), [problems, floorId]);
@@ -255,7 +265,8 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
       const next = { ...doc, qr };
       if (selection?.kind === 'qr' && !qr[selection.key]) setSelection({ kind: 'qr', key: doc.qr[selection.key]?.code || selection.key });
       // Keep the Stores list elsewhere in the admin in step with the new placements.
-      if (storeUpdates.length) onStoresSaved(storeRows.map((r) => (doc.place[r.id] && changes.stores.includes(r.id) ? { ...r, data: { ...r.data, mapFloor: doc.place[r.id].floor, mapUnits: doc.place[r.id].units } } : r)));
+      const withPlacement = (r: ItemRow) => (doc.place[r.id] && changes.stores.includes(r.id) ? { ...r, data: { ...r.data, mapFloor: doc.place[r.id].floor, mapUnits: doc.place[r.id].units } } : r);
+      if (storeUpdates.length) { onStoresSaved(storeRows.map(withPlacement)); onPlacesSaved(placeRows.map(withPlacement)); }
       if (Object.keys(qr).join() !== Object.keys(doc.qr).join()) reset(next); else markSaved(next);
       Object.assign(scans, newScans);
       setVersions(null);
@@ -266,7 +277,7 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
     } finally {
       setSaving(false);
     }
-  }, [saving, changes, doc, saved, scans, selection, storeRows, onStoresSaved, reset, markSaved, toast]);
+  }, [saving, changes, doc, saved, scans, selection, storeRows, placeRows, onStoresSaved, onPlacesSaved, reset, markSaved, toast]);
 
   // ---- keyboard
   useEffect(() => {
@@ -425,7 +436,7 @@ function Editor({ initial, scans, storeRows, onStoresSaved }: { initial: MapDoc;
             placing={placing}
             onPlaceStore={(u) => {
               if (!placing) return;
-              if (u.cat !== 'shop') { toast('error', `${u.id} isn't a shop unit.`); return; }
+              if (u.cat !== 'shop') { toast('error', `${u.id} isn't a shop or place unit. Change its type first.`); return; }
               assignTo(placing.id, [u.id]);
               setPlacing(null);
               setSelection({ kind: 'units', ids: [u.id] });

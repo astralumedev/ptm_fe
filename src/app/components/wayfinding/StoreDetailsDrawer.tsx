@@ -8,13 +8,11 @@ import {
   Phone,
   MapPin,
   Building,
-  Sparkles,
+  Layers,
   ExternalLink,
   ArrowRight,
   Compass,
   Search,
-  Store as StoreIcon,
-  ChevronRight,
   ChevronUp,
   ChevronDown,
   SlidersHorizontal,
@@ -27,7 +25,9 @@ import {
   PathResult,
 } from '../../../types/wayfinding';
 import { SECTORS } from '../../../content/blocks/categories';
-import { CategoryIcon } from './CategoryIcon';
+import { PLACE_CAT } from '../../../services/wayfindingService';
+import { FloorOverview } from './FloorOverview';
+import { EntryMark, entryColor, entryKindLabel, searchEntries } from './mapEntries';
 import { fill, firstUnit, useFloorTexts, useMapCategories, useMapCopy } from './useMapContent';
 
 const AMENITY_KEYS = ['elevator', 'stairs', 'restroom'];
@@ -120,21 +120,8 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
     setSheetMode((prev) => (prev === 'peek' ? 'expanded' : 'peek'));
   };
 
-  // Filter search suggestions
-  const suggestions = useMemo(() => {
-    if (!searchQuery.trim()) return [];
-    const q = searchQuery.toLowerCase();
-    return stores
-      .filter((store) => {
-        const matchName = store.name.toLowerCase().includes(q);
-        const matchCat =
-          (store.cat || '').toLowerCase().includes(q) ||
-          categories.info(store.cat).label.toLowerCase().includes(q);
-        const matchShutter = store.shutters?.some((s) => s.toLowerCase().includes(q));
-        return matchName || matchCat || matchShutter;
-      })
-      .slice(0, 8);
-  }, [searchQuery, stores, categories]);
+  const suggestions = useMemo(() => searchEntries(stores, searchQuery, categories), [searchQuery, stores, categories]);
+  const hasPlaces = stores.some((s) => s.kind === 'place');
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -153,18 +140,16 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
   };
 
   // Stores present on current floor
-  const currentFloorStores = useMemo(() => {
-    return stores.filter((store) => {
-      const matchFloor = store.shutters?.some((s) => s.startsWith(`${currentFloor}:`));
-      if (!matchFloor) return false;
-      if (activeCategory && !categories.matches(store.cat, activeCategory)) return false;
-      return true;
-    });
-  }, [stores, currentFloor, activeCategory, categories]);
+  const floorCounts = useMemo(() => {
+    const here = stores.filter((s) => s.shutters?.some((k) => k.startsWith(`${currentFloor}:`)));
+    const places = here.filter((s) => s.kind === 'place').length;
+    return { stores: here.length - places, places };
+  }, [stores, currentFloor]);
 
   const getCategoryBadge = () => {
-    const catKey = selectedStore?.cat || selectedLocation?.cat || 'shop';
-    const catInfo = categories.info(catKey, categories.info('shop'));
+    const catInfo = selectedStore
+      ? { color: entryColor(selectedStore, categories), label: selectedStore.kind === 'place' ? categories.info(PLACE_CAT).label : entryKindLabel(selectedStore, categories) }
+      : categories.info(selectedLocation?.cat || 'shop', categories.info('shop'));
     return (
       <span
         className={styles.drawerCategoryBadge}
@@ -264,19 +249,9 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
           ) : hasSelection ? (
             <>
               <div className={styles.drawerPeekInfo}>
-                {selectedStore?.logo ? (
-                  <img loading="lazy" decoding="async"
-                    src={selectedStore.logo}
-                    alt={selectedStore.name}
-                    className="w-8 h-8 rounded-lg bg-white p-0.5 object-contain flex-shrink-0"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-lg bg-[#801424]/20 border border-[#801424]/40 text-red-400 flex items-center justify-center flex-shrink-0">
-                    <CategoryIcon
-                      category={selectedStore?.cat || selectedLocation?.cat || 'shop'}
-                      size={16}
-                      color="#fca5a5"
-                    />
+                {selectedStore ? <EntryMark entry={selectedStore} size={32} radius={8} /> : (
+                  <div className="w-8 h-8 rounded-lg bg-[#801424]/20 border border-[#801424]/40 flex items-center justify-center flex-shrink-0">
+                    <MapPin size={15} className="text-red-300" />
                   </div>
                 )}
                 <div className="min-w-0">
@@ -323,13 +298,13 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
           ) : (
             <>
               <div className={styles.drawerPeekInfo}>
-                <div className="w-8 h-8 rounded-lg bg-indigo-950/60 border border-indigo-800/40 text-indigo-400 flex items-center justify-center flex-shrink-0">
-                  <Sparkles size={16} />
+                <div className="w-8 h-8 rounded-lg bg-indigo-950/60 border border-indigo-800/40 text-indigo-300 flex items-center justify-center flex-shrink-0">
+                  <Layers size={16} />
                 </div>
                 <div className="min-w-0">
                   <div className={styles.drawerPeekTitle}>{FLOOR_LABELS[currentFloor]}</div>
                   <div className={styles.drawerPeekSubtitle}>
-                    <span>{fill(copy.floorStores, { count: currentFloorStores.length })}</span>
+                    <span>{fill(copy.storesCount, { count: floorCounts.stores })}{floorCounts.places > 0 && ` · ${fill(copy.placesCount, { count: floorCounts.places })}`}</span>
                     <span>&bull;</span>
                     <span className="text-indigo-400">{copy.tapToBrowse}</span>
                   </div>
@@ -383,7 +358,7 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
           {isPopoverOpen && suggestions.length > 0 && (
             <div className={styles.suggestionsPopover}>
               {suggestions.map((store) => {
-                const catInfo = categories.info(store.cat);
+                const color = entryColor(store, categories);
                 const unit = firstUnit(store.shutters);
 
                 return (
@@ -392,26 +367,16 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
                     className={styles.suggestionItem}
                     onClick={() => handleSelectSuggestion(store)}
                   >
-                    {store.logo ? (
-                      <img loading="lazy" decoding="async"
-                        src={store.logo}
-                        alt={store.name}
-                        className={styles.suggestionLogo}
-                      />
-                    ) : (
-                      <div className={styles.suggestionLogoFallback}>
-                        <StoreIcon size={14} />
-                      </div>
-                    )}
+                    <EntryMark entry={store} size={32} radius={8} />
 
                     <div className={styles.suggestionDetails}>
                       <div className={styles.suggestionName}>{store.name}</div>
                       <div className={styles.suggestionMeta}>
                         <span
                           className={styles.suggestionCat}
-                          style={{ color: catInfo.color }}
+                          style={{ color }}
                         >
-                          {catInfo.label}
+                          {entryKindLabel(store, categories)}
                         </span>
                         <span>&bull;</span>
                         <span>{unit ? fill(copy.unitLabel, { unit }) : copy.notPlaced}</span>
@@ -447,6 +412,7 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
                   </optgroup>
                 );
               })}
+              {hasPlaces && <option value={PLACE_CAT}>{copy.placesFilter}</option>}
               <optgroup label={copy.amenitiesGroup}>
                 {AMENITY_KEYS.map((key) => (
                   <option key={key} value={key}>
@@ -655,19 +621,11 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
 
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 min-w-0">
-                  {selectedStore?.logo && (
-                    <div className="w-12 h-12 rounded-xl bg-white p-1 border border-gray-700 flex-shrink-0 shadow-sm overflow-hidden">
-                      <img loading="lazy" decoding="async"
-                        src={selectedStore.logo}
-                        alt={selectedStore.name}
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                  )}
+                  {selectedStore && <EntryMark entry={selectedStore} size={48} radius={12} />}
                   <div className="min-w-0">
                     {getCategoryBadge()}
                     <h2
-                      className="text-lg sm:text-xl font-bold text-white mt-1 leading-snug truncate"
+                      className="text-lg sm:text-xl font-bold text-white mt-1 leading-snug text-balance"
                       style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
                     >
                       {selectedStore?.name || selectedLocation?.name || selectedLocation?.id}
@@ -713,8 +671,11 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
               </div>
 
               {/* Description */}
+              {selectedStore?.kind === 'place' && selectedStore.subtitle && (
+                <p className="text-[13px] text-gray-200 leading-relaxed">{selectedStore.subtitle}</p>
+              )}
               {selectedStore?.desc && (
-                <p className="text-xs text-gray-300 leading-relaxed font-light line-clamp-3">
+                <p className="text-xs text-gray-300 leading-relaxed line-clamp-4">
                   {selectedStore.desc}
                 </p>
               )}
@@ -748,7 +709,15 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
                   </button>
                 )}
 
-                {selectedStore?.slug ? (
+                {selectedStore?.kind === 'place' ? (
+                  selectedStore.partOf && (
+                    <Link to={`/shops/details/${selectedStore.partOf.slug}`} className={styles.btnSecondaryAction}>
+                      <Building size={15} />
+                      <span>{fill(copy.partOf, { name: selectedStore.partOf.name })}</span>
+                      <ExternalLink size={13} />
+                    </Link>
+                  )
+                ) : selectedStore?.slug ? (
                   <Link
                     to={`/shops/details/${selectedStore.slug}`}
                     className={styles.btnSecondaryAction}
@@ -767,144 +736,23 @@ export const StoreDetailsDrawer: React.FC<StoreDetailsDrawerProps> = ({
               </div>
             </motion.div>
           ) : (
-            /* 3. DEFAULT FLOOR DIRECTORY & BROWSE VIEW */
+            /* 3. WHAT'S ON THIS FLOOR */
             <motion.div
               key="default-view"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="space-y-4"
             >
-              {/* Floor Header & Count */}
-              <div className="flex items-center justify-between pb-2 border-b border-gray-800/80">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="text-[#801424]" size={16} />
-                  <span
-                    className="text-sm font-bold text-white tracking-wide"
-                    style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif" }}
-                  >
-                    {fill(copy.directoryTitle, { floor: FLOOR_LABELS[currentFloor] })}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-semibold text-indigo-400 bg-indigo-950/60 px-2.5 py-0.5 rounded-full border border-indigo-900/60">
-                    {fill(copy.storesCount, { count: currentFloorStores.length })}
-                  </span>
-                  <button
-                    className={styles.btnSecondary}
-                    onClick={() => setSheetMode('peek')}
-                    title={copy.minimize}
-                    aria-label="Minimize to map"
-                  >
-                    <ChevronDown size={15} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Quick Directory List for this Floor */}
-              {currentFloorStores.length > 0 ? (
-                <div className={styles.sidebarStoreList}>
-                  {currentFloorStores.map((store) => {
-                    const catInfo = categories.info(store.cat, categories.info('shop'));
-                    const shutter = firstUnit(store.shutters) || store.id;
-
-                    return (
-                      <div
-                        key={store.id}
-                        className={styles.sidebarStoreCard}
-                        onClick={() => onSelectStore(store)}
-                      >
-                        {store.logo ? (
-                          <img loading="lazy" decoding="async"
-                            src={store.logo}
-                            alt={store.name}
-                            className={styles.sidebarStoreLogo}
-                          />
-                        ) : (
-                          <div className={styles.sidebarStoreLogoFallback}>
-                            <CategoryIcon category={store.cat} size={16} color={catInfo.color} />
-                          </div>
-                        )}
-
-                        <div className={styles.sidebarStoreInfo}>
-                          <h4 className={styles.sidebarStoreTitle}>{store.name}</h4>
-                          <div className={styles.sidebarStoreMeta}>
-                            <span
-                              className={styles.sidebarStoreCat}
-                              style={{ color: catInfo.color }}
-                            >
-                              {catInfo.label}
-                            </span>
-                            <span>&bull;</span>
-                            <span>{fill(copy.unitLabel, { unit: shutter })}</span>
-                          </div>
-                        </div>
-
-                        <ChevronRight size={14} className={styles.sidebarStoreChevron} />
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-6 text-xs text-gray-400 bg-gray-900/40 rounded-xl border border-gray-800">
-                  <SlidersHorizontal size={20} className="mx-auto text-gray-500 mb-2" />
-                  <p>{fill(copy.noMatch, { floor: FLOOR_LABELS[currentFloor] })}</p>
-                  <button
-                    className="mt-2 text-[#818cf8] underline text-xs font-semibold"
-                    onClick={() => onCategoryChange(null)}
-                  >
-                    {copy.clearFilter}
-                  </button>
-                </div>
-              )}
-
-              {/* Floor Amenities Breakdown */}
-              <div className={styles.statsRow}>
-                <div className={styles.statCard}>
-                  <div className={styles.statNum}>
-                    {
-                      floorLocations.filter(
-                        (l) =>
-                          ![
-                            'stairs',
-                            'elevator',
-                            'restroom',
-                            'service',
-                            'void',
-                            'atrium',
-                          ].includes(l.cat)
-                      ).length
-                    }
-                  </div>
-                  <div className={styles.statLabel}>{copy.statShops}</div>
-                </div>
-                <div className={styles.statCard}>
-                  <div className={styles.statNum}>
-                    {floorLocations.filter((l) => l.cat === 'restroom').length || 2}
-                  </div>
-                  <div className={styles.statLabel}>{copy.statRestrooms}</div>
-                </div>
-                <div className={styles.statCard}>
-                  <div className={styles.statNum}>
-                    {floorLocations.filter((l) => ['stairs', 'elevator'].includes(l.cat)).length ||
-                      3}
-                  </div>
-                  <div className={styles.statLabel}>{copy.statLifts}</div>
-                </div>
-              </div>
-
-              {/* Bottom Minimize Button on Mobile */}
-              <div className="pt-2">
-                <button
-                  className={styles.btnSecondary}
-                  onClick={() => setSheetMode('peek')}
-                  style={{ width: '100%' }}
-                >
-                  <ChevronDown size={14} />
-                  <span>{copy.minimize}</span>
-                </button>
-              </div>
+              <FloorOverview
+                floorId={currentFloor}
+                entries={stores}
+                floorLocations={floorLocations}
+                activeCategory={activeCategory}
+                onSelect={onSelectStore}
+                onCategoryChange={onCategoryChange}
+                onMinimize={() => setSheetMode('peek')}
+              />
             </motion.div>
           )}
         </AnimatePresence>

@@ -154,6 +154,8 @@ export const siteHoursBlock = defineBlock<SiteHoursContent>({
 
 export interface FooterContent {
   logoUrl: string;
+  /** Footer background. */
+  tone?: 'light' | 'navy' | 'maroon';
   tagline: string;
   exploreTitle: string;
   exploreLinks: NavLink[];
@@ -182,6 +184,11 @@ export const siteFooterBlock = defineBlock<FooterContent>({
   fields: [
     { key: 'logoUrl', label: 'Footer logo', type: 'imageUrl', half: true },
     { key: 'tagline', label: 'Short description under the logo', type: 'textarea', half: true },
+    {
+      key: 'tone', label: 'Footer colour', type: 'select', half: true,
+      help: 'Text and icons switch to light colours on navy or maroon. Use a logo that reads on dark backgrounds.',
+      options: [{ value: 'light', label: 'Light grey (original)' }, { value: 'navy', label: 'PTM navy' }, { value: 'maroon', label: 'PTM maroon' }],
+    },
     { key: 'exploreTitle', label: 'Links column heading', type: 'text' },
     { key: 'exploreLinks', label: 'Links column', type: 'list', itemTitle: 'label', itemName: 'link', fields: LINK_FIELDS, itemDefaults: { label: '', href: '/' } },
     { key: 'connectTitle', label: 'Contact column heading', type: 'text', half: true, help: 'Phone, email and social icons below it are edited in Site settings.' },
@@ -196,6 +203,7 @@ export const siteFooterBlock = defineBlock<FooterContent>({
   ],
   defaults: {
     logoUrl: '/tm_logo_nobg.png',
+    tone: 'light',
     tagline: "Pokhara's premier destination for shopping, dining, services, and entertainment.",
     exploreTitle: 'EXPLORE',
     exploreLinks: [

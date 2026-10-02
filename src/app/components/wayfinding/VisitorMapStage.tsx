@@ -66,7 +66,7 @@ export const VisitorMapStage = forwardRef<MapCanvasHandle, Props>(function Visit
     for (const s of stores) {
       const units = (s.shutters || []).filter((k) => k.startsWith(`${floorId}:`)).map((k) => k.slice(floorId.length + 1));
       if (!units.length) continue;
-      const occ = { name: s.name, cat: s.cat, units };
+      const occ = { name: s.name, cat: s.cat, units, color: s.kind === 'place' ? s.color : undefined };
       for (const u of units) m.set(u.toLowerCase(), { store: s, occ });
     }
     return m;
@@ -86,7 +86,7 @@ export const VisitorMapStage = forwardRef<MapCanvasHandle, Props>(function Visit
 
   const styleOf = useCallback((u: WayfindingLocation, occ: UnitOccupant | null): UnitStyle => {
     const cat = occ?.cat || u.cat;
-    const color = categories.info(cat).color;
+    const color = occ?.color || categories.info(cat).color;
     const [r, g, b] = hexRgb(color);
     const id = u.id.toLowerCase();
     const selected = selectedStoreUnits.has(id);

@@ -6,7 +6,7 @@ import { publicMedia } from './_lib/media';
 interface Row { id: number; collection: string; slug: string; status: string; data: Record<string, unknown> }
 
 // Collections whose records use the DB row id as their numeric id.
-const NUMERIC_IDS = new Set(['stores', 'blogs', 'pages', 'settings', 'blocks']);
+const NUMERIC_IDS = new Set(['stores', 'places', 'blogs', 'pages', 'settings', 'blocks']);
 
 /**
  * Public, read-only bundle of every published record in one response.

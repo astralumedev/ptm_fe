@@ -134,7 +134,7 @@ export const MallMapPage: React.FC = () => {
     return true;
   }, [floors, defaultStart, routeTexts, goToFloor]);
 
-  // Deep links: ?qr=CODE (scanned), ?store=slug, ?search=name, ?floor=, ?category=, ?from=floor:unit
+  // Deep links: ?qr=CODE (scanned), ?store=slug, ?place=slug, ?search=name, ?floor=, ?category=, ?from=floor:unit
   useEffect(() => {
     if (!floors || !stores) return;
     const key = searchParams.toString();
@@ -147,6 +147,7 @@ export const MallMapPage: React.FC = () => {
     const fromParam = searchParams.get('from');
     const storeParam = (searchParams.get('store') || '').trim().toLowerCase();
     const searchParam = (searchParams.get('search') || '').trim().toLowerCase();
+    const placeParam = (searchParams.get('place') || '').trim().toLowerCase();
 
     let here: StartPoint | null = null;
     const qr = qrPoints.find((q) => q.code === (qrParam || lastScanned() || ''));
@@ -164,8 +165,10 @@ export const MallMapPage: React.FC = () => {
     if (floorParam && ALL_FLOORS.includes(floorParam as FloorId)) goToFloor(floorParam as FloorId);
     if (categoryParam) setActiveCategory(canonical(categoryParam));
 
-    const wanted = storeParam || searchParam
-      ? stores.find((s) => (storeParam && ((s.slug || '').toLowerCase() === storeParam || s.id.toLowerCase() === storeParam)) || (searchParam && s.name.trim().toLowerCase() === searchParam))
+    const wanted = storeParam || searchParam || placeParam
+      ? stores.find((s) => (storeParam && s.kind !== 'place' && ((s.slug || '').toLowerCase() === storeParam || s.id.toLowerCase() === storeParam))
+          || (placeParam && s.kind === 'place' && s.slug.toLowerCase() === placeParam)
+          || (searchParam && s.name.trim().toLowerCase() === searchParam))
       : undefined;
     if (wanted) {
       setSelectedStore(wanted);
