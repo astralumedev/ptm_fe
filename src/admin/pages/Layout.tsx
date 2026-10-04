@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Images, Settings2, UserRound, LogOut, Menu, X, ExternalLink, PanelsTopLeft, Inbox, Map as MapIcon } from 'lucide-react';
+import { LayoutDashboard, Images, Settings2, UserRound, LogOut, Menu, X, ExternalLink, PanelsTopLeft, Inbox, Map as MapIcon, Tags } from 'lucide-react';
 import { COLLECTIONS } from '../schema';
 import { Logo } from '../components/ui';
 
@@ -36,7 +36,8 @@ function Nav({ username, onLogout, unread }: { username: string; onLogout: () =>
         </NavLink>
         <NavLink to="/admin/map" className={linkCls}><MapIcon className="size-4" /> Map management</NavLink>
         <p className="mt-4 mb-1 px-2.5 text-[12px] font-medium text-[var(--adm-ink-3)]">Content</p>
-        <NavLink to="/admin/content" className={linkCls}><PanelsTopLeft className="size-4" /> Site content</NavLink>
+        <NavLink to="/admin/content" className={({ isActive }) => linkCls({ isActive: isActive && !location.pathname.startsWith('/admin/content/categories') })}><PanelsTopLeft className="size-4" /> Site content</NavLink>
+        <NavLink to="/admin/content/categories" className={linkCls}><Tags className="size-4" /> Categories</NavLink>
         {COLLECTIONS.map((c) => (
           <NavLink key={c.key} to={`/admin/${c.key}`} className={linkCls}><c.icon className="size-4" /> {c.label}</NavLink>
         ))}

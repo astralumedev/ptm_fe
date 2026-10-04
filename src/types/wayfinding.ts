@@ -37,6 +37,8 @@ export interface WayfindingStore {
   name: string;
   slug: string;
   cat: string;
+  /** Every category code (stores in several categories); `cat` is the main one. */
+  cats?: string[];
   desc?: string;
   hours?: string;
   phone?: string;

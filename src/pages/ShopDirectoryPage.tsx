@@ -25,7 +25,7 @@ import { useCategories, type Sector } from '../content/blocks/categories';
 import {
   directoryPageBlock,
   inCategory,
-  storeSector,
+  storeSectors,
   floorsOf,
   floorKey,
   compareFloors,
@@ -104,7 +104,7 @@ export default function ShopDirectoryPage() {
 
     // 1. Sector filter
     if (selectedSector !== 'all') {
-      result = result.filter((s) => storeSector(s, find) === selectedSector);
+      result = result.filter((s) => storeSectors(s, find).includes(selectedSector as never));
     }
 
     // 2. Category filter

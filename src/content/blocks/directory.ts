@@ -36,8 +36,12 @@ export const isPublished = (s: Store) => s.status !== 'draft';
 
 type Finder = (slug?: string | null) => Category | undefined;
 
-/** The category a store is filed under, resolving old/alias codes. */
-export const storeCategory = (s: Store, find: Finder) => find(s.categorySlug);
+/** Category codes a store is filed under, main one first (older stores have only categorySlug). */
+export const storeCategorySlugs = (s: Pick<Store, 'categorySlug' | 'categorySlugs'>): string[] =>
+  s.categorySlugs?.length ? s.categorySlugs : s.categorySlug ? [s.categorySlug] : [];
+
+/** The main category a store is filed under, resolving old/alias codes. */
+export const storeCategory = (s: Store, find: Finder) => find(storeCategorySlugs(s)[0]);
 
 const TYPE_SECTOR: Record<string, Sector> = { retail: 'retail', eatery: 'dine', service: 'service', wellness: 'service', hotel: 'service' };
 
@@ -46,7 +50,13 @@ export function storeSector(s: Store, find: Finder): Sector {
   return storeCategory(s, find)?.sector || TYPE_SECTOR[s.type] || 'retail';
 }
 
-export const inCategory = (s: Store, cat: Category, find: Finder) => storeCategory(s, find)?.slug === cat.slug;
+/** Every sector the store's categories belong to. */
+export function storeSectors(s: Store, find: Finder): Sector[] {
+  const sectors = storeCategorySlugs(s).map((c) => find(c)?.sector).filter(Boolean) as Sector[];
+  return sectors.length ? [...new Set(sectors)] : [storeSector(s, find)];
+}
+
+export const inCategory = (s: Store, cat: Category, find: Finder) => storeCategorySlugs(s).some((c) => find(c)?.slug === cat.slug);
 
 /** URL-friendly key for a floor name: "1st Floor" -> "1st-floor". */
 export const floorKey = (floor?: string | null) => (floor || '').trim().toLowerCase().replace(/\s+/g, '-');

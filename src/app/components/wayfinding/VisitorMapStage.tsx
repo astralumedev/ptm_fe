@@ -66,7 +66,7 @@ export const VisitorMapStage = forwardRef<MapCanvasHandle, Props>(function Visit
     for (const s of stores) {
       const units = (s.shutters || []).filter((k) => k.startsWith(`${floorId}:`)).map((k) => k.slice(floorId.length + 1));
       if (!units.length) continue;
-      const occ = { name: s.name, cat: s.cat, units, color: s.kind === 'place' ? s.color : undefined };
+      const occ = { name: s.name, cat: s.cat, cats: s.cats, units, color: s.kind === 'place' ? s.color : undefined };
       for (const u of units) m.set(u.toLowerCase(), { store: s, occ });
     }
     return m;
@@ -93,7 +93,7 @@ export const VisitorMapStage = forwardRef<MapCanvasHandle, Props>(function Visit
     const onRoute = routeUnits.has(id);
     const vacant = !occ && u.cat === 'shop';
     let opacity = 1;
-    if (activeCategory) opacity = (occ && categories.matches(occ.cat, activeCategory)) || categories.matches(u.cat, activeCategory) ? 1 : 0.14;
+    if (activeCategory) opacity = (occ && categories.entryMatches(occ, activeCategory)) || categories.matches(u.cat, activeCategory) ? 1 : 0.14;
     else if (leg) opacity = onRoute || selected ? 1 : 0.42;
     else if (selectedUnitId) opacity = selected ? 1 : 0.55;
 

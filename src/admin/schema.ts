@@ -49,7 +49,7 @@ export const COLLECTIONS: CollectionDef[] = [
     publicUrl: (s) => `/stores/${s}`,
     blank: () => ({
       name: '', subtitle: '', type: 'retail', featured: false, logo: emptyAsset(), cover: emptyAsset(),
-      store_description: '', tags: [], store_gallery: [], mapFloor: '', mapUnits: [], website: null, instagram: null, facebook: null, tiktok: null,
+      store_description: '', categorySlugs: [], tags: [], store_gallery: [], mapFloor: '', mapUnits: [], website: null, instagram: null, facebook: null, tiktok: null,
       contact_number: null, operation_hours: '', owner: { id: 1 }, created_on: new Date().toISOString(),
     }),
     sections: [
@@ -59,7 +59,7 @@ export const COLLECTIONS: CollectionDef[] = [
           { key: 'name', label: 'Store name', type: 'text', required: true },
           { key: 'subtitle', label: 'Tagline', type: 'text', placeholder: 'e.g. Iconic denim & casual wear' },
           { key: 'featured', label: 'Featured store', type: 'toggle', help: 'Featured stores are highlighted in the directory and can be picked for the home page.' },
-          { key: 'categorySlug', label: 'Category', type: 'category', help: 'Files the store under a directory filter. Edit the list under Site content → Store categories.' },
+          { key: 'categorySlugs', label: 'Categories', type: 'categories', help: 'Pick everything the store sells or does. The first is its main category: it sets the map colour, the icon and the label on cards. Manage the list under Categories.' },
           { key: 'store_description', label: 'Description', type: 'textarea' },
           { key: 'tags', label: 'Tags', type: 'tags', help: 'Press Enter after each tag. Used by search.' },
         ],

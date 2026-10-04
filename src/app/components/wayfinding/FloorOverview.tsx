@@ -59,7 +59,7 @@ export function FloorOverview({ floorId, entries, floorLocations, activeCategory
     .map((f) => ({ ...f, count: floorLocations.filter((l) => (f.match as readonly string[]).includes(l.cat)).length }))
     .filter((f) => f.count > 0);
 
-  const filtered = activeCategory ? here.filter((e) => categories.matches(e.cat, activeCategory)) : null;
+  const filtered = activeCategory ? here.filter((e) => categories.entryMatches(e, activeCategory)) : null;
   const filterIsFacility = FACILITIES.some((f) => f.cat === activeCategory);
 
   const row = (e: WayfindingStore) => {
