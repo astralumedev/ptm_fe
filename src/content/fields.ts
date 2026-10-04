@@ -13,6 +13,7 @@ export type FieldType =
   | 'gallery'   // store_gallery list
   | 'list'      // repeatable group of `fields`
   | 'category'  // store category slug from the Categories block
+  | 'categories' // several category slugs, the first is the main one
   | 'store'     // store slug picker
   | 'mapUnits'; // units (shutters) on the floor chosen in `floorKey`
 

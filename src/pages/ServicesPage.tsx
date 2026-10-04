@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { storeCategorySlugs } from '@/content/blocks/directory';
 import { StoreVisual } from '@/app/components/StoreVisual';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -59,8 +60,7 @@ function useServiceGroups(stores: Store[]): ServiceGroup[] {
         intro: copy?.intro || cat.description || '',
         stores: stores.filter(
           (s) =>
-            find(s.categorySlug)?.slug === cat.slug ||
-            codes.has(lower(s.categorySlug)) ||
+            storeCategorySlugs(s).some((c) => find(c)?.slug === cat.slug || codes.has(lower(c))) ||
             (s.tags || []).some((t) => codes.has(lower(t)))
         ),
       });

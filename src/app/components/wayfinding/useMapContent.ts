@@ -61,7 +61,13 @@ export function useMapCategories() {
     [canonical],
   );
 
-  return { ...cats, info, canonical, matches };
+  /** True when a store or place is in the active category (any of its categories). */
+  const entryMatches = useCallback(
+    (e: { cat: string; cats?: string[] }, active: string | null) => (e.cats?.length ? e.cats : [e.cat]).some((c) => matches(c, active)),
+    [matches],
+  );
+
+  return { ...cats, info, canonical, matches, entryMatches };
 }
 
 /** Unit id of a store's first shutter ("floor:A101" -> "A101"), if placed. */

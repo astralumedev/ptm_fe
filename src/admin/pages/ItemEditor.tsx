@@ -88,9 +88,12 @@ export default function ItemEditor() {
       let data = setPath(draft.data, def.slugKey, draft.slug);
       if (def.key === 'blogs' && !isNew) data = setPath(data, 'updated_on', new Date().toISOString());
       if (def.key === 'stores') {
-        // The category decides which section of the site lists the store and the label it shows.
-        const cat = findCategory(data.categorySlug);
-        if (cat) data = { ...data, category: cat.name, type: SECTOR_STORE_TYPE[cat.sector] };
+        // The categories decide which sections of the site list the store; the first (main) one sets
+        // its label, colour and icon. categorySlug mirrors the main one for older readers.
+        const slugs = [...new Set<string>((Array.isArray(data.categorySlugs) && data.categorySlugs.length ? data.categorySlugs : [data.categorySlug]).filter(Boolean))];
+        const cats = slugs.map((s) => findCategory(s)).filter(Boolean) as NonNullable<ReturnType<typeof findCategory>>[];
+        data = { ...data, categorySlugs: slugs, categorySlug: slugs[0] || '' };
+        if (cats[0]) data = { ...data, category: cats[0].name, type: SECTOR_STORE_TYPE[cats[0].sector], types: [...new Set(cats.map((c) => SECTOR_STORE_TYPE[c.sector]))] };
       }
       const { item } = await adminApi.save(def.key, { id: row?.id, slug: draft.slug, status: nextStatus, data });
       upsert(item);

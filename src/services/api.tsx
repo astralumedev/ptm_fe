@@ -126,7 +126,8 @@ class ApiService {
     let result = [...(await loadBundle()).stores];
     const f = params?.filter;
     if (f?.slug) result = result.filter((s) => s.slug === f.slug);
-    if (f?.type) result = result.filter((s) => s.type === f.type);
+    // A store in several categories shows on every matching section page (e.g. Shop and Dine).
+    if (f?.type) result = result.filter((s) => s.type === f.type || s.types?.includes(f.type!));
     if (f?.featured !== undefined) result = result.filter((s) => Boolean(s.featured) === Boolean(f.featured));
     result = byStatus(result, f?.status);
     return { data: limit(result, params?.limit), public: true };

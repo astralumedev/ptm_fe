@@ -88,7 +88,12 @@ export interface Store {
   subtitle: string | null;
   floor?: string;
   category?: string;
+  /** Main category (mirrors categorySlugs[0]). */
   categorySlug?: string;
+  /** Every category the store is filed under, main one first. */
+  categorySlugs?: string[];
+  /** Section page types from all its categories, e.g. ['retail', 'eatery']. */
+  types?: string[];
   unitNumber?: string;
   tags?: string[];
   /** Mall map placement: floor id (e.g. 'ground_floor') and the units the store occupies. */

@@ -89,7 +89,7 @@ function FieldInput({ field: f, value, data, onChange, error, idPrefix }: {
     }
     case 'asset':
       return shell(<ImageInput id={id} preset={f.preset || 'content'} value={imageUrlOf(value)} onChange={(url, m) => onChange(url ? toAsset(url, m?.thumb_url) : toAsset(''))}
-        fallback={f.categoryFallback ? <CategoryFallback slug={data?.categorySlug} wide={f.preset !== 'logo'} /> : undefined} />);
+        fallback={f.categoryFallback ? <CategoryFallback slug={data?.categorySlugs?.[0] || data?.categorySlug} wide={f.preset !== 'logo'} /> : undefined} />);
     case 'imageUrl':
       return shell(<ImageInput id={id} preset={f.preset || 'content'} value={value || ''} onChange={(url) => onChange(url)} />);
     case 'gallery': {
@@ -101,6 +101,11 @@ function FieldInput({ field: f, value, data, onChange, error, idPrefix }: {
     }
     case 'category':
       return shell(<CategorySelect id={id} value={value} onChange={onChange} sector={f.sector} />);
+    case 'categories': {
+      // Stores saved before multi-category only have categorySlug.
+      const list: string[] = Array.isArray(value) && value.length ? value : data?.categorySlug ? [data.categorySlug] : [];
+      return shell(<CategoriesInput id={id} value={list} onChange={onChange} />);
+    }
     case 'store':
       return shell(<StoreSelect id={id} value={value} onChange={onChange} />);
     case 'mapUnits':
@@ -223,6 +228,47 @@ function CategorySelect({ id, value, onChange, sector }: { id: string; value?: s
         ) : null;
       })}
     </select>
+  );
+}
+
+/** Several categories; the first is the main one. Add from a grouped menu, remove or promote with the chips. */
+function CategoriesInput({ id, value, onChange }: { id: string; value: string[]; onChange: (v: string[]) => void }) {
+  const { categories, find } = useAdminCategories();
+  const groups = ['retail', 'dine', 'entertain', 'service'];
+  const names: Record<string, string> = { retail: 'Shop', dine: 'Dine', entertain: 'Entertain', service: 'Services' };
+  const rest = categories.filter((c) => !value.includes(c.slug));
+  return (
+    <div id={id} className="flex flex-col gap-2">
+      {value.length > 0 && (
+        <ul className="flex flex-wrap gap-1.5">
+          {value.map((slug, i) => {
+            const c = find(slug);
+            return (
+              <li key={slug} className="inline-flex items-center gap-1.5 h-8 pl-2 pr-1 rounded-md border text-[13px]"
+                style={{ borderColor: `${c?.color || '#9ca3af'}55`, background: `${c?.color || '#9ca3af'}12` }}>
+                <span className="grid place-items-center size-5 rounded" style={{ color: c?.color || '#6b7280' }}><CmsIcon name={c?.icon} className="size-3.5" /></span>
+                <span className="font-medium text-[var(--adm-ink)]">{c?.name || `${slug} (not in the list)`}</span>
+                {i === 0
+                  ? <span className="ml-0.5 px-1.5 rounded text-[11px] font-semibold bg-[var(--adm-ink)] text-white">Main</span>
+                  : <button type="button" className="ml-0.5 px-1.5 h-5 rounded text-[11px] font-medium text-[var(--adm-ink-2)] hover:bg-white cursor-pointer" onClick={() => onChange([slug, ...value.filter((s) => s !== slug)])} title="Make this the main category">Make main</button>}
+                <button type="button" onClick={() => onChange(value.filter((s) => s !== slug))} className="grid place-items-center size-6 rounded hover:bg-white cursor-pointer" aria-label={`Remove ${c?.name || slug}`}><X className="size-3.5" /></button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      <select className="adm-input" value="" onChange={(e) => e.target.value && onChange([...value, e.target.value])} aria-label="Add a category">
+        <option value="">{value.length ? 'Add another category…' : 'Choose a category…'}</option>
+        {groups.map((g) => {
+          const inGroup = rest.filter((c) => c.sector === g);
+          return inGroup.length ? (
+            <optgroup key={g} label={names[g]}>
+              {inGroup.map((c) => <option key={c.slug} value={c.slug}>{c.name}{c.hidden ? ' (hidden)' : ''}</option>)}
+            </optgroup>
+          ) : null;
+        })}
+      </select>
+    </div>
   );
 }
 
