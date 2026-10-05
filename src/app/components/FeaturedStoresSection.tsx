@@ -58,7 +58,7 @@ export default function FeaturedStoresSection() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.08 }}
               viewport={{ once: true }}
-              className={`w-full ${store.wide ? 'md:col-span-2' : 'md:col-span-1'}`}
+              className={`w-full ${store.colSpanClass || (store.wide ? 'md:col-span-2' : 'md:col-span-1')}`}
             >
               <CmsLink
                 href={store.href}

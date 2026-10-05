@@ -3,6 +3,7 @@ import { useBlock, useBundle } from '@/content/block';
 import { CmsLink } from '@/content/CmsLink';
 import { liveOnly } from '@/content/visibility';
 import { homeQfxBlock, type Movie } from '@/content/blocks/home';
+import { fetchQfxMoviesWithCache, getCachedQfxMovies } from '@/services/qfxService';
 import { motion } from 'framer-motion';
 import { FaArrowRight, FaTicketAlt, FaChevronLeft, FaChevronRight, FaFilm } from 'react-icons/fa';
 
@@ -12,82 +13,68 @@ export default function QFXSection() {
   const qfxStore = bundle?.stores?.find((s) => s.slug === 'qfx-cinemas' || s.name.toLowerCase().includes('qfx'));
   const logoUrl = content.logoUrl || qfxStore?.logo?.data?.full_url || '/stores/qfx/qfx.png';
   const blockMovies = useMemo(() => liveOnly(content.movies), [content.movies]);
-  const [liveMovies, setLiveMovies] = useState<Movie[]>([]);
+  
+  // Initialize synchronously from daily cache if available
+  const [liveMovies, setLiveMovies] = useState<Movie[]>(() => {
+    const cached = getCachedQfxMovies();
+    if (cached && cached.length > 0) {
+      const running = cached.filter((m) => !m.isUpcoming);
+      return (running.length > 0 ? running : cached.slice(0, 7)).map((m) => ({
+        title: m.title,
+        genre: m.genre,
+        rating: m.rating,
+        duration: m.duration,
+        language: m.language,
+        format: m.format,
+        posterUrl: m.posterUrl,
+        showtimes: [],
+        href: m.bookingUrl,
+      }));
+    }
+    return [];
+  });
+  const [loading, setLoading] = useState<boolean>(() => liveMovies.length === 0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Fetch live running movies directly from QFX public API
+  // Fetch live running movies directly from QFX public API with 1-day caching
   useEffect(() => {
     let cancelled = false;
-    const fetchQfxMovies = async () => {
+    const loadMovies = async () => {
       try {
-        const res = await fetch('https://web-api.qfxcinemas.com/api/v3/external/available-movie-shows', {
-          headers: { Accept: 'application/json' },
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        const records = data?.Records || [];
-        if (!Array.isArray(records) || records.length === 0) return;
+        if (liveMovies.length === 0) setLoading(true);
+        const parsed = await fetchQfxMoviesWithCache();
+        if (cancelled) return;
 
-        // Filter to only currently running movies (with active theatrical shows)
-        const runningRecords = records.filter((m: any) => {
-          const sc = typeof m.showCount === 'number' ? m.showCount : 0;
-          return sc >= 7 && m.is_upcoming !== 'Y';
-        });
+        const running = parsed.filter((m) => !m.isUpcoming);
+        const targetList = running.length > 0 ? running : parsed.slice(0, 7);
 
-        const targetList = runningRecords.length > 0 ? runningRecords : records.slice(0, 7);
+        const mapped: Movie[] = targetList.map((m) => ({
+          title: m.title,
+          genre: m.genre,
+          rating: m.rating,
+          duration: m.duration,
+          language: m.language,
+          format: m.format,
+          posterUrl: m.posterUrl,
+          showtimes: [],
+          href: m.bookingUrl,
+        }));
 
-        const parsed: Movie[] = targetList.map((m: any) => {
-          const title = m.original_movie_title || m.title || 'Movie';
-          const rating = m.rating || 'PG';
-          const mins = m.runtime || 120;
-          const hours = Math.floor(mins / 60);
-          const remMins = mins % 60;
-          const duration = hours > 0 ? `${hours}h ${remMins.toString().padStart(2, '0')}m` : `${mins}m`;
-          const genres = (m.genres || []).map((g: any) => g.g_name).filter(Boolean);
-          const genre = genres.length > 0 ? genres.join(' / ') : 'Drama';
-          const langs = (m.movie_languages || []).map((l: any) => l.lang_name).filter(Boolean);
-          const language = langs.length > 0 ? langs.join(' / ') : 'Nepali';
-
-          const mc = m.movie_content || [];
-          const artwork = mc[0]?.artwork || '';
-
-          const screens = m.screens || [];
-          const tmScreens = screens.filter((sc: any) => (sc.cinema_name || '').includes('Trade Mall'));
-          const targetScreens = tmScreens.length > 0 ? tmScreens : screens;
-          const showtimeSet = new Set<string>();
-          targetScreens.forEach((sc: any) => {
-            (sc.showTimes || []).forEach((st: any) => {
-              if (st.show_time) showtimeSet.add(st.show_time);
-            });
-          });
-          const showtimes = Array.from(showtimeSet).sort();
-
-          return {
-            title,
-            genre,
-            rating,
-            duration,
-            language,
-            format: '2D / 3D ATMOS',
-            posterUrl: artwork,
-            showtimes: showtimes.length > 0 ? showtimes : ['11:30 AM', '02:30 PM', '05:45 PM', '08:30 PM'],
-            href: `https://www.qfxcinemas.com/movie/${m.movie_id}`,
-          };
-        }).filter((m) => m.posterUrl);
-
-        if (!cancelled && parsed.length > 0) {
-          setLiveMovies(parsed);
+        if (!cancelled && mapped.length > 0) {
+          setLiveMovies(mapped);
         }
       } catch {
-        // Fallback to blockMovies
+        // network or parse error
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     };
 
-    fetchQfxMovies();
+    loadMovies();
     return () => { cancelled = true; };
   }, []);
 
-  const movies = liveMovies.length > 0 ? liveMovies : blockMovies;
+  const movies = liveMovies.length > 0 ? liveMovies : (loading ? [] : blockMovies);
 
   const handleScroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -96,7 +83,7 @@ export default function QFXSection() {
     }
   };
 
-  if (content.show === false || movies.length === 0) return null;
+  if (content.show === false) return null;
 
   return (
     <section className="w-full py-12 md:py-20 bg-gray-900 text-white relative overflow-hidden border-t border-gray-800">
@@ -171,94 +158,106 @@ export default function QFXSection() {
         </div>
 
         {/* Large Height Horizontally Scrollable Movie Posters Container */}
-        <div
-          ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto pb-6 pt-2 select-none"
-          style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-          }}
-        >
-          {movies.map((movie, index) => (
-            <motion.div
-              key={`${movie.title}-${index}`}
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.08 }}
-              viewport={{ once: true }}
-              className="flex-shrink-0 w-64 sm:w-72 md:w-80 lg:w-[320px]"
-            >
-              <CmsLink
-                href={movie.href || content.bookUrl}
-                className="group relative block w-full overflow-hidden rounded-2xl shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer !no-underline border border-gray-700/60 hover:border-rose-500/40"
-                style={{ textDecoration: 'none' }}
+        {loading && movies.length === 0 ? (
+          <div className="flex gap-6 overflow-x-auto pb-6 pt-2 select-none" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="flex-shrink-0 w-64 sm:w-72 md:w-80 lg:w-[320px] h-[420px] sm:h-[460px] md:h-[500px] rounded-2xl bg-gray-950 border border-gray-800 animate-pulse flex flex-col justify-between p-6 relative overflow-hidden shadow-lg"
               >
-                {/* Large Height Poster Aspect Box */}
-                <div className="relative w-full h-[420px] sm:h-[460px] md:h-[500px] overflow-hidden bg-gray-950">
-                  {/* Poster Image */}
-                  <img loading="lazy" decoding="async"
-                    src={movie.posterUrl}
-                    alt={movie.title}
-                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100"
-                  />
-
-                  {/* Gradient Overlay for Cinematic Text Readability */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/10 transition-opacity duration-500 group-hover:from-black group-hover:via-black/50" />
-
-                  {/* Format Badge (Glassmorphism dark badge with gold text & film icon) */}
-                  <div className="absolute top-4 left-4 z-10">
-                    <span className="inline-flex items-center text-[10px] font-bold text-amber-300 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-amber-400/30 uppercase tracking-widest shadow-xs">
-                      <FaFilm className="w-2.5 h-2.5 mr-1.5 text-amber-400" />
-                      {movie.format}
-                    </span>
-                  </div>
-
-                  {/* Age Rating Badge (Top Right) */}
-                  <div className="absolute top-4 right-4 z-10">
-                    <span className="inline-flex items-center text-[10px] font-semibold text-white/90 bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/20">
-                      {movie.rating} • {movie.duration}
-                    </span>
-                  </div>
-
-                  {/* Movie Info Overlay (Bottom Z-axis) */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end z-10 text-left">
-                    <span
-                      className="text-xs uppercase tracking-widest text-rose-300 font-bold mb-1.5 drop-shadow-xs !no-underline"
-                      style={{ fontFamily: "'Montserrat', sans-serif", textDecoration: 'none' }}
-                    >
-                      {movie.genre}
-                    </span>
-
-                    <h3
-                      className="text-xl md:text-2xl font-bold text-white uppercase tracking-wider leading-snug group-hover:text-rose-200 transition-colors drop-shadow-md !no-underline hover:!no-underline"
-                      style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif", textDecoration: 'none' }}
-                    >
-                      {movie.title}
-                    </h3>
-
-                    {/* Showtimes Pills */}
-                    <div className="mt-3.5 flex flex-wrap gap-1.5">
-                      {(movie.showtimes || []).map((st, i) => (
-                        <span key={i} className="text-[11px] bg-white/15 backdrop-blur-md text-white border border-white/20 px-2.5 py-1 rounded-md font-medium">
-                          {st}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Reserve Seats Action Footer */}
-                    <div className="mt-4 pt-3 border-t border-white/20 flex items-center justify-between text-xs font-bold text-amber-300 group-hover:text-amber-200 transition-colors">
-                      <span className="flex items-center gap-1.5">
-                        <FaTicketAlt className="w-3.5 h-3.5" />
-                        <span>{content.reserveLabel}</span>
-                      </span>
-                      <FaArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </div>
+                <div className="flex justify-between items-center z-10">
+                  <div className="w-24 h-6 bg-gray-800/80 rounded-full" />
+                  <div className="w-20 h-6 bg-gray-800/80 rounded-full" />
                 </div>
-              </CmsLink>
-            </motion.div>
-          ))}
-        </div>
+                <div className="space-y-3 z-10">
+                  <div className="w-28 h-3.5 bg-rose-900/30 rounded-full" />
+                  <div className="w-48 h-6 bg-gray-800/80 rounded-md" />
+                  <div className="w-full h-10 bg-gray-800/50 rounded-xl mt-4" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div
+            ref={scrollContainerRef}
+            className="flex gap-6 overflow-x-auto pb-6 pt-2 select-none"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            }}
+          >
+            {movies.map((movie, index) => (
+              <motion.div
+                key={`${movie.title}-${index}`}
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.08 }}
+                viewport={{ once: true }}
+                className="flex-shrink-0 w-64 sm:w-72 md:w-80 lg:w-[320px]"
+              >
+                <CmsLink
+                  href={movie.href || content.bookUrl}
+                  className="group relative block w-full overflow-hidden rounded-2xl shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer !no-underline border border-gray-700/60 hover:border-rose-500/40"
+                  style={{ textDecoration: 'none' }}
+                >
+                  {/* Large Height Poster Aspect Box */}
+                  <div className="relative w-full h-[420px] sm:h-[460px] md:h-[500px] overflow-hidden bg-gray-950">
+                    {/* Poster Image */}
+                    <img loading="lazy" decoding="async"
+                      src={movie.posterUrl}
+                      alt={movie.title}
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100"
+                    />
+
+                    {/* Gradient Overlay for Cinematic Text Readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/10 transition-opacity duration-500 group-hover:from-black group-hover:via-black/50" />
+
+                    {/* Format Badge (Glassmorphism dark badge with gold text & film icon) */}
+                    <div className="absolute top-4 left-4 z-10">
+                      <span className="inline-flex items-center text-[10px] font-bold text-amber-300 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-amber-400/30 uppercase tracking-widest shadow-xs">
+                        <FaFilm className="w-2.5 h-2.5 mr-1.5 text-amber-400" />
+                        {movie.format}
+                      </span>
+                    </div>
+
+                    {/* Age Rating & Duration Badge (Top Right) */}
+                    <div className="absolute top-4 right-4 z-10">
+                      <span className="inline-flex items-center text-[10px] font-semibold text-white/90 bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/20">
+                        {movie.rating} • {movie.duration}
+                      </span>
+                    </div>
+
+                    {/* Movie Info Overlay (Bottom Z-axis) */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end z-10 text-left">
+                      <span
+                        className="text-xs uppercase tracking-widest text-rose-300 font-bold mb-1.5 drop-shadow-xs !no-underline"
+                        style={{ fontFamily: "'Montserrat', sans-serif", textDecoration: 'none' }}
+                      >
+                        {movie.genre}
+                      </span>
+
+                      <h3
+                        className="text-xl md:text-2xl font-bold text-white uppercase tracking-wider leading-snug group-hover:text-rose-200 transition-colors drop-shadow-md !no-underline hover:!no-underline"
+                        style={{ fontFamily: "'Arizona Flare', 'Times New Roman', serif", textDecoration: 'none' }}
+                      >
+                        {movie.title}
+                      </h3>
+
+                      {/* Reserve Seats Action Footer */}
+                      <div className="mt-4 pt-3 border-t border-white/20 flex items-center justify-between text-xs font-bold text-amber-300 group-hover:text-amber-200 transition-colors">
+                        <span className="flex items-center gap-1.5">
+                          <FaTicketAlt className="w-3.5 h-3.5" />
+                          <span>{content.reserveLabel}</span>
+                        </span>
+                        <FaArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                </CmsLink>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
       </div>
     </section>

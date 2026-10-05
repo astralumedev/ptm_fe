@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import {
   FaFilm,
   FaTicketAlt,
-  FaClock,
   FaCalendarAlt,
   FaMapMarkerAlt,
   FaPhoneAlt,
@@ -21,361 +20,43 @@ import { useBlock } from '../content/block';
 import { CmsLink } from '../content/CmsLink';
 import { CmsIcon } from '../content/icons';
 import { qfxPageBlock } from '../content/blocks/pages';
+import { fetchQfxMoviesWithCache, getCachedQfxMovies, type ParsedQfxMovie } from '../services/qfxService';
 
 const serif = { fontFamily: "'Arizona Flare', 'Times New Roman', serif" };
 
-export interface QfxMovieItem {
-  id: string;
-  title: string;
-  genre: string;
-  language: string;
-  rating: string;
-  duration: string;
-  format: string;
-  posterUrl: string;
-  synopsis: string;
-  releaseDate?: string;
-  director?: string;
-  cast?: string;
-  showtimes: string[];
-  bookingUrl: string;
-  isUpcoming: boolean;
-  showCount: number;
-}
-
-// Comprehensive initial fallback data matching current live QFX schedule
-const FALLBACK_MOVIES: QfxMovieItem[] = [
-  {
-    id: '719',
-    title: 'Digger',
-    genre: 'Comedy / Drama',
-    language: 'English',
-    rating: 'PG',
-    duration: '2h 08m',
-    format: '2D / 3D ATMOS',
-    posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1786878229551-diggerposter.jpg',
-    synopsis: "The most powerful man in the world embarks on a frantic mission to prove he is humanity's savior before his empire crumbles around him.",
-    releaseDate: 'Oct 04, 2026',
-    showtimes: ['11:30 AM', '02:30 PM', '05:45 PM', '08:30 PM'],
-    bookingUrl: 'https://www.qfxcinemas.com/movie/719',
-    isUpcoming: false,
-    showCount: 14,
-  },
-  {
-    id: '649',
-    title: 'Drishyam: The Conclusion',
-    genre: 'Crime / Thriller',
-    language: 'Hindi',
-    rating: 'PG',
-    duration: '2h 30m',
-    format: '2D / 3D ATMOS',
-    posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1777551819476-drishyam3poster.jpg',
-    synopsis: 'Follows the Salgaonkar family as they face unprecedented legal scrutiny and must weave an intricate web of alibis to protect their loved ones.',
-    releaseDate: 'Oct 02, 2026',
-    showtimes: ['11:00 AM', '02:00 PM', '05:15 PM', '08:15 PM'],
-    bookingUrl: 'https://www.qfxcinemas.com/movie/649',
-    isUpcoming: false,
-    showCount: 162,
-  },
-  {
-    id: '722',
-    title: 'Resident Evil',
-    genre: 'Horror / Action',
-    language: 'English',
-    rating: 'Adult',
-    duration: '1h 34m',
-    format: '2D / 3D ATMOS',
-    posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1790594787454-res_500x715_pixels.jpg',
-    synopsis: 'Follows a courier tasked with delivering a classified payload to an isolated research facility, unaware of the viral contagion unleashed inside.',
-    releaseDate: 'Oct 02, 2026',
-    showtimes: ['12:00 PM', '03:15 PM', '06:30 PM', '09:15 PM'],
-    bookingUrl: 'https://www.qfxcinemas.com/movie/722',
-    isUpcoming: false,
-    showCount: 20,
-  },
-  {
-    id: '738',
-    title: 'Baa: Ek Yoddha',
-    genre: 'Drama',
-    language: 'Nepali',
-    rating: 'PG',
-    duration: '2h 25m',
-    format: '2D / 3D ATMOS',
-    posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1789732362535-baaekyodhaposter.jpg',
-    synopsis: 'An emotional Nepali family saga detailing the resilience of a patriarch who battles immense personal sacrifice to guide his children.',
-    releaseDate: 'Sep 25, 2026',
-    showtimes: ['11:15 AM', '02:45 PM', '06:00 PM', '08:45 PM'],
-    bookingUrl: 'https://www.qfxcinemas.com/movie/738',
-    isUpcoming: false,
-    showCount: 60,
-  },
-  {
-    id: '729',
-    title: 'Avengers: Endgame Encore',
-    genre: 'Action / Adventure / Sci-Fi',
-    language: 'English',
-    rating: 'PG',
-    duration: '3h 05m',
-    format: '2D / 3D ATMOS',
-    posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1787740045610-poster.jpg',
-    synopsis: 'The special theatrical encore re-release featuring exclusive bonus content, honoring Earth’s mightiest heroes as they take their stand.',
-    releaseDate: 'Sep 25, 2026',
-    showtimes: ['10:45 AM', '02:15 PM', '05:30 PM', '08:45 PM'],
-    bookingUrl: 'https://www.qfxcinemas.com/movie/729',
-    isUpcoming: false,
-    showCount: 11,
-  },
-  {
-    id: '716',
-    title: 'Pension Patta',
-    genre: 'Drama',
-    language: 'Nepali',
-    rating: 'U',
-    duration: '2h 08m',
-    format: '2D / 3D ATMOS',
-    posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1786261358893-pensionpatta.jpg',
-    synopsis: 'A heartfelt social drama set on the banks of the Khudi River, tracing the journey of a mother and son fighting for dignity and livelihood.',
-    releaseDate: 'Sep 11, 2026',
-    showtimes: ['11:30 AM', '02:30 PM', '05:45 PM'],
-    bookingUrl: 'https://www.qfxcinemas.com/movie/716',
-    isUpcoming: false,
-    showCount: 44,
-  },
-  {
-    id: '734',
-    title: 'Hanuman Ansh',
-    genre: 'Biography / Mythological',
-    language: 'Hindi',
-    rating: 'U',
-    duration: '2h 30m',
-    format: '2D / 3D ATMOS',
-    posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1788776481026-hanumananshposter.jpg',
-    synopsis: 'A young boy in grief seeks divine grace and discovers extraordinary strength through devotion, compassion, and community service.',
-    releaseDate: 'Sep 11, 2026',
-    showtimes: ['11:45 AM', '03:00 PM', '06:15 PM'],
-    bookingUrl: 'https://www.qfxcinemas.com/movie/734',
-    isUpcoming: false,
-    showCount: 7,
-  },
-  // Upcoming / Next Change
-  {
-    id: '740',
-    title: 'Changul',
-    genre: 'Drama / Social Drama',
-    language: 'Nepali',
-    rating: 'U',
-    duration: '2h 07m',
-    format: '2D / 3D ATMOS',
-    posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1789992913658-changulposter.jpg',
-    synopsis: '“चंगुल” is a gripping socially and politically driven Nepali film exploring courage, justice, and the fight against corrupt institutions.',
-    releaseDate: 'Oct 2026',
-    showtimes: ['Preview Shows Scheduled'],
-    bookingUrl: 'https://www.qfxcinemas.com/movie/740',
-    isUpcoming: true,
-    showCount: 2,
-  },
-  {
-    id: '741',
-    title: 'Chameliko Poi',
-    genre: 'Comedy / Drama',
-    language: 'Nepali',
-    rating: 'U',
-    duration: '2h 34m',
-    format: '2D / 3D ATMOS',
-    posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1789993234188-chamelikopoi.jpg',
-    synopsis: 'A vibrant Nepali social comedy-drama celebrating village camaraderie, marriage matchmaking humor, and heartfelt kinship.',
-    releaseDate: 'Oct 2026',
-    showtimes: ['Advance Booking Soon'],
-    bookingUrl: 'https://www.qfxcinemas.com/movie/741',
-    isUpcoming: true,
-    showCount: 2,
-  },
-  {
-    id: '728',
-    title: 'Acharya',
-    genre: 'Action / Drama',
-    language: 'Nepali',
-    rating: 'Adult',
-    duration: '2h 53m',
-    format: '2D / 3D ATMOS',
-    posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1787659383062-500x715_3.jpg',
-    synopsis: 'A high-octane action drama directed by and starring Nikhil Upreti, detailing an undercover officer dismantling an underground criminal syndicate.',
-    releaseDate: 'Oct 2026',
-    showtimes: ['Advance Booking Soon'],
-    bookingUrl: 'https://www.qfxcinemas.com/movie/728',
-    isUpcoming: true,
-    showCount: 3,
-  },
-  {
-    id: '737',
-    title: 'The Paradise',
-    genre: 'Action / Drama',
-    language: 'Hindi Dubbed',
-    rating: 'Adult',
-    duration: '2h 54m',
-    format: '2D / 3D ATMOS',
-    posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1789729706951-paradise.jpg',
-    synopsis: 'In 1980s Secunderabad, a marginalized community battles systemic injustice and fights for dignity under inspiring leadership.',
-    releaseDate: 'Coming Soon',
-    showtimes: ['Advance Booking Soon'],
-    bookingUrl: 'https://www.qfxcinemas.com/movie/737',
-    isUpcoming: true,
-    showCount: 2,
-  },
-  {
-    id: '715',
-    title: 'Jhingedaau 2',
-    genre: 'Social Drama / Family / Comedy',
-    language: 'Nepali',
-    rating: 'PG',
-    duration: '2h 29m',
-    format: '2D / 3D ATMOS',
-    posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1790251342745-image_15.jfif',
-    synopsis: 'Picking up where the hit original left off, following the two brothers on their hilarious quest to secure prosperity for their household.',
-    releaseDate: 'Coming Soon',
-    showtimes: ['Advance Booking Soon'],
-    bookingUrl: 'https://www.qfxcinemas.com/movie/715',
-    isUpcoming: true,
-    showCount: 2,
-  },
-  {
-    id: '710',
-    title: 'Elephants in the Fog',
-    genre: 'Drama',
-    language: 'Nepali',
-    rating: 'PG',
-    duration: '1h 48m',
-    format: '2D / 3D ATMOS',
-    posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1787298976750-500x715_2.jpg',
-    synopsis: 'Follows Pirati, the matriarch of a community in a Nepalese village, navigating profound human bonds, identity, and aspirations.',
-    releaseDate: 'Coming Soon',
-    showtimes: ['Advance Booking Soon'],
-    bookingUrl: 'https://www.qfxcinemas.com/movie/710',
-    isUpcoming: true,
-    showCount: 3,
-  },
-  {
-    id: '714',
-    title: 'Parvati',
-    genre: 'Drama / Family',
-    language: 'Nepali',
-    rating: 'U',
-    duration: '2h 52m',
-    format: '2D / 3D ATMOS',
-    posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1785498424888-500x715web.jpg',
-    synopsis: 'A heartfelt family drama tracing the inspiring life journey of a young girl from childhood struggles to academic and personal triumphs.',
-    releaseDate: 'Coming Soon',
-    showtimes: ['Advance Booking Soon'],
-    bookingUrl: 'https://www.qfxcinemas.com/movie/714',
-    isUpcoming: true,
-    showCount: 4,
-  },
-  {
-    id: '697',
-    title: 'Gauthali',
-    genre: 'Social Drama / Family',
-    language: 'Nepali',
-    rating: 'PG',
-    duration: '2h 20m',
-    format: '2D / 3D ATMOS',
-    posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1781611931049-gauthaliposter.jpg',
-    synopsis: 'A moving tale of a woman who reclaims her autonomy and education, becoming a beacon of hope for young girls in rural Nepal.',
-    releaseDate: 'Coming Soon',
-    showtimes: ['Advance Booking Soon'],
-    bookingUrl: 'https://www.qfxcinemas.com/movie/697',
-    isUpcoming: true,
-    showCount: 4,
-  },
-];
+export type QfxMovieItem = ParsedQfxMovie;
 
 export default function QfxPage() {
   const content = useBlock(qfxPageBlock);
-  const [movies, setMovies] = useState<QfxMovieItem[]>(FALLBACK_MOVIES);
+  
+  // Synchronously initialize from 1-day cache if available
+  const [movies, setMovies] = useState<QfxMovieItem[]>(() => {
+    const cached = getCachedQfxMovies();
+    return cached && cached.length > 0 ? cached : [];
+  });
+  const [loading, setLoading] = useState<boolean>(() => movies.length === 0);
   const [activeTab, setActiveTab] = useState<'all' | 'running' | 'upcoming'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
-  const [loading, setLoading] = useState(false);
 
-  // Fetch live running & upcoming movie data directly from QFX public API
+  // Fetch live running & upcoming movie data directly from QFX public API with 1-day cache
   useEffect(() => {
     let cancelled = false;
-    const fetchQfxMovies = async () => {
+    const loadMovies = async () => {
       try {
-        setLoading(true);
-        const res = await fetch('https://web-api.qfxcinemas.com/api/v3/external/available-movie-shows', {
-          headers: { Accept: 'application/json' },
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        const records = data?.Records || [];
-        if (!Array.isArray(records) || records.length === 0) return;
-
-        const parsed: QfxMovieItem[] = records.map((m: any) => {
-          const id = String(m.movie_id || '');
-          const title = m.original_movie_title || m.title || 'Movie';
-          const rating = m.rating || 'PG';
-          const mins = m.runtime || m.mrrdr_runtime || 120;
-          const hours = Math.floor(mins / 60);
-          const remMins = mins % 60;
-          const duration = hours > 0 ? `${hours}h ${remMins.toString().padStart(2, '0')}m` : `${mins}m`;
-
-          const genres = (m.genres || []).map((g: any) => g.g_name).filter(Boolean);
-          const genre = genres.length > 0 ? genres.join(' / ') : 'Drama';
-
-          const langs = (m.movie_languages || []).map((l: any) => l.lang_name).filter(Boolean);
-          const language = langs.length > 0 ? langs.join(' / ') : 'Nepali';
-
-          const mc = m.movie_content || [];
-          const artwork = mc[0]?.artwork || '';
-          const synopsis = mc[0]?.mc_plot || '';
-          const director = mc[0]?.director || '';
-          const cast = mc[0]?.cast || '';
-
-          const showCount = typeof m.showCount === 'number' ? m.showCount : 0;
-          const isUpcoming = showCount < 7 || m.is_upcoming === 'Y';
-
-          const screens = m.screens || [];
-          const tmScreens = screens.filter((sc: any) => (sc.cinema_name || '').includes('Trade Mall'));
-          const targetScreens = tmScreens.length > 0 ? tmScreens : screens;
-          const showtimeSet = new Set<string>();
-          targetScreens.forEach((sc: any) => {
-            (sc.showTimes || []).forEach((st: any) => {
-              if (st.show_time) showtimeSet.add(st.show_time);
-            });
-          });
-          const showtimes = Array.from(showtimeSet).sort();
-
-          return {
-            id,
-            title,
-            genre,
-            language,
-            rating,
-            duration,
-            format: '2D / 3D ATMOS',
-            posterUrl: artwork,
-            synopsis,
-            director,
-            cast,
-            releaseDate: m.original_release_date ? new Date(m.original_release_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : undefined,
-            showtimes: showtimes.length > 0 ? showtimes : (isUpcoming ? ['Advance Booking Soon'] : ['11:30 AM', '02:30 PM', '05:45 PM', '08:30 PM']),
-            bookingUrl: `https://www.qfxcinemas.com/movie/${id}`,
-            isUpcoming,
-            showCount,
-          };
-        }).filter((m) => m.posterUrl);
-
+        if (movies.length === 0) setLoading(true);
+        const parsed = await fetchQfxMoviesWithCache();
         if (!cancelled && parsed.length > 0) {
           setMovies(parsed);
         }
-      } catch (err) {
-        // Fallback to FALLBACK_MOVIES is retained
+      } catch {
+        // network or parse error
       } finally {
         if (!cancelled) setLoading(false);
       }
     };
 
-    fetchQfxMovies();
+    loadMovies();
     return () => { cancelled = true; };
   }, []);
 
@@ -464,7 +145,7 @@ export default function QfxPage() {
             </div>
             <div className="flex items-center gap-2 bg-gray-900/80 border border-gray-800 px-3.5 py-2 rounded-xl backdrop-blur-md">
               <FaMapMarkerAlt className="text-amber-400 w-4 h-4" />
-              <span>5th Floor, Pokhara Trade Mall</span>
+              <span>Pokhara Trade Mall, Chipledhunga</span>
             </div>
           </div>
         </div>
@@ -588,10 +269,10 @@ export default function QfxPage() {
             </h2>
             <p className="text-xs sm:text-sm text-gray-400 mt-1">
               {activeTab === 'running'
-                ? content.nowShowingSub || 'Live scheduled showtimes running daily on Level 5 Cineplex.'
+                ? content.nowShowingSub || 'Currently running at Pokhara Trade Mall. Select any movie to book directly on QFX.'
                 : activeTab === 'upcoming'
-                ? content.upcomingSub || 'Arriving soon to QFX Cinemas Pokhara Trade Mall.'
-                : 'Browse all active screenings, scheduled showtimes, and upcoming blockbusters.'}
+                ? content.upcomingSub || 'Arriving soon to QFX Cinemas Pokhara Trade Mall. Advance booking on QFX.'
+                : 'Browse all active theatrical releases and upcoming blockbusters.'}
             </p>
           </div>
 
@@ -601,8 +282,42 @@ export default function QfxPage() {
           </div>
         </div>
 
-        {/* VERTICAL MOVIE LISTINGS */}
-        {displayedMovies.length === 0 ? (
+        {/* VERTICAL MOVIE LISTINGS (Loading Skeleton vs List) */}
+        {loading && movies.length === 0 ? (
+          <div className="space-y-8">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="bg-gray-900/60 border border-gray-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl animate-pulse grid grid-cols-1 md:grid-cols-12 min-h-[380px]"
+              >
+                <div className="md:col-span-4 lg:col-span-3 bg-gray-950 p-6 flex flex-col justify-between min-h-[320px]">
+                  <div className="flex justify-between">
+                    <div className="w-24 h-6 bg-gray-800 rounded-full" />
+                    <div className="w-20 h-6 bg-gray-800 rounded-full" />
+                  </div>
+                  <div className="w-28 h-6 bg-gray-800 rounded-full" />
+                </div>
+                <div className="md:col-span-8 lg:col-span-9 p-6 sm:p-8 flex flex-col justify-between space-y-6">
+                  <div className="space-y-4">
+                    <div className="flex gap-2">
+                      <div className="w-20 h-5 bg-rose-900/30 rounded-full" />
+                      <div className="w-24 h-5 bg-gray-800 rounded-full" />
+                    </div>
+                    <div className="w-3/4 h-8 bg-gray-800 rounded-lg" />
+                    <div className="w-full h-16 bg-gray-800/60 rounded-lg" />
+                  </div>
+                  <div className="pt-4 border-t border-gray-800/80 flex items-center justify-between">
+                    <div className="flex gap-3">
+                      <div className="w-36 h-11 bg-rose-900/40 rounded-xl" />
+                      <div className="w-28 h-11 bg-gray-800 rounded-xl" />
+                    </div>
+                    <div className="w-32 h-5 bg-gray-800 rounded" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : displayedMovies.length === 0 ? (
           <div className="bg-gray-900/60 border border-gray-800 rounded-3xl p-12 text-center space-y-4">
             <FaFilm className="w-12 h-12 text-gray-600 mx-auto" />
             <h3 className="text-xl font-bold text-white">No movies found</h3>
@@ -711,42 +426,6 @@ export default function QfxPage() {
                         {movie.cast && <div><span className="text-gray-500 font-medium">Cast:</span> {movie.cast}</div>}
                       </div>
                     )}
-
-                    {/* Location & Screen Tag */}
-                    <div className="flex items-center gap-2 text-xs text-gray-400 bg-gray-950/60 p-3 rounded-xl border border-gray-800">
-                      <FaMapMarkerAlt className="text-[#801424] w-3.5 h-3.5 flex-shrink-0" />
-                      <span>Screening at <strong>Pokhara Trade Mall</strong>, Chipledhunga • Level 5 Cineplex (Audi 1 & Audi 2)</span>
-                    </div>
-
-                    {/* Showtimes Pill List */}
-                    <div className="space-y-2 pt-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
-                          <FaClock className="w-3 h-3 text-rose-400" />
-                          {!movie.isUpcoming ? "Today's Scheduled Showtimes:" : 'Booking Status:'}
-                        </span>
-                        {!movie.isUpcoming && (
-                          <span className="text-[11px] text-emerald-400 font-medium">
-                            {movie.showCount > 0 ? `${movie.showCount} active shows scheduled` : 'Daily shows'}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap gap-2">
-                        {movie.showtimes.map((st, i) => (
-                          <a
-                            key={i}
-                            href={movie.bookingUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-xs bg-gray-950/90 hover:bg-[#801424] hover:border-[#801424] text-white border border-gray-700 px-3.5 py-1.5 rounded-lg font-medium transition-colors shadow-xs group/time"
-                          >
-                            <span>{st}</span>
-                            <FaExternalLinkAlt className="w-2.5 h-2.5 opacity-60 group-hover/time:opacity-100 transition-opacity" />
-                          </a>
-                        ))}
-                      </div>
-                    </div>
                   </div>
 
                   {/* Bottom Action CTAs */}
@@ -770,7 +449,7 @@ export default function QfxPage() {
                         className="inline-flex items-center gap-2 px-4 py-3 bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs sm:text-sm font-semibold rounded-xl border border-gray-700 transition-colors"
                       >
                         <FaMapMarkerAlt className="w-3 h-3 text-rose-400" />
-                        <span>5th Floor Map</span>
+                        <span>Mall Map</span>
                       </CmsLink>
                     </div>
 

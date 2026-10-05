@@ -204,26 +204,35 @@ export const homeDiningBlock = defineBlock<StoreShowcaseContent>({
       { store: 'meriz-coffee' },
       { store: 'the-cube-cafe' },
       { store: 'june-coffee-smoothies' },
-      { store: 'boba-station', wide: true },
+      { store: 'boba-station' },
     ],
   },
 });
 
-export interface ResolvedStoreCard { key: string; name: string; category: string; floor: string; imageUrl: string; href: string; wide: boolean; tall: boolean;
+export interface ResolvedStoreCard {
+  key: string;
+  name: string;
+  category: string;
+  floor: string;
+  imageUrl: string;
+  href: string;
+  wide: boolean;
+  colSpanClass: string;
+  tall: boolean;
   /** Store category code, for the icon shown when there is no photo. */
-  categorySlug?: string }
+  categorySlug?: string;
+}
 
 /**
  * Live showcase items merged with the store they point to. Overrides win; missing values fall back
- * to the store record. When items are empty or contain unmatched dummy placeholders, dynamically
- * populates with real featured stores from the API. Rows alternate tall / short, matching the grid layout.
+ * to the store record. Intelligently calculates wide vs regular card spans based on total item count
+ * so every row in the 3-column grid is completely filled with zero awkward empty spaces.
  */
 export function useStoreCards(items: StoreCardItem[] | undefined, defaultType?: 'retail' | 'eatery'): ResolvedStoreCard[] {
   const bundle = useBundle();
   const stores = bundle?.stores;
   return useMemo(() => {
     const out: ResolvedStoreCard[] = [];
-    let used = 0;
 
     // Filter to valid configured items (items that resolve to an existing store in bundle.stores, or valid custom place)
     const validItems: StoreCardItem[] = [];
@@ -254,11 +263,7 @@ export function useStoreCards(items: StoreCardItem[] | undefined, defaultType?: 
         });
         const needed = 7 - itemsToProcess.length;
         featuredRetail.slice(0, needed).forEach((s) => {
-          const nextIdx = itemsToProcess.length;
-          itemsToProcess.push({
-            store: s.slug,
-            wide: nextIdx === 1 || nextIdx === 5,
-          });
+          itemsToProcess.push({ store: s.slug });
         });
       } else if (defaultType === 'eatery' && itemsToProcess.length < 4) {
         const eateries = stores.filter(
@@ -266,24 +271,64 @@ export function useStoreCards(items: StoreCardItem[] | undefined, defaultType?: 
         );
         eateries.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
         eateries.forEach((s) => {
-          const nextIdx = itemsToProcess.length;
-          itemsToProcess.push({
-            store: s.slug,
-            wide: nextIdx === 0 || nextIdx === 4,
-          });
+          itemsToProcess.push({ store: s.slug });
         });
       }
     }
+
+    const total = itemsToProcess.length;
 
     itemsToProcess.forEach((item, i) => {
       const s = item.store ? stores?.find((x) => x.slug === item.store) : undefined;
       const name = (item.store && s ? (item.name || s.name) : item.name) || s?.name;
       if (!name) return;
-      const wide = item.wide !== undefined ? !!item.wide : (i === 1 || i === 5);
-      const span = wide ? 2 : 1;
-      if ((used % 3) + span > 3) used += 3 - (used % 3); // a wide card that doesn't fit starts a new row
-      const row = Math.floor(used / 3);
-      used += span;
+
+      // Adaptive layout rules depending on total items count to guarantee filled 3-column rows
+      let wide = false;
+      let colSpanClass = 'md:col-span-1';
+      let tall = false;
+
+      if (total === 1) {
+        wide = true;
+        colSpanClass = 'md:col-span-3';
+        tall = true;
+      } else if (total === 2) {
+        wide = i === 0;
+        colSpanClass = i === 0 ? 'md:col-span-2' : 'md:col-span-1';
+        tall = true;
+      } else if (total === 3) {
+        wide = false;
+        colSpanClass = 'md:col-span-1';
+        tall = true;
+      } else if (total === 4) {
+        // Row 1 (2 + 1), Row 2 (1 + 2)
+        if (i === 0) { wide = true; colSpanClass = 'md:col-span-2'; tall = true; }
+        else if (i === 1) { wide = false; colSpanClass = 'md:col-span-1'; tall = true; }
+        else if (i === 2) { wide = false; colSpanClass = 'md:col-span-1'; tall = false; }
+        else { wide = true; colSpanClass = 'md:col-span-2'; tall = false; }
+      } else if (total === 5) {
+        // Row 1 (2 + 1 = 2 items), Row 2 (1 + 1 + 1 = 3 items)
+        if (i === 0) { wide = true; colSpanClass = 'md:col-span-2'; tall = true; }
+        else if (i === 1) { wide = false; colSpanClass = 'md:col-span-1'; tall = true; }
+        else { wide = false; colSpanClass = 'md:col-span-1'; tall = false; }
+      } else if (total === 6) {
+        // 2 equal rows of 3 columns
+        wide = false;
+        colSpanClass = 'md:col-span-1';
+        tall = i < 3;
+      } else if (total === 7) {
+        // Signature 7-card layout: Row 1 (1 + 2), Row 2 (1 + 1 + 1), Row 3 (2 + 1)
+        if (i === 1 || i === 5) { wide = true; colSpanClass = 'md:col-span-2'; tall = i < 2 || i > 4; }
+        else { wide = false; colSpanClass = 'md:col-span-1'; tall = i < 2 || i > 4; }
+      } else {
+        // 8+ items: repeating staggered layout
+        const mod = i % 7;
+        const isWide = mod === 1 || mod === 5;
+        wide = item.wide !== undefined ? !!item.wide : isWide;
+        colSpanClass = wide ? 'md:col-span-2' : 'md:col-span-1';
+        tall = mod < 2 || mod > 4;
+      }
+
       out.push({
         key: `${item.store || 'item'}-${i}`,
         name,
@@ -293,7 +338,8 @@ export function useStoreCards(items: StoreCardItem[] | undefined, defaultType?: 
         href: item.href || (s ? `/shops/details/${s.slug}` : ''),
         categorySlug: s?.categorySlug || s?.category,
         wide,
-        tall: row % 2 === 0,
+        colSpanClass,
+        tall,
       });
     });
     return out;
@@ -302,7 +348,7 @@ export function useStoreCards(items: StoreCardItem[] | undefined, defaultType?: 
 
 /* ---------------- QFX ---------------- */
 
-export interface Movie extends Schedulable { title: string; genre: string; rating: string; duration: string; language?: string; format: string; posterUrl: string; showtimes: string[]; href?: string }
+export interface Movie extends Schedulable { title: string; genre: string; rating: string; duration: string; language?: string; format: string; posterUrl: string; showtimes?: string[]; href?: string }
 export interface QfxContent {
   show: boolean;
   badge: string;
@@ -319,7 +365,7 @@ export const homeQfxBlock = defineBlock<QfxContent>({
   key: 'home-qfx',
   group: GROUP,
   label: 'QFX Cinemas – now showing',
-  description: 'The cinema section with the scrolling row of movie posters and showtimes.',
+  description: 'The cinema section with the scrolling row of movie posters.',
   page: '/',
   fields: [
     SHOW_FIELD,
@@ -333,7 +379,7 @@ export const homeQfxBlock = defineBlock<QfxContent>({
     {
       key: 'movies', label: 'Now showing', type: 'list', itemTitle: 'title', itemName: 'movie', max: 20,
       help: 'Update every week. Set "Hide after" to the last show date so old movies disappear on their own. If no movie is live, the whole section is hidden.',
-      itemDefaults: { title: '', genre: '', rating: 'UA', duration: '', format: '2D', posterUrl: '', showtimes: [] },
+      itemDefaults: { title: '', genre: '', rating: 'UA', duration: '', format: '2D', posterUrl: '' },
       fields: [
         { key: 'title', label: 'Movie title', type: 'text', required: true },
         { key: 'genre', label: 'Genre', type: 'text', half: true, placeholder: 'Action / Comedy' },
@@ -342,7 +388,6 @@ export const homeQfxBlock = defineBlock<QfxContent>({
         { key: 'duration', label: 'Duration', type: 'text', half: true, placeholder: '2h 08m' },
         { key: 'language', label: 'Language', type: 'text', half: true, help: 'For your reference; not shown on the poster right now.' },
         { key: 'posterUrl', label: 'Poster', type: 'imageUrl', half: true, help: 'Portrait poster image.' },
-        { key: 'showtimes', label: 'Showtimes', type: 'tags', help: 'Type each time and press Enter, e.g. 11:00 AM.' },
         { key: 'href', label: 'Link', type: 'url', help: 'Optional. Defaults to the booking website above.' },
         ...SCHEDULE_FIELDS,
       ],
@@ -354,7 +399,7 @@ export const homeQfxBlock = defineBlock<QfxContent>({
     logoUrl: '/stores/qfx/qfx.png',
     title: 'QFX CINEMAS',
     intro: 'Catch the latest global blockbusters and Nepali cinema at Pokhara Trade Mall! Featuring state-of-the-art 4K laser projection, immersive Dolby Atmos surround sound, and luxury recliner seating.',
-    bookLabel: 'View All Movies & Showtimes',
+    bookLabel: 'View All Movies & Book on QFX',
     bookUrl: '/qfx',
     reserveLabel: 'Reserve Seats',
     movies: [
@@ -366,7 +411,6 @@ export const homeQfxBlock = defineBlock<QfxContent>({
         language: 'English',
         format: '2D / 3D ATMOS',
         posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1786878229551-diggerposter.jpg',
-        showtimes: ['11:30 AM', '02:30 PM', '05:45 PM', '08:30 PM'],
         href: 'https://www.qfxcinemas.com/movie/719',
       },
       {
@@ -377,7 +421,6 @@ export const homeQfxBlock = defineBlock<QfxContent>({
         language: 'Hindi',
         format: '2D / 3D ATMOS',
         posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1777551819476-drishyam3poster.jpg',
-        showtimes: ['11:00 AM', '02:00 PM', '05:15 PM', '08:15 PM'],
         href: 'https://www.qfxcinemas.com/movie/649',
       },
       {
@@ -388,7 +431,6 @@ export const homeQfxBlock = defineBlock<QfxContent>({
         language: 'English',
         format: '2D / 3D ATMOS',
         posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1790594787454-res_500x715_pixels.jpg',
-        showtimes: ['12:00 PM', '03:15 PM', '06:30 PM', '09:15 PM'],
         href: 'https://www.qfxcinemas.com/movie/722',
       },
       {
@@ -399,7 +441,6 @@ export const homeQfxBlock = defineBlock<QfxContent>({
         language: 'Nepali',
         format: '2D / 3D ATMOS',
         posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1789732362535-baaekyodhaposter.jpg',
-        showtimes: ['11:15 AM', '02:45 PM', '06:00 PM', '08:45 PM'],
         href: 'https://www.qfxcinemas.com/movie/738',
       },
       {
@@ -410,7 +451,6 @@ export const homeQfxBlock = defineBlock<QfxContent>({
         language: 'English',
         format: '2D / 3D ATMOS',
         posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1787740045610-poster.jpg',
-        showtimes: ['10:45 AM', '02:15 PM', '05:30 PM', '08:45 PM'],
         href: 'https://www.qfxcinemas.com/movie/729',
       },
       {
@@ -421,7 +461,6 @@ export const homeQfxBlock = defineBlock<QfxContent>({
         language: 'Nepali',
         format: '2D / 3D ATMOS',
         posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1786261358893-pensionpatta.jpg',
-        showtimes: ['11:30 AM', '02:30 PM', '05:45 PM'],
         href: 'https://www.qfxcinemas.com/movie/716',
       },
       {
@@ -432,7 +471,6 @@ export const homeQfxBlock = defineBlock<QfxContent>({
         language: 'Hindi',
         format: '2D / 3D ATMOS',
         posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1788776481026-hanumananshposter.jpg',
-        showtimes: ['11:45 AM', '03:00 PM', '06:15 PM'],
         href: 'https://www.qfxcinemas.com/movie/734',
       },
     ],

@@ -58,7 +58,7 @@ export default function DineSection() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.08 }}
               viewport={{ once: true }}
-              className={`w-full ${spot.wide ? 'md:col-span-2' : 'md:col-span-1'}`}
+              className={`w-full ${spot.colSpanClass || (spot.wide ? 'md:col-span-2' : 'md:col-span-1')}`}
             >
               <CmsLink
                 href={spot.href}
