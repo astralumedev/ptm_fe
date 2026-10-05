@@ -7,7 +7,7 @@ import { FaArrowRight, FaMapMarkerAlt } from 'react-icons/fa';
 
 export default function DineSection() {
   const content = useBlock(homeDiningBlock);
-  const cards = useStoreCards(content.items);
+  const cards = useStoreCards(content.items, 'eatery');
   if (content.show === false || cards.length === 0) return null;
   return (
     <section className="w-full py-12 md:py-20 bg-[#faf8f6] border-t border-amber-100/60">

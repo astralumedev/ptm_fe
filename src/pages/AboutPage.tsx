@@ -103,8 +103,8 @@ export default function AboutPage() {
               className="lg:col-span-7 space-y-6"
             >
               {hero.eyebrow && (
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 border border-red-200/70 text-[#801424] text-xs font-bold tracking-widest uppercase">
-                  <span className="w-2 h-2 rounded-full bg-[#801424] animate-ping" />
+                <div className="inline-flex items-center gap-2 text-[#801424] text-xs font-bold tracking-widest uppercase mb-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#801424]" />
                   {hero.eyebrow}
                 </div>
               )}
@@ -285,7 +285,7 @@ export default function AboutPage() {
 
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto mb-16 md:mb-20">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 border border-red-200/80 text-[#801424] text-xs font-bold tracking-widest uppercase mb-3">
+            <div className="inline-flex items-center gap-2 text-[#801424] text-xs font-bold tracking-widest uppercase mb-2">
               <FaHistory className="w-3.5 h-3.5" />
               {history.eyebrow}
             </div>
@@ -410,7 +410,7 @@ export default function AboutPage() {
           {/* Section Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 border border-red-200/80 text-[#801424] text-xs font-bold tracking-widest uppercase mb-3">
+              <div className="inline-flex items-center gap-2 text-[#801424] text-xs font-bold tracking-widest uppercase mb-2">
                 <FaNewspaper className="w-3.5 h-3.5" />
                 {media.eyebrow}
               </div>
@@ -539,7 +539,7 @@ export default function AboutPage() {
 
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 border border-red-200/80 text-[#801424] text-xs font-bold tracking-widest uppercase mb-3">
+            <div className="inline-flex items-center gap-2 text-[#801424] text-xs font-bold tracking-widest uppercase mb-2">
               <FaUsers className="w-3.5 h-3.5" />
               {leadership.eyebrow}
             </div>
@@ -670,7 +670,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 border border-red-200/80 text-[#801424] text-xs font-bold tracking-widest uppercase mb-3">
+            <div className="inline-flex items-center gap-2 text-[#801424] text-xs font-bold tracking-widest uppercase mb-2">
               <FaAward className="w-3.5 h-3.5" />
               {features.eyebrow}
             </div>
@@ -751,7 +751,7 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 border border-red-200/80 text-[#801424] text-xs font-bold tracking-widest uppercase mb-3">
+            <div className="inline-flex items-center gap-2 text-[#801424] text-xs font-bold tracking-widest uppercase mb-2">
               <FaLightbulb className="w-3.5 h-3.5" />
               {faq.eyebrow}
             </div>

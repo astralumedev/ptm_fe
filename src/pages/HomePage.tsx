@@ -3,7 +3,6 @@ import Footer from '../app/components/Footer'
 import FeaturedStoresSection from '@/app/components/FeaturedStoresSection'
 import QFXSection from '@/app/components/QFXSection'
 import DineSection from '@/app/components/DineSection'
-import OpeningSoonSection from '@/app/components/OpeningSoonSection'
 
 export default function HomePage() {
   return (
@@ -12,7 +11,6 @@ export default function HomePage() {
       <FeaturedStoresSection />
       <DineSection />
       <QFXSection />
-      <OpeningSoonSection />
       <Footer />
     </div>
   )

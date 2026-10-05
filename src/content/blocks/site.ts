@@ -68,7 +68,7 @@ export const siteNavBlock = defineBlock<SiteNavContent>({
       { label: "What's On", href: '/latest' },
       { label: 'Shop', href: '/shop' },
       { label: 'Dine', href: '/dine' },
-      { label: 'Entertain', href: '/entertain' },
+      { label: 'QFX', href: '/qfx' },
       {
         label: 'Services',
         groups: [

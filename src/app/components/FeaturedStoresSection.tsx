@@ -7,7 +7,7 @@ import { FaArrowRight, FaMapMarkerAlt } from 'react-icons/fa';
 
 export default function FeaturedStoresSection() {
   const content = useBlock(homeFeaturedBlock);
-  const cards = useStoreCards(content.items);
+  const cards = useStoreCards(content.items, 'retail');
   if (content.show === false || cards.length === 0) return null;
   return (
     <section className="w-full py-12 md:py-20 bg-white">

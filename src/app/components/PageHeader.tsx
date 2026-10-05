@@ -31,7 +31,6 @@ export interface PageHeaderProps {
 const PageHeader: React.FC<PageHeaderProps> = ({
   title,
   subtitle,
-  badge,
   breadcrumbs,
   tabs,
   activeTab,
@@ -85,14 +84,6 @@ const PageHeader: React.FC<PageHeaderProps> = ({
 
         {/* Header Content Container */}
         <div className={`flex flex-col ${isLeft ? 'items-start text-left' : 'items-center text-center'}`}>
-          
-          {/* Optional Badge */}
-          {badge && (
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-red-50 border border-red-200/80 text-[#801424] text-[11px] font-bold uppercase tracking-widest mb-3 shadow-xs" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#801424] animate-pulse" />
-              <span>{badge}</span>
-            </div>
-          )}
 
           {/* Main Title with Arizona Flare Font */}
           <h1

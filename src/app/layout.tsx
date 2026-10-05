@@ -7,7 +7,7 @@ import HomePage from '../pages/HomePage';
 const ShopPage = lazy(() => import('../pages/ShopPage'));
 const ShopDirectoryPage = lazy(() => import('../pages/ShopDirectoryPage'));
 const DinePage = lazy(() => import('../pages/DinePage'));
-const EntertainPage = lazy(() => import('../pages/EntertainPage'));
+const QfxPage = lazy(() => import('../pages/QfxPage'));
 const ServicesPage = lazy(() => import('../pages/ServicesPage'));
 const ShopDetailPage = lazy(() => import('../pages/ShopDetailPage'));
 const LatestPage = lazy(() => import('../pages/LatestPage'));
@@ -48,7 +48,11 @@ const router = createBrowserRouter(
         <Route path="/shops/retail" element={<ShopDirectoryPage />} />
         <Route path="/dine" element={<DinePage />} />
         <Route path="/shops/eatery" element={<DinePage />} />
-        <Route path="/entertain" element={<EntertainPage />} />
+        <Route path="/qfx" element={<QfxPage />} />
+        <Route path="/entertain" element={<QfxPage />} />
+        <Route path="/cinema" element={<QfxPage />} />
+        <Route path="/cinemas" element={<QfxPage />} />
+        <Route path="/movies" element={<QfxPage />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/shops/service" element={<ServicesPage />} />
         <Route path="/shops/details/:slug" element={<ShopDetailPage />} />

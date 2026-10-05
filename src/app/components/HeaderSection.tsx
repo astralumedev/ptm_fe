@@ -7,9 +7,9 @@ import styles from './HeaderSection.module.css';
 import { useMenuItems } from './navData';
 import { useSiteNav, useMallHours } from '@/content/blocks/site';
 import { CmsLink } from '@/content/CmsLink';
-import { useBlock } from '@/content/block';
+import { useBlock, useBundle } from '@/content/block';
 import { liveOnly } from '@/content/visibility';
-import { homeHeroBlock } from '@/content/blocks/home';
+import { homeHeroBlock, type HeroSlide } from '@/content/blocks/home';
 
 /** Banner colours staff can pick; each stays dark enough for the white headline. */
 const HERO_TONES: Record<string, { bg: string; glowA: string; glowB: string }> = {
@@ -22,8 +22,68 @@ const HeaderSection = () => {
   const menuItems = useMenuItems();
   const nav = useSiteNav();
   const hours = useMallHours();
+  const bundle = useBundle();
   const hero = useBlock(homeHeroBlock);
-  const slides = useMemo(() => liveOnly(hero.slides), [hero.slides]);
+
+  const slides = useMemo(() => {
+    const configured = liveOnly(hero.slides || []);
+    // Check if the slides are just the initial placeholder texts
+    const isDefaultDummy = configured.length > 0 && configured.every((s) =>
+      s.title === 'Festive Shopping Extravaganza 2026' ||
+      s.title === 'QFX Cinemas New 4K Screen Unveiling' ||
+      s.title === 'Mustang Thakali Food & Wine Fest' ||
+      s.title === 'New Luxury Fashion Boutiques Opening'
+    );
+
+    if (configured.length > 0 && !isDefaultDummy) {
+      return configured;
+    }
+
+    // Dynamic slides from live API events, offers, and blogs
+    const apiSlides: HeroSlide[] = [];
+
+    if (bundle?.events && bundle.events.length > 0) {
+      liveOnly(bundle.events).slice(0, 3).forEach((e) => {
+        apiSlides.push({
+          title: e.title,
+          category: (e.tag || e.category || 'EVENT').toUpperCase(),
+          date: e.date,
+          summary: e.description,
+          imageUrl: e.imageUrl,
+          href: '/latest#events',
+        });
+      });
+    }
+
+    if (bundle?.offers && bundle.offers.length > 0) {
+      liveOnly(bundle.offers).slice(0, 2).forEach((o) => {
+        apiSlides.push({
+          title: `${o.storeName}: ${o.title}`,
+          category: (o.badge || 'OFFER').toUpperCase(),
+          date: o.validUntil ? `Valid until ${o.validUntil}` : undefined,
+          summary: `${o.discount ? o.discount + ' • ' : ''}${o.description}`,
+          imageUrl: o.imageUrl,
+          href: '/latest#offers',
+        });
+      });
+    }
+
+    if (apiSlides.length < 4 && bundle?.blogs && bundle.blogs.length > 0) {
+      bundle.blogs.slice(0, 2).forEach((b) => {
+        const textSummary = (b.content || '').replace(/<[^>]*>/g, '').trim().slice(0, 110);
+        apiSlides.push({
+          title: b.title,
+          category: 'STORY',
+          summary: textSummary ? `${textSummary}...` : 'Read more about shopping and lifestyle at Pokhara Trade Mall.',
+          imageUrl: b.cover_image?.data?.full_url || '',
+          href: `/blogs/${b.slug}`,
+        });
+      });
+    }
+
+    return apiSlides.length > 0 ? apiSlides : configured;
+  }, [hero.slides, bundle?.events, bundle?.offers, bundle?.blogs]);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);

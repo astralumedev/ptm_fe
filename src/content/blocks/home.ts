@@ -174,13 +174,13 @@ export const homeFeaturedBlock = defineBlock<StoreShowcaseContent>({
     seeAllLink: '/shop',
     cardCta: 'Explore Outlet',
     items: [
-      { store: 'levis-store', name: "LEVI'S STORE", category: 'Fashion & Apparel', floor: '1st Floor - Wing A', imageUrl: '/stores/levis_cover.webp' },
-      { store: 'fone-decor-tech', name: 'FONE DECOR & TECH', category: 'Tech & Mobiles', floor: 'Ground Floor - Tech Alley', imageUrl: '/stores/fone_decor_cover.jpeg', wide: true },
-      { store: 'obsession-cosmetics', name: 'OBSESSION COSMETICS', category: 'Beauty & Skincare', floor: '1st Floor - Beauty Hub', imageUrl: '/stores/obsession_cosmetics_cover.jpeg' },
-      { store: 'woven-nepali-handicrafts', name: 'WOVEN NEPALI HANDICRAFTS', category: 'Local Crafts & Gifts', floor: 'Ground Floor Main Atrium', imageUrl: '/stores/woven_cover.jpg' },
-      { store: 'dadybird-fashion', name: 'DADYBIRD FASHION', category: 'Fashion & Kids', floor: '2nd Floor - Wing B', imageUrl: '/stores/dadybird_cover.webp' },
-      { store: 'cube-gaming-tech', name: 'CUBE GAMING & TECH', category: 'Tech & Gaming', floor: 'Ground Floor - Tech Alley', imageUrl: '/stores/cube_cover.jpg', wide: true },
-      { store: 'malabar-gold-diamonds', name: 'MALABAR GOLD & DIAMONDS', category: 'Jewelry & Watches', floor: 'Ground Floor Plaza', imageUrl: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&q=80' },
+      { store: 'obsession-cosmetics' },
+      { store: 'fone-decor', wide: true },
+      { store: 'titan' },
+      { store: 'newmew-pokhara' },
+      { store: 'cheppa-bee' },
+      { store: 'dadybird-collection', wide: true },
+      { store: 'safari' },
     ],
   },
 });
@@ -200,13 +200,11 @@ export const homeDiningBlock = defineBlock<StoreShowcaseContent>({
     seeAllLink: '/dine',
     cardCta: 'Explore Outlet',
     items: [
-      { store: 'himalayan-java-coffee', name: 'HIMALAYAN JAVA COFFEE', category: 'Specialty Coffee & Bakery', floor: 'Ground Floor Plaza', imageUrl: '/stores/himalayan_java_cover.jpg', wide: true },
-      { store: 'mantra-thakali-kitchen', name: 'MANTRA THAKALI & BAR', category: 'Nepali Ethnic Dining', floor: '3rd Floor Food Court', imageUrl: '/stores/mantra_thakali_cover.jpg' },
-      { store: 'fewa-lakeside-bistro', name: 'FEWA LAKESIDE BISTRO', category: 'Wood-fired Pizza & Bistro', floor: '1st Floor Terrace', imageUrl: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80' },
-      { store: '', name: 'POKHARA FOOD COURT', category: 'Multi-Cuisine Food Hall', floor: '3rd Floor Main Atrium', imageUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80', href: '/dine' },
-      { store: '', name: 'ANNAPURNA ROOFTOP LOUNGE', category: 'Craft Cocktails & Grills', floor: 'Rooftop Level', imageUrl: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=800&q=80', href: '/dine' },
-      { store: 'everest-momo-house', name: 'HIMALAYAN MOMO HOUSE', category: 'Authentic Dumplings & Snacks', floor: '3rd Floor Food Court', imageUrl: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80' },
-      { store: 'fewa-lakeside-bistro', name: 'LAKESIDE BAKERY & CREPERIE', category: 'French Pastries & Waffles', floor: 'Ground Floor Wing B', imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80', wide: true },
+      { store: 'classic-chulo', wide: true },
+      { store: 'meriz-coffee' },
+      { store: 'the-cube-cafe' },
+      { store: 'june-coffee-smoothies' },
+      { store: 'boba-station', wide: true },
     ],
   },
 });
@@ -217,20 +215,71 @@ export interface ResolvedStoreCard { key: string; name: string; category: string
 
 /**
  * Live showcase items merged with the store they point to. Overrides win; missing values fall back
- * to the store record. Cards whose store was removed and that have no own name are dropped.
- * Rows alternate tall / short, like the original grid.
+ * to the store record. When items are empty or contain unmatched dummy placeholders, dynamically
+ * populates with real featured stores from the API. Rows alternate tall / short, matching the grid layout.
  */
-export function useStoreCards(items: StoreCardItem[] | undefined): ResolvedStoreCard[] {
+export function useStoreCards(items: StoreCardItem[] | undefined, defaultType?: 'retail' | 'eatery'): ResolvedStoreCard[] {
   const bundle = useBundle();
   const stores = bundle?.stores;
   return useMemo(() => {
     const out: ResolvedStoreCard[] = [];
     let used = 0;
-    liveOnly(items).forEach((item, i) => {
+
+    // Filter to valid configured items (items that resolve to an existing store in bundle.stores, or valid custom place)
+    const validItems: StoreCardItem[] = [];
+    if (items && items.length > 0) {
+      for (const item of liveOnly(items)) {
+        if (item.store) {
+          const s = stores?.find((x) => x.slug === item.store);
+          if (s) validItems.push(item);
+        } else if (item.name && item.name !== 'POKHARA FOOD COURT' && item.name !== 'ANNAPURNA ROOFTOP LOUNGE') {
+          validItems.push(item);
+        }
+      }
+    }
+
+    const itemsToProcess = [...validItems];
+
+    // If no valid items (or fewer than target count), auto-populate from real API stores
+    if (stores && stores.length > 0) {
+      if (defaultType === 'retail' && itemsToProcess.length < 6) {
+        const featuredRetail = stores.filter(
+          (s) => (s.type === 'retail' || s.types?.includes('retail')) && !itemsToProcess.some((it) => it.store === s.slug)
+        );
+        // Featured stores first, then stores with cover photos
+        featuredRetail.sort((a, b) => {
+          if (Boolean(b.featured) !== Boolean(a.featured)) return b.featured ? 1 : -1;
+          if (Boolean(b.cover?.data?.full_url) !== Boolean(a.cover?.data?.full_url)) return b.cover?.data?.full_url ? 1 : -1;
+          return 0;
+        });
+        const needed = 7 - itemsToProcess.length;
+        featuredRetail.slice(0, needed).forEach((s) => {
+          const nextIdx = itemsToProcess.length;
+          itemsToProcess.push({
+            store: s.slug,
+            wide: nextIdx === 1 || nextIdx === 5,
+          });
+        });
+      } else if (defaultType === 'eatery' && itemsToProcess.length < 4) {
+        const eateries = stores.filter(
+          (s) => (s.type === 'eatery' || s.types?.includes('eatery')) && !itemsToProcess.some((it) => it.store === s.slug)
+        );
+        eateries.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+        eateries.forEach((s) => {
+          const nextIdx = itemsToProcess.length;
+          itemsToProcess.push({
+            store: s.slug,
+            wide: nextIdx === 0 || nextIdx === 4,
+          });
+        });
+      }
+    }
+
+    itemsToProcess.forEach((item, i) => {
       const s = item.store ? stores?.find((x) => x.slug === item.store) : undefined;
-      const name = item.name || s?.name;
+      const name = (item.store && s ? (item.name || s.name) : item.name) || s?.name;
       if (!name) return;
-      const wide = !!item.wide;
+      const wide = item.wide !== undefined ? !!item.wide : (i === 1 || i === 5);
       const span = wide ? 2 : 1;
       if ((used % 3) + span > 3) used += 3 - (used % 3); // a wide card that doesn't fit starts a new row
       const row = Math.floor(used / 3);
@@ -238,9 +287,9 @@ export function useStoreCards(items: StoreCardItem[] | undefined): ResolvedStore
       out.push({
         key: `${item.store || 'item'}-${i}`,
         name,
-        category: item.category || s?.category || '',
-        floor: item.floor || s?.floor || '',
-        imageUrl: item.imageUrl || s?.cover?.data?.full_url || s?.logo?.data?.full_url || '',
+        category: (item.store && s ? (item.category || s.category) : item.category) || s?.category || '',
+        floor: (item.store && s ? (item.floor || s.floor) : item.floor) || s?.floor || '',
+        imageUrl: (item.store && s ? (s.cover?.data?.full_url || item.imageUrl || s.logo?.data?.full_url) : item.imageUrl) || s?.cover?.data?.full_url || s?.logo?.data?.full_url || '',
         href: item.href || (s ? `/shops/details/${s.slug}` : ''),
         categorySlug: s?.categorySlug || s?.category,
         wide,
@@ -248,7 +297,7 @@ export function useStoreCards(items: StoreCardItem[] | undefined): ResolvedStore
       });
     });
     return out;
-  }, [items, stores]);
+  }, [items, stores, defaultType]);
 }
 
 /* ---------------- QFX ---------------- */
@@ -305,16 +354,87 @@ export const homeQfxBlock = defineBlock<QfxContent>({
     logoUrl: '/stores/qfx/qfx.png',
     title: 'QFX CINEMAS',
     intro: 'Catch the latest global blockbusters and Nepali cinema at Pokhara Trade Mall! Featuring state-of-the-art 4K laser projection, immersive Dolby Atmos surround sound, and luxury recliner seating.',
-    bookLabel: 'Book Tickets',
-    bookUrl: 'https://www.qfxcinemas.com/',
+    bookLabel: 'View All Movies & Showtimes',
+    bookUrl: '/qfx',
     reserveLabel: 'Reserve Seats',
     movies: [
-      { title: 'AVATAR: FIRE AND ASH', genre: 'Sci-Fi / Action / Epic', rating: 'UA', duration: '3h 12m', language: 'English (3D)', format: '3D ATMOS', posterUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80', showtimes: ['11:00 AM', '03:00 PM', '07:00 PM'] },
-      { title: 'DEADPOOL & WOLVERINE', genre: 'Action / Sci-Fi / Comedy', rating: 'UA 16+', duration: '2h 08m', language: 'English', format: '3D', posterUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80', showtimes: ['11:15 AM', '02:30 PM', '06:00 PM'] },
-      { title: 'DUNE: PART TWO', genre: 'Sci-Fi / Epic Adventure', rating: 'UA', duration: '2h 46m', language: 'English', format: '3D', posterUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80', showtimes: ['12:00 PM', '04:00 PM', '08:00 PM'] },
-      { title: 'INSIDE OUT 2', genre: 'Animation / Family', rating: 'U', duration: '1h 36m', language: 'English', format: '2D', posterUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80', showtimes: ['10:45 AM', '01:15 PM', '03:45 PM'] },
-      { title: 'GLADIATOR II', genre: 'Action / Historical Epic', rating: 'UA', duration: '2h 28m', language: 'English', format: '3D', posterUrl: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=800&q=80', showtimes: ['02:15 PM', '07:00 PM'] },
-      { title: 'KANGUVA: THE WARRIOR', genre: 'Period Action / Drama', rating: 'UA', duration: '2h 34m', language: 'Nepali / Hindi', format: '3D', posterUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80', showtimes: ['10:30 AM', '02:00 PM', '05:45 PM'] },
+      {
+        title: 'Digger',
+        genre: 'Comedy / Drama',
+        rating: 'PG',
+        duration: '2h 08m',
+        language: 'English',
+        format: '2D / 3D ATMOS',
+        posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1786878229551-diggerposter.jpg',
+        showtimes: ['11:30 AM', '02:30 PM', '05:45 PM', '08:30 PM'],
+        href: 'https://www.qfxcinemas.com/movie/719',
+      },
+      {
+        title: 'Drishyam: The Conclusion',
+        genre: 'Crime / Thriller',
+        rating: 'PG',
+        duration: '2h 30m',
+        language: 'Hindi',
+        format: '2D / 3D ATMOS',
+        posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1777551819476-drishyam3poster.jpg',
+        showtimes: ['11:00 AM', '02:00 PM', '05:15 PM', '08:15 PM'],
+        href: 'https://www.qfxcinemas.com/movie/649',
+      },
+      {
+        title: 'Resident Evil',
+        genre: 'Horror / Action',
+        rating: 'Adult',
+        duration: '1h 34m',
+        language: 'English',
+        format: '2D / 3D ATMOS',
+        posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1790594787454-res_500x715_pixels.jpg',
+        showtimes: ['12:00 PM', '03:15 PM', '06:30 PM', '09:15 PM'],
+        href: 'https://www.qfxcinemas.com/movie/722',
+      },
+      {
+        title: 'Baa: Ek Yoddha',
+        genre: 'Drama',
+        rating: 'PG',
+        duration: '2h 25m',
+        language: 'Nepali',
+        format: '2D / 3D ATMOS',
+        posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1789732362535-baaekyodhaposter.jpg',
+        showtimes: ['11:15 AM', '02:45 PM', '06:00 PM', '08:45 PM'],
+        href: 'https://www.qfxcinemas.com/movie/738',
+      },
+      {
+        title: 'Avengers: Endgame Encore',
+        genre: 'Action / Adventure / Sci Fi',
+        rating: 'PG',
+        duration: '3h 05m',
+        language: 'English',
+        format: '2D / 3D ATMOS',
+        posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1787740045610-poster.jpg',
+        showtimes: ['10:45 AM', '02:15 PM', '05:30 PM', '08:45 PM'],
+        href: 'https://www.qfxcinemas.com/movie/729',
+      },
+      {
+        title: 'Pension Patta',
+        genre: 'Drama',
+        rating: 'U',
+        duration: '2h 08m',
+        language: 'Nepali',
+        format: '2D / 3D ATMOS',
+        posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1786261358893-pensionpatta.jpg',
+        showtimes: ['11:30 AM', '02:30 PM', '05:45 PM'],
+        href: 'https://www.qfxcinemas.com/movie/716',
+      },
+      {
+        title: 'Hanuman Ansh',
+        genre: 'Biography / Mythological',
+        rating: 'U',
+        duration: '2h 30m',
+        language: 'Hindi',
+        format: '2D / 3D ATMOS',
+        posterUrl: 'https://qfx-images.qfxcinemas.com/S3/uploads/gallery/1788776481026-hanumananshposter.jpg',
+        showtimes: ['11:45 AM', '03:00 PM', '06:15 PM'],
+        href: 'https://www.qfxcinemas.com/movie/734',
+      },
     ],
   },
 });

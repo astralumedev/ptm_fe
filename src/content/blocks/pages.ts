@@ -678,91 +678,138 @@ export interface Spotlight {
   primaryLabel: string; primaryHref: string; primaryIcon?: string; secondaryLabel?: string; secondaryHref?: string;
 }
 
-export interface EntertainPageContent {
-  title: string; subtitle: string; badge: string;
-  spotlights: Spotlight[];
-  eventsHidden?: boolean; eventsEyebrow: string; eventsHeading: string; eventsText: string;
-  eventsPrimaryLabel: string; eventsPrimaryHref: string; eventsSecondaryLabel: string; eventsSecondaryHref: string;
+/* =========================================================== QFX CINEMAS PAGE */
+
+export interface QfxExperienceFeature {
+  icon: string;
+  title: string;
+  text: string;
 }
 
-export const entertainPageBlock = defineBlock<EntertainPageContent>({
-  key: 'entertain-page',
-  group: 'Entertain page',
-  label: 'Entertain page',
-  description: 'The header, the attraction spotlights (cinema, game zone…) and the events banner on the Entertain page.',
-  page: '/entertain',
+export interface QfxPageContent {
+  title: string;
+  subtitle: string;
+  badge: string;
+  reserveLabel: string;
+  nowShowingHeading: string;
+  nowShowingSub: string;
+  upcomingHeading: string;
+  upcomingSub: string;
+  phoneLabel: string;
+  phone: string;
+  locationLabel: string;
+  location: string;
+  hoursLabel: string;
+  hours: string;
+  vipHeading: string;
+  vipSub: string;
+  vipFeatures: QfxExperienceFeature[];
+  privateBookingHidden?: boolean;
+  privateBookingHeading: string;
+  privateBookingText: string;
+  privateBookingLabel: string;
+  privateBookingHref: string;
+  privateBookingPhone: string;
+}
+
+export const qfxPageBlock = defineBlock<QfxPageContent>({
+  key: 'qfx-page',
+  group: 'QFX page',
+  label: 'QFX Cinemas page',
+  description: 'Header, movie listings intro, multiplex features, and private booking section on the QFX page.',
+  page: '/qfx',
   fields: [
-    text('title', 'Page title', { half: true }), text('badge', 'Small badge above the title', { half: true }),
+    text('title', 'Page title', { half: true }),
+    text('badge', 'Header badge', { half: true }),
     area('subtitle', 'Header subtitle'),
+    text('reserveLabel', 'Booking CTA button label', { half: true }),
+    text('nowShowingHeading', 'Now Showing section title', { half: true }),
+    text('nowShowingSub', 'Now Showing subtitle', { half: true }),
+    text('upcomingHeading', 'Upcoming section title', { half: true }),
+    text('upcomingSub', 'Upcoming subtitle', { half: true }),
+    text('phoneLabel', 'Box office phone label', { half: true }),
+    text('phone', 'Box office phone number', { half: true }),
+    text('locationLabel', 'Location label', { half: true }),
+    text('location', 'Location text', { half: true }),
+    text('hoursLabel', 'Hours label', { half: true }),
+    text('hours', 'Operating hours', { half: true }),
+    text('vipHeading', 'Experience section heading', { half: true }),
+    text('vipSub', 'Experience section subtitle', { half: true }),
     {
-      key: 'spotlights', label: 'Attraction spotlights', type: 'list', itemTitle: 'title', itemName: 'attraction',
-      itemDefaults: { eyebrowIcon: 'star', features: [] },
-      fields: [
-        img('image', 'Photo', { preset: 'cover' }), text('imageAlt', 'Photo description'),
-        text('badge', 'Red tag on the photo', { half: true }), text('location', 'Location tag', { half: true, placeholder: 'e.g. 5th Floor, Unit 502' }),
-        text('kicker', 'Small label above the name', { half: true }), text('title', 'Name on the photo', { half: true, required: true }),
-        icon('eyebrowIcon', 'Label icon'), text('eyebrow', 'Small red label', { half: true }),
-        text('heading', 'Heading'), area('body', 'Description'),
-        { key: 'features', label: 'Highlights', type: 'list', itemTitle: 'title', itemName: 'highlight', max: 6, itemDefaults: { icon: 'star' }, fields: [icon('icon'), text('title', 'Title', { half: true }), text('text', 'Text')] },
-        text('hoursLabel', 'Hours label', { half: true }), text('hours', 'Hours', { half: true }),
-        text('phoneLabel', 'Phone label', { half: true }), text('phone', 'Phone', { half: true }),
-        text('primaryLabel', 'Main button text', { half: true }), link('primaryHref', 'Main button link', { half: true }),
-        icon('primaryIcon', 'Main button icon', { help: 'Optional. Without an icon an arrow is shown after the text.' }),
-        text('secondaryLabel', 'Second button text (optional)', { half: true }), link('secondaryHref', 'Second button link', { half: true }),
-        ...SCHEDULE_FIELDS,
-      ],
+      key: 'vipFeatures',
+      label: 'Multiplex highlights',
+      type: 'list',
+      itemTitle: 'title',
+      itemName: 'highlight',
+      max: 6,
+      itemDefaults: { icon: 'star', title: '', text: '' },
+      fields: [icon('icon'), text('title', 'Title', { half: true }), text('text', 'Description')],
     },
-    { key: 'eventsHidden', label: 'Hide the events banner', type: 'toggle' },
-    text('eventsEyebrow', 'Events banner: small label', { half: true }), text('eventsHeading', 'Events banner: heading', { half: true }),
-    area('eventsText', 'Events banner: text'),
-    text('eventsPrimaryLabel', 'Red button text', { half: true }), link('eventsPrimaryHref', 'Red button link', { half: true }),
-    text('eventsSecondaryLabel', 'Dark button text', { half: true }), link('eventsSecondaryHref', 'Dark button link', { half: true }),
+    { key: 'privateBookingHidden', label: 'Hide private bookings section', type: 'toggle' },
+    text('privateBookingHeading', 'Private bookings heading', { half: true }),
+    area('privateBookingText', 'Private bookings description'),
+    text('privateBookingLabel', 'Private bookings CTA text', { half: true }),
+    link('privateBookingHref', 'Private bookings link', { half: true }),
+    text('privateBookingPhone', 'Private bookings phone', { half: true }),
   ],
   defaults: {
-    title: 'Cinema & Entertainment',
-    subtitle: 'Experience high-definition 4K laser cinema with Dolby Atmos, immerse yourself in 360° virtual reality gaming, and celebrate memorable gatherings on our Level 5 entertainment deck.',
-    badge: 'LEVEL 5 ENTERTAINMENT DECK',
-    spotlights: [
+    title: 'QFX CINEMAS',
+    subtitle: "Experience high-definition 4K Laser projection with immersive Dolby Atmos surround sound, luxury recliners, and the latest international and Nepali cinema at Pokhara Trade Mall's premier multiplex.",
+    badge: 'LEVEL 5 MULTIPLEX • POKHARA TRADE MALL',
+    reserveLabel: 'Reserve Seats',
+    nowShowingHeading: 'Now Showing in Pokhara',
+    nowShowingSub: 'Currently running on Level 5 Cineplex with daily scheduled showtimes.',
+    upcomingHeading: 'Upcoming & Next Change',
+    upcomingSub: 'Arriving soon to QFX Cinemas Pokhara Trade Mall. Advance booking and previews.',
+    phoneLabel: 'Box Office Inquiries:',
+    phone: '+977 61-525500',
+    locationLabel: 'Multiplex Location:',
+    location: '5th Floor (Level 5), Pokhara Trade Mall, Chipledhunga',
+    hoursLabel: 'Box Office Hours:',
+    hours: '8:30 AM - 10:30 PM (Daily)',
+    vipHeading: 'The QFX Multiplex Experience',
+    vipSub: "Pokhara's most advanced cinema destination featuring world-class audiovisual technology.",
+    vipFeatures: [
       {
-        image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80',
-        imageAlt: 'QFX Cinemas Pokhara Trade Mall', badge: 'Cinema', location: '5th Floor, Level 5',
-        kicker: 'Premium Screening', title: 'QFX Cinemas Cineplex',
-        eyebrowIcon: 'film', eyebrow: 'State-of-the-Art Multiplex', heading: 'The Gold Standard for Movies in Pokhara',
-        body: "Pokhara Trade Mall houses the city's finest QFX Cineplex, equipped with cutting-edge 4K RGB laser projection, multi-dimensional Dolby Atmos surround audio, and ultra-plush VIP seating for the ultimate cinematic escape.",
-        features: [
-          { icon: 'tv', title: '4K RGB Laser', text: 'Hyper-vibrant color gamuts and pristine contrast.' },
-          { icon: 'sound', title: 'Dolby Atmos', text: '64-channel 3D acoustic immersion.' },
-          { icon: 'couch', title: 'VIP Recliners', text: 'Luxury leather ergonomic recliners.' },
-        ],
-        hoursLabel: 'Operating Hours:', hours: '9:00 AM - 11:30 PM (Daily)',
-        phoneLabel: 'Box Office Inquiries:', phone: '+977 61-525500',
-        primaryLabel: 'Check Showtimes & Book', primaryHref: 'https://qfxcinemas.com', primaryIcon: 'ticket',
-        secondaryLabel: '5th Floor Map', secondaryHref: '/mall-map',
+        icon: 'tv',
+        title: '4K RGB Laser Projection',
+        text: 'Ultra-crisp visual clarity, intense contrast ratios, and hyper-vibrant color gamuts on giant wall-to-wall silver screens.',
       },
       {
-        image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80',
-        imageAlt: '4D VR Game Zone Pokhara Trade Mall', badge: 'VR & Arcade', location: '5th Floor, Unit 502',
-        kicker: 'Virtual Reality', title: '4D VR Game Zone',
-        eyebrowIcon: 'gamepad', eyebrow: 'High-Tech Amusement', heading: 'Virtual Reality Thrills & Classic Arcade',
-        body: 'Immerse yourself in mind-bending 360° virtual rollercoasters, race high-octane supercars on pneumatic simulators, challenge your friends to air hockey tournaments, and win exclusive prizes.',
-        features: [
-          { icon: 'vr', title: '360° VR Pods', text: 'Full-motion rollercoasters & sci-fi space rides.' },
-          { icon: 'gamepad', title: 'Arcade Games', text: 'Hoops, air hockey, motorcycle racing & dance revolution.' },
-          { icon: 'star', title: 'Family Passes', text: 'Discounted group tokens and weekend combo tickets.' },
-        ],
-        hoursLabel: 'Operating Hours:', hours: '10:00 AM - 9:30 PM (Daily)',
-        phoneLabel: 'Inquiries & Group Bookings:', phone: '+977 9801987654',
-        primaryLabel: 'Find Game Zone on Map', primaryHref: '/mall-map', primaryIcon: '',
-        secondaryLabel: '', secondaryHref: '',
+        icon: 'sound',
+        title: 'Dolby Atmos 3D Audio',
+        text: '64-channel multidimensional acoustic surround sound placing audio precision all around and above you.',
+      },
+      {
+        icon: 'couch',
+        title: 'VIP Luxury Recliners',
+        text: 'Ergonomic plush leather power recliners with personal armrests and extra legroom for maximum viewing comfort.',
+      },
+      {
+        icon: 'cup',
+        title: 'Gourmet Concessions',
+        text: 'Fresh warm buttered caramel popcorn, loaded nachos, hot snacks, artisanal coffees, and chilled beverages.',
       },
     ],
-    eventsEyebrow: 'Live Events & Private Screenings',
-    eventsHeading: 'Host Private Screenings, Community Meetups & Festive Galas',
-    eventsText: 'From corporate movie nights and private cinema bookings at QFX Cinemas to seasonal music showcases, cultural festivals, and pop-up activations, Pokhara Trade Mall provides a premier stage for unforgettable entertainment experiences.',
-    eventsPrimaryLabel: 'Plan A Gathering or Event', eventsPrimaryHref: '/contact',
-    eventsSecondaryLabel: 'Explore Latest Events & Shows', eventsSecondaryHref: '/latest',
+    privateBookingHidden: false,
+    privateBookingHeading: 'Host Private Screenings, Corporate Shows & Celebrations',
+    privateBookingText: 'From private movie premieres, executive corporate presentations, and product launches to birthday celebrations and school group excursions, QFX Cinemas at Pokhara Trade Mall delivers an unmatched private theater experience with custom catering packages.',
+    privateBookingLabel: 'Inquire for Private Booking',
+    privateBookingHref: '/contact',
+    privateBookingPhone: '+977 61-525500',
   },
 });
+
+export const entertainPageBlock = qfxPageBlock;
+export type EntertainPageContent = QfxPageContent;
+export interface Spotlight {
+  hidden?: boolean; showFrom?: string; hideAfter?: string;
+  image: string; imageAlt: string; badge: string; location: string; kicker: string; title: string;
+  eyebrowIcon: string; eyebrow: string; heading: string; body: string;
+  features: { icon: string; title: string; text: string }[];
+  hoursLabel: string; hours: string; phoneLabel: string; phone: string;
+  primaryLabel: string; primaryHref: string; primaryIcon?: string; secondaryLabel?: string; secondaryHref?: string;
+}
 
 /* ==================================================================== LEGAL */
 
@@ -864,7 +911,7 @@ export const contentPageBlock = defineBlock<ContentPageTexts>({
 export const pagesBlocks: BlockDef<any>[] = [
   aboutHeroBlock, aboutHistoryBlock, aboutMediaBlock, aboutLeadershipBlock, aboutFeaturesBlock, aboutFaqBlock, aboutCtaBlock,
   servicesPageBlock, servicesAmenitiesBlock,
-  entertainPageBlock,
+  qfxPageBlock, entertainPageBlock,
   contactPageBlock,
   privacyPolicyBlock, contentPageBlock,
 ];
