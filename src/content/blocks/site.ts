@@ -163,7 +163,8 @@ export interface FooterContent {
   timingsTitle: string;
   findUsTitle: string;
   mallName: string;
-  address: string;
+  /** Retired: the footer shows the address from Site settings. Kept so older saved sections still type-check. */
+  address?: string;
   mapsUrl: string;
   mapsLabel: string;
   copyright: string;
@@ -195,7 +196,6 @@ export const siteFooterBlock = defineBlock<FooterContent>({
     { key: 'timingsTitle', label: 'Timings column heading', type: 'text', half: true, help: 'The hours themselves are edited in "Mall timings".' },
     { key: 'findUsTitle', label: 'Location column heading', type: 'text', half: true },
     { key: 'mallName', label: 'Name above the address', type: 'text', half: true },
-    { key: 'address', label: 'Address', type: 'textarea', help: 'Leave empty to use the address from Site settings.' },
     { key: 'mapsUrl', label: 'Google Maps link', type: 'url', half: true, help: 'Open the mall in Google Maps, press Share and paste the link here.' },
     { key: 'mapsLabel', label: 'Google Maps button text', type: 'text', half: true },
     { key: 'copyright', label: 'Copyright line', type: 'text', help: 'Write {year} where the current year should appear.' },
@@ -216,7 +216,6 @@ export const siteFooterBlock = defineBlock<FooterContent>({
     timingsTitle: 'Mall Timings',
     findUsTitle: 'Find Us',
     mallName: 'Pokhara Trade Mall',
-    address: 'Chiple Dhunga Road, पोखरा 33700, Nepal',
     mapsUrl: 'https://www.google.com/maps?ll=28.223844,83.986463&z=18&t=m&hl=en&gl=NP&mapclient=embed&cid=13569072981790925385',
     mapsLabel: 'View on Google Maps',
     copyright: '© {year} Pokhara Trade Mall. All rights reserved.',

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { FaFacebook, FaInstagram, FaTiktok, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 import { SiteSettings } from '@/data/models/SiteSettings';
 import api from '@/services/api';
 import { useBlock } from '@/content/block';
@@ -123,6 +124,11 @@ const Footer: React.FC = () => {
                 <FaInstagram className="w-4 h-4" />
               </a>
             )}
+            {siteSettings?.twitter && (
+              <a href={siteSettings.twitter} className="text-gray-800 hover:text-[#2e3094] transition-colors p-3 bg-white rounded-full border border-gray-300 shadow-xs" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+                <FaXTwitter className="w-4 h-4" />
+              </a>
+            )}
             {siteSettings?.tiktok && (
               <a href={siteSettings.tiktok} className="text-gray-800 hover:text-[#2e3094] transition-colors p-3 bg-white rounded-full border border-gray-300 shadow-xs" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
                 <FaTiktok className="w-4 h-4" />
@@ -153,7 +159,7 @@ const Footer: React.FC = () => {
           </h4>
           <div className="text-sm text-gray-700 space-y-1.5 mb-5">
             <p className="font-medium text-gray-900">{footer.mallName}</p>
-            <p className="text-xs leading-relaxed text-gray-600">{footer.address || siteSettings?.address}</p>
+            <p className="text-xs leading-relaxed text-gray-600">{siteSettings?.address}</p>
           </div>
           
           <a 

@@ -105,7 +105,7 @@ export function SiteContentEditor() {
     setSaving(true);
     setError('');
     try {
-      const { item } = await adminApi.save('blocks', { id: row?.id, slug: def.key, status: 'published', data: draft });
+      const { item } = await adminApi.save('blocks', { id: row?.id, slug: def.key, status: 'published', data: changedFromDefaults(draft, def.defaults) });
       upsert(item);
       toast('ok', 'Saved. Live on the website within a minute.');
     } catch (e) {
@@ -186,6 +186,18 @@ export function SiteContentEditor() {
       </Dialog>
     </div>
   );
+}
+
+/**
+ * Only the values staff changed are stored; everything else keeps following the built-in defaults,
+ * so later wording changes in the code still reach sections that have been saved before.
+ */
+function changedFromDefaults(draft: Record<string, any>, defaults: Record<string, any>): Record<string, any> {
+  const out: Record<string, any> = {};
+  for (const [k, v] of Object.entries(draft)) {
+    if (JSON.stringify(v) !== JSON.stringify(defaults[k])) out[k] = v;
+  }
+  return out;
 }
 
 function findMissing(fields: import('@/content/fields').Field[], data: Record<string, any>, prefix = ''): string | null {

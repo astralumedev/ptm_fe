@@ -281,8 +281,8 @@ export const COLLECTIONS: CollectionDef[] = [
 export const SETTINGS_FIELDS: Field[] = [
   { key: 'phone', label: 'Phone', type: 'text', half: true, required: true, help: 'Separate several numbers with “/”. The first one is used for tap-to-call.' },
   { key: 'email', label: 'Email', type: 'text', half: true, required: true },
-  { key: 'address', label: 'Address', type: 'text', required: true },
-  { key: 'location_info', label: 'Location details', type: 'textarea', help: 'Shown on the contact page and footer.' },
+  { key: 'address', label: 'Address', type: 'text', required: true, help: 'Shown in the footer and on the contact page.' },
+  { key: 'location_info', label: 'Location details', type: 'textarea', help: 'Shown on the contact page, under the address.' },
   { key: 'facebook', label: 'Facebook', type: 'url', half: true },
   { key: 'instagram', label: 'Instagram', type: 'url', half: true },
   { key: 'tiktok', label: 'TikTok', type: 'url', half: true },

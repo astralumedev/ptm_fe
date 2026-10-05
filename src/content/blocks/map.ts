@@ -51,7 +51,6 @@ export const mapPageBlock = defineBlock({
     t('defaultStartName', 'Default starting point name', 'Used for directions until a visitor scans a QR code or picks where they are.'),
     t('mainEntrance', 'Fallback starting point name'),
     t('youAreHere', 'Map: "you are here" marker'),
-    t('startPoint', 'Map: start marker fallback'),
 
     t('loadingTitle', 'Loading screen: title'),
     t('loadingText', 'Loading screen: message'),
@@ -70,7 +69,6 @@ export const mapPageBlock = defineBlock({
     t('next', 'Mobile bar: next'),
     t('finish', 'Mobile bar: finish'),
     t('go', 'Mobile bar: directions button'),
-    t('floorStores', 'Mobile bar: stores on floor', '{count} = number of stores.'),
     t('tapToBrowse', 'Mobile bar: browse hint'),
 
     t('activeNavigation', 'Directions: label'),
@@ -97,9 +95,6 @@ export const mapPageBlock = defineBlock({
     t('storesCount', 'Floor directory: store count', '{count} = number.'),
     t('noMatch', 'Floor directory: nothing matches', '{floor} = floor name.'),
     t('clearFilter', 'Floor directory: clear filter'),
-    t('statShops', 'Floor stats: shops'),
-    t('statRestrooms', 'Floor stats: restrooms'),
-    t('statLifts', 'Floor stats: lifts'),
     t('placesCount', 'Floor directory: place count', '{count} = number.'),
     t('placesHeading', 'Floor directory: places heading', 'Food court, ticket counters and other places from the Places list.'),
     t('otherGroup', 'Floor directory: stores with no category'),
@@ -111,10 +106,6 @@ export const mapPageBlock = defineBlock({
     t('partOf', 'Place panel: belongs to a store', '{name} = store name.'),
     t('placesFilter', 'Category menus: places option'),
 
-    t('elevatorTo', 'Map: lift label', '{floor} = e.g. "To First Floor".'),
-    t('stairsTo', 'Map: stairs label', '{floor} = e.g. "To First Floor".'),
-    t('transitTo', 'Map: leaving towards', '{floor} = floor name.'),
-    t('transitFrom', 'Map: arriving from', '{floor} = floor name.'),
 
     t('zoomIn', 'Controls: zoom in'),
     t('zoomOut', 'Controls: zoom out'),
@@ -155,7 +146,6 @@ export const mapPageBlock = defineBlock({
     defaultStartName: 'Ground Floor Main Entrance',
     mainEntrance: 'Main Entrance',
     youAreHere: 'You Are Here',
-    startPoint: 'Start Point',
 
     loadingTitle: 'Pokhara Trade Mall',
     loadingText: 'Loading Interactive Floor Plans & Wayfinding...',
@@ -174,7 +164,6 @@ export const mapPageBlock = defineBlock({
     next: 'Next',
     finish: 'Finish',
     go: 'Go',
-    floorStores: '{count} Stores & Outlets',
     tapToBrowse: 'Tap to browse list',
 
     activeNavigation: 'Active Navigation',
@@ -201,9 +190,6 @@ export const mapPageBlock = defineBlock({
     storesCount: '{count} stores',
     noMatch: 'No stores match the active category filter on {floor}.',
     clearFilter: 'Clear Filter',
-    statShops: 'Shops & Eateries',
-    statRestrooms: 'Restrooms',
-    statLifts: 'Lifts & Stairs',
     placesCount: '{count} places',
     placesHeading: 'Places',
     otherGroup: 'More',
@@ -215,10 +201,6 @@ export const mapPageBlock = defineBlock({
     partOf: 'Part of {name}',
     placesFilter: 'Places & facilities',
 
-    elevatorTo: 'Elevator {floor}',
-    stairsTo: 'Stairs {floor}',
-    transitTo: 'To {floor}',
-    transitFrom: 'From {floor}',
 
     zoomIn: 'Zoom In',
     zoomOut: 'Zoom Out',

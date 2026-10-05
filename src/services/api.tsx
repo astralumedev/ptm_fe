@@ -66,10 +66,23 @@ export interface ContentBundle {
 
 const EMPTY_BUNDLE: ContentBundle = { stores: [], blogs: [], pages: [], events: [], offers: [], settings: [], blocks: [], unavailable: true };
 
+const LAST_GOOD = 'ptm-content';
+
 async function fetchBundle(): Promise<ContentBundle> {
   const res = await fetch('/api/content', { headers: { Accept: 'application/json' } });
   if (!res.ok || !res.headers.get('content-type')?.includes('json')) throw new Error(`content ${res.status}`);
-  return (await res.json()) as ContentBundle;
+  const data = (await res.json()) as ContentBundle;
+  try { localStorage.setItem(LAST_GOOD, JSON.stringify(data)); } catch { /* storage full or blocked */ }
+  return data;
+}
+
+/** The last content this browser loaded, so a failed request shows staff's text rather than the built-in defaults. */
+function lastGoodBundle(): ContentBundle {
+  try {
+    const saved = JSON.parse(localStorage.getItem(LAST_GOOD) || 'null') as ContentBundle | null;
+    if (saved && Array.isArray(saved.blocks)) return { ...saved, unavailable: true };
+  } catch { /* storage blocked or corrupt */ }
+  return EMPTY_BUNDLE;
 }
 
 let bundlePromise: Promise<ContentBundle> | null = null;
@@ -89,10 +102,10 @@ export function subscribeBundle(fn: () => void) {
  */
 export function loadBundle(): Promise<ContentBundle> {
   if (!bundlePromise) {
-    // One retry covers a cold start or a flaky mobile connection; after that the site shows
-    // its empty states and a notice rather than stale or invented content.
+    // One retry covers a cold start or a flaky mobile connection; after that the site shows the
+    // last content this browser loaded, or, on a first visit, its empty states and a notice.
     bundlePromise = fetchBundle()
-      .catch(() => new Promise<ContentBundle>((resolve) => setTimeout(() => fetchBundle().then(resolve, () => resolve(EMPTY_BUNDLE)), 1500)))
+      .catch(() => new Promise<ContentBundle>((resolve) => setTimeout(() => fetchBundle().then(resolve, () => resolve(lastGoodBundle())), 1500)))
       .then((data) => {
         snapshot = { ...data, blocks: data.blocks || [] };
         listeners.forEach((l) => l());

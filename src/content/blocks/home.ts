@@ -224,6 +224,67 @@ export interface ResolvedStoreCard {
 }
 
 /**
+ * Text and photos copied into the store cards the site launched with. On a card linked to a store
+ * they are placeholders, not staff choices, so the store's own details are shown instead.
+ */
+const LAUNCH_COPIES = new Set<string>([
+  "/stores/cube_cover.jpg",
+  "/stores/dadybird_cover.webp",
+  "/stores/fone_decor_cover.jpeg",
+  "/stores/himalayan_java_cover.jpg",
+  "/stores/levis_cover.webp",
+  "/stores/mantra_thakali_cover.jpg",
+  "/stores/obsession_cosmetics_cover.jpeg",
+  "/stores/woven_cover.jpg",
+  "1st Floor - Beauty Hub",
+  "1st Floor - Wing A",
+  "1st Floor Terrace",
+  "2nd Floor - Wing B",
+  "3rd Floor Food Court",
+  "Authentic Dumplings & Snacks",
+  "Beauty & Skincare",
+  "CUBE GAMING & TECH",
+  "DADYBIRD FASHION",
+  "FEWA LAKESIDE BISTRO",
+  "FONE DECOR & TECH",
+  "Fashion & Apparel",
+  "Fashion & Kids",
+  "French Pastries & Waffles",
+  "Ground Floor - Tech Alley",
+  "Ground Floor Main Atrium",
+  "Ground Floor Plaza",
+  "Ground Floor Wing B",
+  "HIMALAYAN JAVA COFFEE",
+  "HIMALAYAN MOMO HOUSE",
+  "Jewelry & Watches",
+  "LAKESIDE BAKERY & CREPERIE",
+  "LEVI'S STORE",
+  "Local Crafts & Gifts",
+  "MALABAR GOLD & DIAMONDS",
+  "MANTRA THAKALI & BAR",
+  "Nepali Ethnic Dining",
+  "OBSESSION COSMETICS",
+  "Specialty Coffee & Bakery",
+  "Tech & Gaming",
+  "Tech & Mobiles",
+  "WOVEN NEPALI HANDICRAFTS",
+  "Wood-fired Pizza & Bistro",
+  "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80",
+]);
+
+function withoutLaunchCopies(item: StoreCardItem): StoreCardItem {
+  if (!item.store) return item;
+  const out = { ...item };
+  for (const k of ['name', 'category', 'floor', 'imageUrl'] as const) {
+    if (out[k] && LAUNCH_COPIES.has(out[k]!)) delete out[k];
+  }
+  return out;
+}
+
+/**
  * Live showcase items merged with the store they point to. Overrides win; missing values fall back
  * to the store record. Intelligently calculates wide vs regular card spans based on total item count
  * so every row in the 3-column grid is completely filled with zero awkward empty spaces.
@@ -237,7 +298,7 @@ export function useStoreCards(items: StoreCardItem[] | undefined, defaultType?: 
     // Filter to valid configured items (items that resolve to an existing store in bundle.stores, or valid custom place)
     const validItems: StoreCardItem[] = [];
     if (items && items.length > 0) {
-      for (const item of liveOnly(items)) {
+      for (const item of liveOnly(items).map(withoutLaunchCopies)) {
         if (item.store) {
           const s = stores?.find((x) => x.slug === item.store);
           if (s) validItems.push(item);

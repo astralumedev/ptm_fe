@@ -268,6 +268,9 @@ const ContactPage: React.FC = () => {
                 <div>
                   <h3 className="font-bold text-gray-900 font-arizona-flare">{c.locationTitle}</h3>
                   <p className="text-xs text-gray-500">{address}</p>
+                  {settings?.location_info && settings.location_info !== address && (
+                    <p className="text-xs text-gray-500">{settings.location_info}</p>
+                  )}
                 </div>
               </div>
               {c.locationText && (
