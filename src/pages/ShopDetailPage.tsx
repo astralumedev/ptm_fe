@@ -208,7 +208,7 @@ export default function ShopDetailPage() {
             {/* Practical Info Card */}
             <div className="bg-white p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-gray-200/80 shadow-xs space-y-4">
               <h3 className="text-base font-bold text-gray-900 font-arizona-flare uppercase tracking-wider">
-                Store Information
+                {t.infoHeading}
               </h3>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-xs">
