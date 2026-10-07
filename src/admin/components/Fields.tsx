@@ -96,7 +96,8 @@ function FieldInput({ field: f, value, data, onChange, error, idPrefix }: {
       const urls: string[] = (Array.isArray(value) ? value : []).map((g: any) => g?.directus_files_id?.data?.full_url).filter(Boolean);
       return shell(
         <GalleryInput preset={f.preset || 'content'} urls={urls}
-          onChange={(next) => onChange(next.map((u) => ({ directus_files_id: { data: toAsset(u).data } })))} />,
+          onChange={(next) => onChange(next.map(galleryItem))}
+          onAdd={(added) => onChange((prev: unknown) => [...(Array.isArray(prev) ? prev : []), ...added.map(galleryItem)])} />,
       );
     }
     case 'category':
@@ -119,6 +120,8 @@ function FieldInput({ field: f, value, data, onChange, error, idPrefix }: {
   }
 }
 
+const galleryItem = (url: string) => ({ directus_files_id: { data: toAsset(url).data } });
+
 /** What visitors see when a store has no photo: its category's icon on the category colour. */
 function CategoryFallback({ slug, wide }: { slug?: string; wide: boolean }) {
   const { find } = useAdminCategories();
@@ -137,12 +140,16 @@ function CategoryFallback({ slug, wide }: { slug?: string; wide: boolean }) {
 }
 
 /** Repeatable items (slides, FAQs, menu links…): collapsible cards with reorder, duplicate and remove. */
-function ListInput({ field: f, value, onChange, idPrefix }: { field: Field; value: Data[]; onChange: (v: Data[]) => void; idPrefix: string }) {
+function ListInput({ field: f, value, onChange, idPrefix }: {
+  field: Field; value: Data[]; onChange: (v: Data[] | ((prev: unknown) => Data[])) => void; idPrefix: string;
+}) {
   const [open, setOpen] = useState<number | null>(value.length === 1 ? 0 : null);
   const noun = f.itemName || 'item';
   const full = f.max !== undefined && value.length >= f.max;
 
-  const update = (i: number, path: string, v: unknown) => onChange(value.map((item, j) => (j === i ? setPath(item || {}, path, v) : item)));
+  // An updater, not a copy of `value`: an upload that finishes later must not undo edits made since.
+  const update = (i: number, path: string, v: unknown) =>
+    onChange((list) => (Array.isArray(list) ? list : []).map((item, j) => (j === i ? setPath(item || {}, path, v) : item)));
   const move = (i: number, d: number) => {
     const next = [...value];
     [next[i], next[i + d]] = [next[i + d], next[i]];

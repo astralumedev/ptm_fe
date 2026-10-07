@@ -184,7 +184,8 @@ export function ImageInput({ value, onChange, preset, id, fallback }: { value: s
   );
 }
 
-export function GalleryInput({ urls, onChange, preset }: { urls: string[]; onChange: (urls: string[], media?: MediaRecord[]) => void; preset: ImagePreset }) {
+/** `onAdd` appends to the gallery as it is when the upload finishes, so photos removed or added meanwhile stay that way. */
+export function GalleryInput({ urls, onChange, onAdd, preset }: { urls: string[]; onChange: (urls: string[]) => void; onAdd: (urls: string[]) => void; preset: ImagePreset }) {
   const [picking, setPicking] = useState(false);
   const move = (i: number, d: number) => {
     const next = [...urls];
@@ -212,9 +213,9 @@ export function GalleryInput({ urls, onChange, preset }: { urls: string[]; onCha
       <div className="flex gap-2">
         <button type="button" className="adm-btn adm-btn-sm" onClick={() => setPicking(true)}><Images className="size-3.5" /> Add from library</button>
       </div>
-      <Dropzone preset={preset} compact multiple onUploaded={(m) => onChange([...urls, ...m.map((x) => x.url)], m)} />
+      <Dropzone preset={preset} compact multiple onUploaded={(m) => onAdd(m.map((x) => x.url))} />
       <MediaPicker open={picking} onClose={() => setPicking(false)} preset={preset}
-        onPick={(m) => { onChange([...urls, m.url], [m]); setPicking(false); }} />
+        onPick={(m) => { onAdd([m.url]); setPicking(false); }} />
     </div>
   );
 }

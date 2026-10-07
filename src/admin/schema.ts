@@ -295,6 +295,10 @@ export function getPath(obj: any, path: string): any {
   return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
 }
 
+/**
+ * `value` may be a function of the current value. Lists and galleries pass one, so an image that
+ * finishes uploading lands on the form as it is now, not as it was when the upload started.
+ */
 export function setPath<T extends Record<string, any>>(obj: T, path: string, value: unknown): T {
   const keys = path.split('.');
   const next: any = Array.isArray(obj) ? [...obj] : { ...obj };
@@ -303,7 +307,8 @@ export function setPath<T extends Record<string, any>>(obj: T, path: string, val
     cur[k] = cur[k] && typeof cur[k] === 'object' ? { ...cur[k] } : {};
     cur = cur[k];
   });
-  cur[keys[keys.length - 1]] = value;
+  const last = keys[keys.length - 1];
+  cur[last] = typeof value === 'function' ? value(cur[last]) : value;
   return next;
 }
 
